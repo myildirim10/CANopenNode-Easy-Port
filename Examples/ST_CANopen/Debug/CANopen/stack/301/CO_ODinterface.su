@@ -1,0 +1,10 @@
+../CANopen/stack/301/CO_ODinterface.c:31:7:OD_readOriginal	40	static
+../CANopen/stack/301/CO_ODinterface.c:75:7:OD_writeOriginal	40	static
+../CANopen/stack/301/CO_ODinterface.c:126:14:OD_readDisabled	24	static
+../CANopen/stack/301/CO_ODinterface.c:134:14:OD_writeDisabled	24	static
+../CANopen/stack/301/CO_ODinterface.c:143:13:OD_find	32	static
+../CANopen/stack/301/CO_ODinterface.c:182:7:OD_getSub	56	static
+../CANopen/stack/301/CO_ODinterface.c:264:10:OD_getSDOabCode	16	static
+../CANopen/stack/301/CO_ODinterface.c:300:7:OD_get_value	72	static
+../CANopen/stack/301/CO_ODinterface.c:317:7:OD_set_value	72	static
+../CANopen/stack/301/CO_ODinterface.c:332:7:OD_getPtr	64	static

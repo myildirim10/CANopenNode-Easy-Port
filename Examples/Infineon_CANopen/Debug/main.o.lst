@@ -1,0 +1,230 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "main.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .text.main,"ax",%progbits
+  20              	 .align 2
+  21              	 .global main
+  22              	 .thumb
+  23              	 .thumb_func
+  25              	main:
+  26              	.LFB466:
+  27              	 .file 1 "../main.c"
+   1:../main.c     **** /**
+   2:../main.c     ****   ******************************************************************************
+   3:../main.c     ****   * @file           : main.c
+   4:../main.c     ****   * @brief          : Example file for XMC4800 CANopen communication
+   5:../main.c     ****   ******************************************************************************
+   6:../main.c     ****   */
+   7:../main.c     **** 
+   8:../main.c     **** /* Includes ------------------------------------------------------------------*/
+   9:../main.c     **** #include "DAVE.h"    //Declarations from DAVE Code Generation (includes SFR declaration)
+  10:../main.c     **** #include "CANopenNode.h"
+  11:../main.c     **** 
+  12:../main.c     **** #include "301/CO_ODinterface.h"
+  13:../main.c     **** #include "OD.h"
+  14:../main.c     **** /* Defines -------------------------------------------------------------------*/
+  15:../main.c     **** 
+  16:../main.c     **** /* Enum definitions ----------------------------------------------------------*/
+  17:../main.c     **** 
+  18:../main.c     **** /* Structure definitions -----------------------------------------------------*/
+  19:../main.c     **** 
+  20:../main.c     **** /* External variables --------------------------------------------------------*/
+  21:../main.c     **** 
+  22:../main.c     **** /* Private variables ---------------------------------------------------------*/
+  23:../main.c     **** 
+  24:../main.c     **** /* Private function prototypes -----------------------------------------------*/
+  25:../main.c     **** 
+  26:../main.c     **** 
+  27:../main.c     **** /* Functions ----------------------------------------------------------------*/
+  28:../main.c     **** /**
+  29:../main.c     **** 
+  30:../main.c     ****  * @brief main() - Application entry point
+  31:../main.c     ****  *
+  32:../main.c     ****  * <b>Details of function</b><br>
+  33:../main.c     ****  * This routine is the application entry point. It is invoked by the device startup code. It is res
+  34:../main.c     ****  * invoking the APP initialization dispatcher routine - DAVE_Init() and hosting the place-holder fo
+  35:../main.c     ****  * code.
+  36:../main.c     ****  */
+  37:../main.c     **** int main(void)
+  38:../main.c     **** {
+  28              	 .loc 1 38 0
+  29              	 .cfi_startproc
+  30              	 
+  31              	 
+  32 0000 80B5     	 push {r7,lr}
+  33              	.LCFI0:
+  34              	 .cfi_def_cfa_offset 8
+  35              	 .cfi_offset 7,-8
+  36              	 .cfi_offset 14,-4
+  37 0002 82B0     	 sub sp,sp,#8
+  38              	.LCFI1:
+  39              	 .cfi_def_cfa_offset 16
+  40 0004 00AF     	 add r7,sp,#0
+  41              	.LCFI2:
+  42              	 .cfi_def_cfa_register 7
+  39:../main.c     ****   DAVE_STATUS_t status;
+  40:../main.c     **** 
+  41:../main.c     ****   status = DAVE_Init();           /* Initialization of DAVE APPs  */
+  43              	 .loc 1 41 0
+  44 0006 FFF7FEFF 	 bl DAVE_Init
+  45 000a 0346     	 mov r3,r0
+  46 000c FB71     	 strb r3,[r7,#7]
+  42:../main.c     **** 
+  43:../main.c     ****   if (status != DAVE_STATUS_SUCCESS)
+  47              	 .loc 1 43 0
+  48 000e FB79     	 ldrb r3,[r7,#7]
+  49 0010 002B     	 cmp r3,#0
+  50 0012 00D0     	 beq .L2
+  51              	.L3:
+  44:../main.c     ****   {
+  45:../main.c     ****     /* Placeholder for error handler code. The while loop below can be replaced with an user error 
+  46:../main.c     ****     XMC_DEBUG("DAVE APPs initialization failed\n");
+  47:../main.c     ****     while(1);
+  52              	 .loc 1 47 0 discriminator 1
+  53 0014 FEE7     	 b .L3
+  54              	.L2:
+  48:../main.c     ****   }
+  49:../main.c     **** 
+  50:../main.c     ****   xCANopenNodeInit();
+  55              	 .loc 1 50 0
+  56 0016 FFF7FEFF 	 bl xCANopenNodeInit
+  57              	.L4:
+  51:../main.c     **** 
+  52:../main.c     **** 
+  53:../main.c     ****   while(1)
+  54:../main.c     ****   {
+  55:../main.c     **** 	  vCANopenNodeProcess();
+  58              	 .loc 1 55 0 discriminator 1
+  59 001a FFF7FEFF 	 bl vCANopenNodeProcess
+  56:../main.c     ****   }
+  60              	 .loc 1 56 0 discriminator 1
+  61 001e FCE7     	 b .L4
+  62              	 .cfi_endproc
+  63              	.LFE466:
+  65              	 .section .text.CCU43_1_IRQHandler,"ax",%progbits
+  66              	 .align 2
+  67              	 .global CCU43_1_IRQHandler
+  68              	 .thumb
+  69              	 .thumb_func
+  71              	CCU43_1_IRQHandler:
+  72              	.LFB467:
+  57:../main.c     **** }
+  58:../main.c     **** 
+  59:../main.c     **** 
+  60:../main.c     **** /**
+  61:../main.c     ****  *  @brief Timer Handler (1 ms)
+  62:../main.c     ****  */
+  63:../main.c     **** void TimerHandler ( void )
+  64:../main.c     **** {
+  73              	 .loc 1 64 0
+  74              	 .cfi_startproc
+  75              	 
+  76              	 
+  77 0000 80B5     	 push {r7,lr}
+  78              	.LCFI3:
+  79              	 .cfi_def_cfa_offset 8
+  80              	 .cfi_offset 7,-8
+  81              	 .cfi_offset 14,-4
+  82 0002 00AF     	 add r7,sp,#0
+  83              	.LCFI4:
+  84              	 .cfi_def_cfa_register 7
+  65:../main.c     ****     vCANopenNodeTimerInterrupt();
+  85              	 .loc 1 65 0
+  86 0004 FFF7FEFF 	 bl vCANopenNodeTimerInterrupt
+  66:../main.c     **** 
+  67:../main.c     **** 	/* Acknowledge the period match interrupt*/
+  68:../main.c     ****     TIMER_ClearEvent(&TIMER_0);
+  87              	 .loc 1 68 0
+  88 0008 0148     	 ldr r0,.L6
+  89 000a FFF7FEFF 	 bl TIMER_ClearEvent
+  69:../main.c     **** }
+  90              	 .loc 1 69 0
+  91 000e 80BD     	 pop {r7,pc}
+  92              	.L7:
+  93              	 .align 2
+  94              	.L6:
+  95 0010 00000000 	 .word TIMER_0
+  96              	 .cfi_endproc
+  97              	.LFE467:
+  99              	 .section .text.CAN0_1_IRQHandler,"ax",%progbits
+ 100              	 .align 2
+ 101              	 .global CAN0_1_IRQHandler
+ 102              	 .thumb
+ 103              	 .thumb_func
+ 105              	CAN0_1_IRQHandler:
+ 106              	.LFB468:
+  70:../main.c     **** 
+  71:../main.c     **** 
+  72:../main.c     **** /**
+  73:../main.c     ****  *  @brief CAN Receive Handler
+  74:../main.c     ****  */
+  75:../main.c     **** void CANReceiveHandler ( void )
+  76:../main.c     **** {
+ 107              	 .loc 1 76 0
+ 108              	 .cfi_startproc
+ 109              	 
+ 110              	 
+ 111 0000 80B5     	 push {r7,lr}
+ 112              	.LCFI5:
+ 113              	 .cfi_def_cfa_offset 8
+ 114              	 .cfi_offset 7,-8
+ 115              	 .cfi_offset 14,-4
+ 116 0002 00AF     	 add r7,sp,#0
+ 117              	.LCFI6:
+ 118              	 .cfi_def_cfa_register 7
+  77:../main.c     ****    vCANopenNodeReceiveInterrupt();
+ 119              	 .loc 1 77 0
+ 120 0004 FFF7FEFF 	 bl vCANopenNodeReceiveInterrupt
+  78:../main.c     **** }
+ 121              	 .loc 1 78 0
+ 122 0008 80BD     	 pop {r7,pc}
+ 123              	 .cfi_endproc
+ 124              	.LFE468:
+ 126 000a 00BF     	 .text
+ 127              	.Letext0:
+ 128              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 129              	 .file 3 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 130              	 .file 4 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/XMC4800.h"
+ 131              	 .file 5 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc4_scu.h"
+ 132              	 .file 6 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc_ccu4.h"
+ 133              	 .file 7 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
+ 134              	 .file 8 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/TIMER/timer.h"
+ 135              	 .file 9 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/DAVE.h"
+ 136              	 .file 10 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 137              	 .file 11 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/core_cm4.h"
+ 138              	 .file 12 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/system_XMC4800.h"
+ 139              	 .file 13 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/TIMER/timer_extern.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+    {standard input}:20     .text.main:00000000 $t
+    {standard input}:25     .text.main:00000000 main
+    {standard input}:66     .text.CCU43_1_IRQHandler:00000000 $t
+    {standard input}:71     .text.CCU43_1_IRQHandler:00000000 CCU43_1_IRQHandler
+    {standard input}:95     .text.CCU43_1_IRQHandler:00000010 $d
+    {standard input}:100    .text.CAN0_1_IRQHandler:00000000 $t
+    {standard input}:105    .text.CAN0_1_IRQHandler:00000000 CAN0_1_IRQHandler
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+DAVE_Init
+xCANopenNodeInit
+vCANopenNodeProcess
+vCANopenNodeTimerInterrupt
+TIMER_ClearEvent
+TIMER_0
+vCANopenNodeReceiveInterrupt

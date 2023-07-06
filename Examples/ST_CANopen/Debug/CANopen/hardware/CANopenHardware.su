@@ -1,0 +1,5 @@
+../CANopen/hardware/CANopenHardware.c:67:32:xCANopenHardwareInit	48	static
+../CANopen/hardware/CANopenHardware.c:114:6:vLogTransmit	16	static
+../CANopen/hardware/CANopenHardware.c:129:6:vResetModule	4	static
+../CANopen/hardware/CANopenHardware.c:145:28:xCANTransmitMessage	56	static
+../CANopen/hardware/CANopenHardware.c:198:28:xCANReceiveMessage	56	static

@@ -1,0 +1,15 @@
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_Emergency.h:642:22:CO_isError	24	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_Emergency.h:657:23:CO_getErrorRegister	16	static
+../CANopen/stack/301/CO_NMT_Heartbeat.h:318:38:CO_NMT_getInternalState	16	static
+../CANopen/stack/305/CO_LSSslave.h:192:30:CO_LSSslave_getState	16	static
+../CANopen/stack/CANopen.c:323:7:CO_new	32	static
+../CANopen/stack/CANopen.c:615:6:CO_delete	16	static
+../CANopen/stack/CANopen.c:834:8:CO_isLSSslaveEnabled	24	static
+../CANopen/stack/CANopen.c:844:18:CO_CANinit	48	static
+../CANopen/stack/CANopen.c:867:18:CO_LSSinit	56	static
+../CANopen/stack/CANopen.c:896:18:CO_CANopenInit	88	static
+../CANopen/stack/CANopen.c:1206:18:CO_CANopenInitPDO	96	static
+../CANopen/stack/CANopen.c:1293:20:CO_process	112	static
+../CANopen/stack/CANopen.c:1409:8:CO_process_SYNC	40	static
+../CANopen/stack/CANopen.c:1444:6:CO_process_RPDO	40	static
+../CANopen/stack/CANopen.c:1472:6:CO_process_TPDO	40	static

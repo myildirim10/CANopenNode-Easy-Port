@@ -1,0 +1,15 @@
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_driver.h:740:23:CO_getUint8	24	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_driver.h:748:24:CO_getUint32	24	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:439:24:OD_getIndex	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:454:22:OD_mappable	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:588:21:OD_extension_init	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:650:21:OD_get_u8	32	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:664:21:OD_get_u32	32	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:751:21:OD_set_u32	32	static
+../CANopen/stack/301/CO_SDOserver.c:56:13:CO_SDO_receive	32	static
+../CANopen/stack/301/CO_SDOserver.c:167:25:CO_SDOserver_init_canRxTx	48	static
+../CANopen/stack/301/CO_SDOserver.c:235:14:OD_write_1201_additional	72	static
+../CANopen/stack/301/CO_SDOserver.c:315:18:CO_SDOserver_init	56	static
+../CANopen/stack/301/CO_SDOserver.c:476:15:validateAndWriteToOD	56	static
+../CANopen/stack/301/CO_SDOserver.c:597:15:readFromOd	64	static
+../CANopen/stack/301/CO_SDOserver.c:685:17:CO_SDOserver_process	112	static

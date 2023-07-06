@@ -1,0 +1,1092 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "CO_storageEeprom.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .text.storeEeprom,"ax",%progbits
+  20              	 .align 2
+  21              	 .thumb
+  22              	 .thumb_func
+  24              	storeEeprom:
+  25              	.LFB33:
+  26              	 .file 1 "../CANopen/stack/storage/CO_storageEeprom.c"
+   1:../CANopen/stack/storage/CO_storageEeprom.c **** /*
+   2:../CANopen/stack/storage/CO_storageEeprom.c ****  * CANopen data storage object for storing data into block device (eeprom)
+   3:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+   4:../CANopen/stack/storage/CO_storageEeprom.c ****  * @file        CO_storageEeprom.c
+   5:../CANopen/stack/storage/CO_storageEeprom.c ****  * @author      Janez Paternoster
+   6:../CANopen/stack/storage/CO_storageEeprom.c ****  * @copyright   2021 Janez Paternoster
+   7:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+   8:../CANopen/stack/storage/CO_storageEeprom.c ****  * This file is part of CANopenNode, an opensource CANopen Stack.
+   9:../CANopen/stack/storage/CO_storageEeprom.c ****  * Project home page is <https://github.com/CANopenNode/CANopenNode>.
+  10:../CANopen/stack/storage/CO_storageEeprom.c ****  * For more information on CANopen see <http://www.can-cia.org/>.
+  11:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+  12:../CANopen/stack/storage/CO_storageEeprom.c ****  * Licensed under the Apache License, Version 2.0 (the "License");
+  13:../CANopen/stack/storage/CO_storageEeprom.c ****  * you may not use this file except in compliance with the License.
+  14:../CANopen/stack/storage/CO_storageEeprom.c ****  * You may obtain a copy of the License at
+  15:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+  16:../CANopen/stack/storage/CO_storageEeprom.c ****  *     http://www.apache.org/licenses/LICENSE-2.0
+  17:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+  18:../CANopen/stack/storage/CO_storageEeprom.c ****  * Unless required by applicable law or agreed to in writing, software
+  19:../CANopen/stack/storage/CO_storageEeprom.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  20:../CANopen/stack/storage/CO_storageEeprom.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  21:../CANopen/stack/storage/CO_storageEeprom.c ****  * See the License for the specific language governing permissions and
+  22:../CANopen/stack/storage/CO_storageEeprom.c ****  * limitations under the License.
+  23:../CANopen/stack/storage/CO_storageEeprom.c ****  */
+  24:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  25:../CANopen/stack/storage/CO_storageEeprom.c **** #include "storage/CO_storageEeprom.h"
+  26:../CANopen/stack/storage/CO_storageEeprom.c **** #include "storage/CO_eeprom.h"
+  27:../CANopen/stack/storage/CO_storageEeprom.c **** #include "301/crc16-ccitt.h"
+  28:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  29:../CANopen/stack/storage/CO_storageEeprom.c **** #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+  30:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  31:../CANopen/stack/storage/CO_storageEeprom.c **** /*
+  32:../CANopen/stack/storage/CO_storageEeprom.c ****  * Function for writing data on "Store parameters" command - OD object 1010
+  33:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+  34:../CANopen/stack/storage/CO_storageEeprom.c ****  * For more information see file CO_storage.h, CO_storage_entry_t.
+  35:../CANopen/stack/storage/CO_storageEeprom.c ****  */
+  36:../CANopen/stack/storage/CO_storageEeprom.c **** static ODR_t storeEeprom(CO_storage_entry_t *entry, CO_CANmodule_t *CANmodule) {
+  27              	 .loc 1 36 0
+  28              	 .cfi_startproc
+  29              	 
+  30              	 
+  31 0000 80B5     	 push {r7,lr}
+  32              	.LCFI0:
+  33              	 .cfi_def_cfa_offset 8
+  34              	 .cfi_offset 7,-8
+  35              	 .cfi_offset 14,-4
+  36 0002 86B0     	 sub sp,sp,#24
+  37              	.LCFI1:
+  38              	 .cfi_def_cfa_offset 32
+  39 0004 00AF     	 add r7,sp,#0
+  40              	.LCFI2:
+  41              	 .cfi_def_cfa_register 7
+  42 0006 7860     	 str r0,[r7,#4]
+  43 0008 3960     	 str r1,[r7]
+  37:../CANopen/stack/storage/CO_storageEeprom.c ****     bool_t writeOk;
+  38:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  39:../CANopen/stack/storage/CO_storageEeprom.c ****     /* save data to the eeprom */
+  40:../CANopen/stack/storage/CO_storageEeprom.c ****     CO_LOCK_OD(CANmodule);
+  41:../CANopen/stack/storage/CO_storageEeprom.c ****     writeOk = CO_eeprom_writeBlock(entry->storageModule, entry->addr,
+  44              	 .loc 1 41 0
+  45 000a 7B68     	 ldr r3,[r7,#4]
+  46 000c D868     	 ldr r0,[r3,#12]
+  47 000e 7B68     	 ldr r3,[r7,#4]
+  48 0010 1968     	 ldr r1,[r3]
+  49 0012 7B68     	 ldr r3,[r7,#4]
+  50 0014 9A69     	 ldr r2,[r3,#24]
+  51 0016 7B68     	 ldr r3,[r7,#4]
+  52 0018 5B68     	 ldr r3,[r3,#4]
+  53 001a FFF7FEFF 	 bl CO_eeprom_writeBlock
+  54 001e 7861     	 str r0,[r7,#20]
+  42:../CANopen/stack/storage/CO_storageEeprom.c ****                                    entry->eepromAddr, entry->len);
+  43:../CANopen/stack/storage/CO_storageEeprom.c ****     entry->crc = crc16_ccitt(entry->addr, entry->len, 0);
+  55              	 .loc 1 43 0
+  56 0020 7B68     	 ldr r3,[r7,#4]
+  57 0022 1A68     	 ldr r2,[r3]
+  58 0024 7B68     	 ldr r3,[r7,#4]
+  59 0026 5B68     	 ldr r3,[r3,#4]
+  60 0028 1046     	 mov r0,r2
+  61 002a 1946     	 mov r1,r3
+  62 002c 0022     	 movs r2,#0
+  63 002e FFF7FEFF 	 bl crc16_ccitt
+  64 0032 0346     	 mov r3,r0
+  65 0034 1A46     	 mov r2,r3
+  66 0036 7B68     	 ldr r3,[r7,#4]
+  67 0038 1A82     	 strh r2,[r3,#16]
+  44:../CANopen/stack/storage/CO_storageEeprom.c ****     CO_UNLOCK_OD(CANmodule);
+  45:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  46:../CANopen/stack/storage/CO_storageEeprom.c ****     /* Verify, if data in eeprom are equal */
+  47:../CANopen/stack/storage/CO_storageEeprom.c ****     uint16_t crc_read = CO_eeprom_getCrcBlock(entry->storageModule,
+  68              	 .loc 1 47 0
+  69 003a 7B68     	 ldr r3,[r7,#4]
+  70 003c D968     	 ldr r1,[r3,#12]
+  71 003e 7B68     	 ldr r3,[r7,#4]
+  72 0040 9A69     	 ldr r2,[r3,#24]
+  73 0042 7B68     	 ldr r3,[r7,#4]
+  74 0044 5B68     	 ldr r3,[r3,#4]
+  75 0046 0846     	 mov r0,r1
+  76 0048 1146     	 mov r1,r2
+  77 004a 1A46     	 mov r2,r3
+  78 004c FFF7FEFF 	 bl CO_eeprom_getCrcBlock
+  79 0050 0346     	 mov r3,r0
+  80 0052 7B82     	 strh r3,[r7,#18]
+  48:../CANopen/stack/storage/CO_storageEeprom.c ****                                               entry->eepromAddr, entry->len);
+  49:../CANopen/stack/storage/CO_storageEeprom.c ****     if (entry->crc != crc_read || !writeOk) {
+  81              	 .loc 1 49 0
+  82 0054 7B68     	 ldr r3,[r7,#4]
+  83 0056 1B8A     	 ldrh r3,[r3,#16]
+  84 0058 7A8A     	 ldrh r2,[r7,#18]
+  85 005a 9A42     	 cmp r2,r3
+  86 005c 02D1     	 bne .L2
+  87              	 .loc 1 49 0 is_stmt 0 discriminator 1
+  88 005e 7B69     	 ldr r3,[r7,#20]
+  89 0060 002B     	 cmp r3,#0
+  90 0062 01D1     	 bne .L3
+  91              	.L2:
+  50:../CANopen/stack/storage/CO_storageEeprom.c ****         return ODR_HW;
+  92              	 .loc 1 50 0 is_stmt 1
+  93 0064 0A23     	 movs r3,#10
+  94 0066 2BE0     	 b .L7
+  95              	.L3:
+  51:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+  52:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  53:../CANopen/stack/storage/CO_storageEeprom.c ****     /* Write signature (see CO_storageEeprom_init() for info) */
+  54:../CANopen/stack/storage/CO_storageEeprom.c ****     uint16_t signatureOfEntry = (uint16_t)entry->len;
+  96              	 .loc 1 54 0
+  97 0068 7B68     	 ldr r3,[r7,#4]
+  98 006a 5B68     	 ldr r3,[r3,#4]
+  99 006c 3B82     	 strh r3,[r7,#16]
+  55:../CANopen/stack/storage/CO_storageEeprom.c ****     uint32_t signature = (((uint32_t)entry->crc) << 16) | signatureOfEntry;
+ 100              	 .loc 1 55 0
+ 101 006e 7B68     	 ldr r3,[r7,#4]
+ 102 0070 1B8A     	 ldrh r3,[r3,#16]
+ 103 0072 1A04     	 lsls r2,r3,#16
+ 104 0074 3B8A     	 ldrh r3,[r7,#16]
+ 105 0076 1343     	 orrs r3,r3,r2
+ 106 0078 FB60     	 str r3,[r7,#12]
+  56:../CANopen/stack/storage/CO_storageEeprom.c ****     writeOk = CO_eeprom_writeBlock(entry->storageModule,
+ 107              	 .loc 1 56 0
+ 108 007a 7B68     	 ldr r3,[r7,#4]
+ 109 007c D968     	 ldr r1,[r3,#12]
+ 110 007e 7B68     	 ldr r3,[r7,#4]
+ 111 0080 5B69     	 ldr r3,[r3,#20]
+ 112 0082 07F10C02 	 add r2,r7,#12
+ 113 0086 0846     	 mov r0,r1
+ 114 0088 1146     	 mov r1,r2
+ 115 008a 1A46     	 mov r2,r3
+ 116 008c 0423     	 movs r3,#4
+ 117 008e FFF7FEFF 	 bl CO_eeprom_writeBlock
+ 118 0092 7861     	 str r0,[r7,#20]
+  57:../CANopen/stack/storage/CO_storageEeprom.c ****                                    (uint8_t *)&signature,
+  58:../CANopen/stack/storage/CO_storageEeprom.c ****                                    entry->eepromAddrSignature,
+  59:../CANopen/stack/storage/CO_storageEeprom.c ****                                    sizeof(signature));
+  60:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  61:../CANopen/stack/storage/CO_storageEeprom.c ****     /* verify signature and write */
+  62:../CANopen/stack/storage/CO_storageEeprom.c ****     uint32_t signatureRead;
+  63:../CANopen/stack/storage/CO_storageEeprom.c ****     CO_eeprom_readBlock(entry->storageModule,
+ 119              	 .loc 1 63 0
+ 120 0094 7B68     	 ldr r3,[r7,#4]
+ 121 0096 D968     	 ldr r1,[r3,#12]
+ 122 0098 7B68     	 ldr r3,[r7,#4]
+ 123 009a 5B69     	 ldr r3,[r3,#20]
+ 124 009c 07F10802 	 add r2,r7,#8
+ 125 00a0 0846     	 mov r0,r1
+ 126 00a2 1146     	 mov r1,r2
+ 127 00a4 1A46     	 mov r2,r3
+ 128 00a6 0423     	 movs r3,#4
+ 129 00a8 FFF7FEFF 	 bl CO_eeprom_readBlock
+  64:../CANopen/stack/storage/CO_storageEeprom.c ****                         (uint8_t *)&signatureRead,
+  65:../CANopen/stack/storage/CO_storageEeprom.c ****                         entry->eepromAddrSignature,
+  66:../CANopen/stack/storage/CO_storageEeprom.c ****                         sizeof(signatureRead));
+  67:../CANopen/stack/storage/CO_storageEeprom.c ****     if(signature != signatureRead || !writeOk) {
+ 130              	 .loc 1 67 0
+ 131 00ac FA68     	 ldr r2,[r7,#12]
+ 132 00ae BB68     	 ldr r3,[r7,#8]
+ 133 00b0 9A42     	 cmp r2,r3
+ 134 00b2 02D1     	 bne .L5
+ 135              	 .loc 1 67 0 is_stmt 0 discriminator 1
+ 136 00b4 7B69     	 ldr r3,[r7,#20]
+ 137 00b6 002B     	 cmp r3,#0
+ 138 00b8 01D1     	 bne .L6
+ 139              	.L5:
+  68:../CANopen/stack/storage/CO_storageEeprom.c ****         return ODR_HW;
+ 140              	 .loc 1 68 0 is_stmt 1
+ 141 00ba 0A23     	 movs r3,#10
+ 142 00bc 00E0     	 b .L7
+ 143              	.L6:
+  69:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+  70:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  71:../CANopen/stack/storage/CO_storageEeprom.c ****     return ODR_OK;
+ 144              	 .loc 1 71 0
+ 145 00be 0023     	 movs r3,#0
+ 146              	.L7:
+ 147 00c0 5BB2     	 sxtb r3,r3
+  72:../CANopen/stack/storage/CO_storageEeprom.c **** }
+ 148              	 .loc 1 72 0 discriminator 1
+ 149 00c2 1846     	 mov r0,r3
+ 150 00c4 1837     	 adds r7,r7,#24
+ 151              	.LCFI3:
+ 152              	 .cfi_def_cfa_offset 8
+ 153 00c6 BD46     	 mov sp,r7
+ 154              	.LCFI4:
+ 155              	 .cfi_def_cfa_register 13
+ 156              	 
+ 157 00c8 80BD     	 pop {r7,pc}
+ 158              	 .cfi_endproc
+ 159              	.LFE33:
+ 161 00ca 00BF     	 .section .text.restoreEeprom,"ax",%progbits
+ 162              	 .align 2
+ 163              	 .thumb
+ 164              	 .thumb_func
+ 166              	restoreEeprom:
+ 167              	.LFB34:
+  73:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  74:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  75:../CANopen/stack/storage/CO_storageEeprom.c **** /*
+  76:../CANopen/stack/storage/CO_storageEeprom.c ****  * Function for restoring data on "Restore default parameters" command - OD 1011
+  77:../CANopen/stack/storage/CO_storageEeprom.c ****  *
+  78:../CANopen/stack/storage/CO_storageEeprom.c ****  * For more information see file CO_storage.h, CO_storage_entry_t.
+  79:../CANopen/stack/storage/CO_storageEeprom.c ****  */
+  80:../CANopen/stack/storage/CO_storageEeprom.c **** static ODR_t restoreEeprom(CO_storage_entry_t *entry,
+  81:../CANopen/stack/storage/CO_storageEeprom.c ****                            CO_CANmodule_t *CANmodule)
+  82:../CANopen/stack/storage/CO_storageEeprom.c **** {
+ 168              	 .loc 1 82 0
+ 169              	 .cfi_startproc
+ 170              	 
+ 171              	 
+ 172 0000 80B5     	 push {r7,lr}
+ 173              	.LCFI5:
+ 174              	 .cfi_def_cfa_offset 8
+ 175              	 .cfi_offset 7,-8
+ 176              	 .cfi_offset 14,-4
+ 177 0002 86B0     	 sub sp,sp,#24
+ 178              	.LCFI6:
+ 179              	 .cfi_def_cfa_offset 32
+ 180 0004 00AF     	 add r7,sp,#0
+ 181              	.LCFI7:
+ 182              	 .cfi_def_cfa_register 7
+ 183 0006 7860     	 str r0,[r7,#4]
+ 184 0008 3960     	 str r1,[r7]
+  83:../CANopen/stack/storage/CO_storageEeprom.c ****     (void) CANmodule;
+  84:../CANopen/stack/storage/CO_storageEeprom.c ****     bool_t writeOk;
+  85:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  86:../CANopen/stack/storage/CO_storageEeprom.c ****     /* Write empty signature */
+  87:../CANopen/stack/storage/CO_storageEeprom.c ****     uint32_t signature = 0xFFFFFFFF;
+ 185              	 .loc 1 87 0
+ 186 000a 4FF0FF33 	 mov r3,#-1
+ 187 000e 3B61     	 str r3,[r7,#16]
+  88:../CANopen/stack/storage/CO_storageEeprom.c ****     writeOk = CO_eeprom_writeBlock(entry->storageModule,
+ 188              	 .loc 1 88 0
+ 189 0010 7B68     	 ldr r3,[r7,#4]
+ 190 0012 D968     	 ldr r1,[r3,#12]
+ 191 0014 7B68     	 ldr r3,[r7,#4]
+ 192 0016 5B69     	 ldr r3,[r3,#20]
+ 193 0018 07F11002 	 add r2,r7,#16
+ 194 001c 0846     	 mov r0,r1
+ 195 001e 1146     	 mov r1,r2
+ 196 0020 1A46     	 mov r2,r3
+ 197 0022 0423     	 movs r3,#4
+ 198 0024 FFF7FEFF 	 bl CO_eeprom_writeBlock
+ 199 0028 7861     	 str r0,[r7,#20]
+  89:../CANopen/stack/storage/CO_storageEeprom.c ****                                    (uint8_t *)&signature,
+  90:../CANopen/stack/storage/CO_storageEeprom.c ****                                    entry->eepromAddrSignature,
+  91:../CANopen/stack/storage/CO_storageEeprom.c ****                                    sizeof(signature));
+  92:../CANopen/stack/storage/CO_storageEeprom.c **** 
+  93:../CANopen/stack/storage/CO_storageEeprom.c ****     /* verify signature and protection */
+  94:../CANopen/stack/storage/CO_storageEeprom.c ****     uint32_t signatureRead;
+  95:../CANopen/stack/storage/CO_storageEeprom.c ****     CO_eeprom_readBlock(entry->storageModule,
+ 200              	 .loc 1 95 0
+ 201 002a 7B68     	 ldr r3,[r7,#4]
+ 202 002c D968     	 ldr r1,[r3,#12]
+ 203 002e 7B68     	 ldr r3,[r7,#4]
+ 204 0030 5B69     	 ldr r3,[r3,#20]
+ 205 0032 07F10C02 	 add r2,r7,#12
+ 206 0036 0846     	 mov r0,r1
+ 207 0038 1146     	 mov r1,r2
+ 208 003a 1A46     	 mov r2,r3
+ 209 003c 0423     	 movs r3,#4
+ 210 003e FFF7FEFF 	 bl CO_eeprom_readBlock
+  96:../CANopen/stack/storage/CO_storageEeprom.c ****                         (uint8_t *)&signatureRead,
+  97:../CANopen/stack/storage/CO_storageEeprom.c ****                         entry->eepromAddrSignature,
+  98:../CANopen/stack/storage/CO_storageEeprom.c ****                         sizeof(signatureRead));
+  99:../CANopen/stack/storage/CO_storageEeprom.c ****     if(signature != signatureRead || !writeOk) {
+ 211              	 .loc 1 99 0
+ 212 0042 3A69     	 ldr r2,[r7,#16]
+ 213 0044 FB68     	 ldr r3,[r7,#12]
+ 214 0046 9A42     	 cmp r2,r3
+ 215 0048 02D1     	 bne .L9
+ 216              	 .loc 1 99 0 is_stmt 0 discriminator 1
+ 217 004a 7B69     	 ldr r3,[r7,#20]
+ 218 004c 002B     	 cmp r3,#0
+ 219 004e 01D1     	 bne .L10
+ 220              	.L9:
+ 100:../CANopen/stack/storage/CO_storageEeprom.c ****         return ODR_HW;
+ 221              	 .loc 1 100 0 is_stmt 1
+ 222 0050 0A23     	 movs r3,#10
+ 223 0052 00E0     	 b .L12
+ 224              	.L10:
+ 101:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+ 102:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 103:../CANopen/stack/storage/CO_storageEeprom.c ****     return ODR_OK;
+ 225              	 .loc 1 103 0
+ 226 0054 0023     	 movs r3,#0
+ 227              	.L12:
+ 228 0056 5BB2     	 sxtb r3,r3
+ 104:../CANopen/stack/storage/CO_storageEeprom.c **** }
+ 229              	 .loc 1 104 0 discriminator 1
+ 230 0058 1846     	 mov r0,r3
+ 231 005a 1837     	 adds r7,r7,#24
+ 232              	.LCFI8:
+ 233              	 .cfi_def_cfa_offset 8
+ 234 005c BD46     	 mov sp,r7
+ 235              	.LCFI9:
+ 236              	 .cfi_def_cfa_register 13
+ 237              	 
+ 238 005e 80BD     	 pop {r7,pc}
+ 239              	 .cfi_endproc
+ 240              	.LFE34:
+ 242              	 .section .text.CO_storageEeprom_init,"ax",%progbits
+ 243              	 .align 2
+ 244              	 .global CO_storageEeprom_init
+ 245              	 .thumb
+ 246              	 .thumb_func
+ 248              	CO_storageEeprom_init:
+ 249              	.LFB35:
+ 105:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 106:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 107:../CANopen/stack/storage/CO_storageEeprom.c **** /******************************************************************************/
+ 108:../CANopen/stack/storage/CO_storageEeprom.c **** CO_ReturnError_t CO_storageEeprom_init(CO_storage_t *storage,
+ 109:../CANopen/stack/storage/CO_storageEeprom.c ****                                        CO_CANmodule_t *CANmodule,
+ 110:../CANopen/stack/storage/CO_storageEeprom.c ****                                        void *storageModule,
+ 111:../CANopen/stack/storage/CO_storageEeprom.c ****                                        OD_entry_t *OD_1010_StoreParameters,
+ 112:../CANopen/stack/storage/CO_storageEeprom.c ****                                        OD_entry_t *OD_1011_RestoreDefaultParam,
+ 113:../CANopen/stack/storage/CO_storageEeprom.c ****                                        CO_storage_entry_t *entries,
+ 114:../CANopen/stack/storage/CO_storageEeprom.c ****                                        uint8_t entriesCount,
+ 115:../CANopen/stack/storage/CO_storageEeprom.c ****                                        uint32_t *storageInitError)
+ 116:../CANopen/stack/storage/CO_storageEeprom.c **** {
+ 250              	 .loc 1 116 0
+ 251              	 .cfi_startproc
+ 252              	 
+ 253              	 
+ 254 0000 2DE9F047 	 push {r4,r5,r6,r7,r8,r9,r10,lr}
+ 255              	.LCFI10:
+ 256              	 .cfi_def_cfa_offset 32
+ 257              	 .cfi_offset 4,-32
+ 258              	 .cfi_offset 5,-28
+ 259              	 .cfi_offset 6,-24
+ 260              	 .cfi_offset 7,-20
+ 261              	 .cfi_offset 8,-16
+ 262              	 .cfi_offset 9,-12
+ 263              	 .cfi_offset 10,-8
+ 264              	 .cfi_offset 14,-4
+ 265 0004 94B0     	 sub sp,sp,#80
+ 266              	.LCFI11:
+ 267              	 .cfi_def_cfa_offset 112
+ 268 0006 04AF     	 add r7,sp,#16
+ 269              	.LCFI12:
+ 270              	 .cfi_def_cfa 7,96
+ 271 0008 F860     	 str r0,[r7,#12]
+ 272 000a B960     	 str r1,[r7,#8]
+ 273 000c 7A60     	 str r2,[r7,#4]
+ 274 000e 3B60     	 str r3,[r7]
+ 275 0010 6B46     	 mov r3,sp
+ 276 0012 9A46     	 mov r10,r3
+ 117:../CANopen/stack/storage/CO_storageEeprom.c ****     CO_ReturnError_t ret;
+ 118:../CANopen/stack/storage/CO_storageEeprom.c ****     bool_t eepromOvf = false;
+ 277              	 .loc 1 118 0
+ 278 0014 0023     	 movs r3,#0
+ 279 0016 3B61     	 str r3,[r7,#16]
+ 119:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 120:../CANopen/stack/storage/CO_storageEeprom.c ****     /* verify arguments */
+ 121:../CANopen/stack/storage/CO_storageEeprom.c ****     if (storage == NULL || entries == NULL || entriesCount == 0
+ 280              	 .loc 1 121 0
+ 281 0018 FB68     	 ldr r3,[r7,#12]
+ 282 001a 002B     	 cmp r3,#0
+ 283 001c 09D0     	 beq .L14
+ 284              	 .loc 1 121 0 is_stmt 0 discriminator 1
+ 285 001e 7B6E     	 ldr r3,[r7,#100]
+ 286 0020 002B     	 cmp r3,#0
+ 287 0022 06D0     	 beq .L14
+ 288              	 .loc 1 121 0 discriminator 2
+ 289 0024 97F86830 	 ldrb r3,[r7,#104]
+ 290 0028 002B     	 cmp r3,#0
+ 291 002a 02D0     	 beq .L14
+ 122:../CANopen/stack/storage/CO_storageEeprom.c ****         || storageInitError == NULL
+ 292              	 .loc 1 122 0 is_stmt 1
+ 293 002c FB6E     	 ldr r3,[r7,#108]
+ 294 002e 002B     	 cmp r3,#0
+ 295 0030 01D1     	 bne .L15
+ 296              	.L14:
+ 123:../CANopen/stack/storage/CO_storageEeprom.c ****     ) {
+ 124:../CANopen/stack/storage/CO_storageEeprom.c ****         return CO_ERROR_ILLEGAL_ARGUMENT;
+ 297              	 .loc 1 124 0
+ 298 0032 FF23     	 movs r3,#255
+ 299 0034 05E1     	 b .L16
+ 300              	.L15:
+ 125:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+ 126:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 127:../CANopen/stack/storage/CO_storageEeprom.c ****     storage->enabled = false;
+ 301              	 .loc 1 127 0
+ 302 0036 FB68     	 ldr r3,[r7,#12]
+ 303 0038 0022     	 movs r2,#0
+ 304 003a 5A63     	 str r2,[r3,#52]
+ 128:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 129:../CANopen/stack/storage/CO_storageEeprom.c ****     /* Initialize storage hardware */
+ 130:../CANopen/stack/storage/CO_storageEeprom.c ****     if (!CO_eeprom_init(storageModule)) {
+ 305              	 .loc 1 130 0
+ 306 003c 7868     	 ldr r0,[r7,#4]
+ 307 003e FFF7FEFF 	 bl CO_eeprom_init
+ 308 0042 0346     	 mov r3,r0
+ 309 0044 002B     	 cmp r3,#0
+ 310 0046 05D1     	 bne .L17
+ 131:../CANopen/stack/storage/CO_storageEeprom.c ****         *storageInitError = 0xFFFFFFFF;
+ 311              	 .loc 1 131 0
+ 312 0048 FB6E     	 ldr r3,[r7,#108]
+ 313 004a 4FF0FF32 	 mov r2,#-1
+ 314 004e 1A60     	 str r2,[r3]
+ 132:../CANopen/stack/storage/CO_storageEeprom.c ****         return CO_ERROR_DATA_CORRUPT;
+ 315              	 .loc 1 132 0
+ 316 0050 F323     	 movs r3,#243
+ 317 0052 F6E0     	 b .L16
+ 318              	.L17:
+ 133:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+ 134:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 135:../CANopen/stack/storage/CO_storageEeprom.c ****     /* initialize storage and OD extensions */
+ 136:../CANopen/stack/storage/CO_storageEeprom.c ****     ret = CO_storage_init(storage,
+ 319              	 .loc 1 136 0
+ 320 0054 7E4B     	 ldr r3,.L29
+ 321 0056 0093     	 str r3,[sp]
+ 322 0058 7E4B     	 ldr r3,.L29+4
+ 323 005a 0193     	 str r3,[sp,#4]
+ 324 005c 7B6E     	 ldr r3,[r7,#100]
+ 325 005e 0293     	 str r3,[sp,#8]
+ 326 0060 97F86830 	 ldrb r3,[r7,#104]
+ 327 0064 0393     	 str r3,[sp,#12]
+ 328 0066 F868     	 ldr r0,[r7,#12]
+ 329 0068 B968     	 ldr r1,[r7,#8]
+ 330 006a 3A68     	 ldr r2,[r7]
+ 331 006c 3B6E     	 ldr r3,[r7,#96]
+ 332 006e FFF7FEFF 	 bl CO_storage_init
+ 333 0072 0346     	 mov r3,r0
+ 334 0074 87F83F30 	 strb r3,[r7,#63]
+ 137:../CANopen/stack/storage/CO_storageEeprom.c ****                           CANmodule,
+ 138:../CANopen/stack/storage/CO_storageEeprom.c ****                           OD_1010_StoreParameters,
+ 139:../CANopen/stack/storage/CO_storageEeprom.c ****                           OD_1011_RestoreDefaultParam,
+ 140:../CANopen/stack/storage/CO_storageEeprom.c ****                           storeEeprom,
+ 141:../CANopen/stack/storage/CO_storageEeprom.c ****                           restoreEeprom,
+ 142:../CANopen/stack/storage/CO_storageEeprom.c ****                           entries,
+ 143:../CANopen/stack/storage/CO_storageEeprom.c ****                           entriesCount);
+ 144:../CANopen/stack/storage/CO_storageEeprom.c ****     if (ret != CO_ERROR_NO) {
+ 335              	 .loc 1 144 0
+ 336 0078 97F93F30 	 ldrsb r3,[r7,#63]
+ 337 007c 002B     	 cmp r3,#0
+ 338 007e 02D0     	 beq .L18
+ 145:../CANopen/stack/storage/CO_storageEeprom.c ****         return ret;
+ 339              	 .loc 1 145 0
+ 340 0080 97F83F30 	 ldrb r3,[r7,#63]
+ 341 0084 DDE0     	 b .L16
+ 342              	.L18:
+ 146:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+ 147:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 148:../CANopen/stack/storage/CO_storageEeprom.c ****     /* Read entry signatures from the eeprom */
+ 149:../CANopen/stack/storage/CO_storageEeprom.c ****     uint32_t signatures[entriesCount];
+ 343              	 .loc 1 149 0
+ 344 0086 97F86860 	 ldrb r6,[r7,#104]
+ 345 008a 3346     	 mov r3,r6
+ 346 008c 013B     	 subs r3,r3,#1
+ 347 008e 3B63     	 str r3,[r7,#48]
+ 348 0090 F2B2     	 uxtb r2,r6
+ 349 0092 4FF00003 	 mov r3,#0
+ 350 0096 4FEA4319 	 lsl r9,r3,#5
+ 351 009a 49EAD269 	 orr r9,r9,r2,lsr#27
+ 352 009e 4FEA4218 	 lsl r8,r2,#5
+ 353 00a2 F2B2     	 uxtb r2,r6
+ 354 00a4 4FF00003 	 mov r3,#0
+ 355 00a8 5D01     	 lsls r5,r3,#5
+ 356 00aa 45EAD265 	 orr r5,r5,r2,lsr#27
+ 357 00ae 5401     	 lsls r4,r2,#5
+ 358 00b0 3346     	 mov r3,r6
+ 359 00b2 9B00     	 lsls r3,r3,#2
+ 360 00b4 0333     	 adds r3,r3,#3
+ 361 00b6 0733     	 adds r3,r3,#7
+ 362 00b8 DB08     	 lsrs r3,r3,#3
+ 363 00ba DB00     	 lsls r3,r3,#3
+ 364 00bc ADEB030D 	 sub sp,sp,r3
+ 365 00c0 04AB     	 add r3,sp,#16
+ 366 00c2 0333     	 adds r3,r3,#3
+ 367 00c4 9B08     	 lsrs r3,r3,#2
+ 368 00c6 9B00     	 lsls r3,r3,#2
+ 369 00c8 FB62     	 str r3,[r7,#44]
+ 150:../CANopen/stack/storage/CO_storageEeprom.c ****     size_t signaturesAddress = CO_eeprom_getAddr(storageModule,
+ 370              	 .loc 1 150 0
+ 371 00ca 3346     	 mov r3,r6
+ 372 00cc 9A00     	 lsls r2,r3,#2
+ 373 00ce 07F11003 	 add r3,r7,#16
+ 374 00d2 7868     	 ldr r0,[r7,#4]
+ 375 00d4 0021     	 movs r1,#0
+ 376 00d6 FFF7FEFF 	 bl CO_eeprom_getAddr
+ 377 00da B862     	 str r0,[r7,#40]
+ 151:../CANopen/stack/storage/CO_storageEeprom.c ****                                                  false,
+ 152:../CANopen/stack/storage/CO_storageEeprom.c ****                                                  sizeof(signatures),
+ 153:../CANopen/stack/storage/CO_storageEeprom.c ****                                                  &eepromOvf);
+ 154:../CANopen/stack/storage/CO_storageEeprom.c ****     CO_eeprom_readBlock(storageModule,
+ 155:../CANopen/stack/storage/CO_storageEeprom.c ****                         (uint8_t *)signatures,
+ 378              	 .loc 1 155 0
+ 379 00dc FA6A     	 ldr r2,[r7,#44]
+ 154:../CANopen/stack/storage/CO_storageEeprom.c ****                         (uint8_t *)signatures,
+ 380              	 .loc 1 154 0
+ 381 00de 3346     	 mov r3,r6
+ 382 00e0 9B00     	 lsls r3,r3,#2
+ 383 00e2 7868     	 ldr r0,[r7,#4]
+ 384 00e4 1146     	 mov r1,r2
+ 385 00e6 BA6A     	 ldr r2,[r7,#40]
+ 386 00e8 FFF7FEFF 	 bl CO_eeprom_readBlock
+ 156:../CANopen/stack/storage/CO_storageEeprom.c ****                         signaturesAddress,
+ 157:../CANopen/stack/storage/CO_storageEeprom.c ****                         sizeof(signatures));
+ 158:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 159:../CANopen/stack/storage/CO_storageEeprom.c ****     /* initialize entries */
+ 160:../CANopen/stack/storage/CO_storageEeprom.c ****     *storageInitError = 0;
+ 387              	 .loc 1 160 0
+ 388 00ec FB6E     	 ldr r3,[r7,#108]
+ 389 00ee 0022     	 movs r2,#0
+ 390 00f0 1A60     	 str r2,[r3]
+ 391              	.LBB2:
+ 161:../CANopen/stack/storage/CO_storageEeprom.c ****     for (uint8_t i = 0; i < entriesCount; i++) {
+ 392              	 .loc 1 161 0
+ 393 00f2 0023     	 movs r3,#0
+ 394 00f4 87F83E30 	 strb r3,[r7,#62]
+ 395 00f8 97E0     	 b .L19
+ 396              	.L27:
+ 397              	.LBB3:
+ 162:../CANopen/stack/storage/CO_storageEeprom.c ****         CO_storage_entry_t *entry = &entries[i];
+ 398              	 .loc 1 162 0
+ 399 00fa 97F83E20 	 ldrb r2,[r7,#62]
+ 400 00fe 1346     	 mov r3,r2
+ 401 0100 9B00     	 lsls r3,r3,#2
+ 402 0102 1344     	 add r3,r3,r2
+ 403 0104 DB00     	 lsls r3,r3,#3
+ 404 0106 1A46     	 mov r2,r3
+ 405 0108 7B6E     	 ldr r3,[r7,#100]
+ 406 010a 1344     	 add r3,r3,r2
+ 407 010c 7B62     	 str r3,[r7,#36]
+ 163:../CANopen/stack/storage/CO_storageEeprom.c ****         bool_t isAuto = (entry->attr & CO_storage_auto) != 0;
+ 408              	 .loc 1 163 0
+ 409 010e 7B6A     	 ldr r3,[r7,#36]
+ 410 0110 5B7A     	 ldrb r3,[r3,#9]
+ 411 0112 03F00203 	 and r3,r3,#2
+ 412 0116 002B     	 cmp r3,#0
+ 413 0118 14BF     	 ite ne
+ 414 011a 0123     	 movne r3,#1
+ 415 011c 0023     	 moveq r3,#0
+ 416 011e DBB2     	 uxtb r3,r3
+ 417 0120 3B62     	 str r3,[r7,#32]
+ 164:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 165:../CANopen/stack/storage/CO_storageEeprom.c ****         /* verify arguments */
+ 166:../CANopen/stack/storage/CO_storageEeprom.c ****         if (entry->addr == NULL || entry->len == 0 || entry->subIndexOD < 2) {
+ 418              	 .loc 1 166 0
+ 419 0122 7B6A     	 ldr r3,[r7,#36]
+ 420 0124 1B68     	 ldr r3,[r3]
+ 421 0126 002B     	 cmp r3,#0
+ 422 0128 07D0     	 beq .L20
+ 423              	 .loc 1 166 0 is_stmt 0 discriminator 1
+ 424 012a 7B6A     	 ldr r3,[r7,#36]
+ 425 012c 5B68     	 ldr r3,[r3,#4]
+ 426 012e 002B     	 cmp r3,#0
+ 427 0130 03D0     	 beq .L20
+ 428              	 .loc 1 166 0 discriminator 2
+ 429 0132 7B6A     	 ldr r3,[r7,#36]
+ 430 0134 1B7A     	 ldrb r3,[r3,#8]
+ 431 0136 012B     	 cmp r3,#1
+ 432 0138 05D8     	 bhi .L21
+ 433              	.L20:
+ 167:../CANopen/stack/storage/CO_storageEeprom.c ****             *storageInitError = i;
+ 434              	 .loc 1 167 0 is_stmt 1
+ 435 013a 97F83E20 	 ldrb r2,[r7,#62]
+ 436 013e FB6E     	 ldr r3,[r7,#108]
+ 437 0140 1A60     	 str r2,[r3]
+ 168:../CANopen/stack/storage/CO_storageEeprom.c ****             return CO_ERROR_ILLEGAL_ARGUMENT;
+ 438              	 .loc 1 168 0
+ 439 0142 FF23     	 movs r3,#255
+ 440 0144 7DE0     	 b .L16
+ 441              	.L21:
+ 169:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 170:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 171:../CANopen/stack/storage/CO_storageEeprom.c ****         /* calculate addresses inside eeprom */
+ 172:../CANopen/stack/storage/CO_storageEeprom.c ****         entry->eepromAddrSignature = signaturesAddress + sizeof(uint32_t) * i;
+ 442              	 .loc 1 172 0
+ 443 0146 97F83E30 	 ldrb r3,[r7,#62]
+ 444 014a 9A00     	 lsls r2,r3,#2
+ 445 014c BB6A     	 ldr r3,[r7,#40]
+ 446 014e 1A44     	 add r2,r2,r3
+ 447 0150 7B6A     	 ldr r3,[r7,#36]
+ 448 0152 5A61     	 str r2,[r3,#20]
+ 173:../CANopen/stack/storage/CO_storageEeprom.c ****         entry->eepromAddr = CO_eeprom_getAddr(storageModule,
+ 449              	 .loc 1 173 0
+ 450 0154 7B6A     	 ldr r3,[r7,#36]
+ 451 0156 5A68     	 ldr r2,[r3,#4]
+ 452 0158 07F11003 	 add r3,r7,#16
+ 453 015c 7868     	 ldr r0,[r7,#4]
+ 454 015e 396A     	 ldr r1,[r7,#32]
+ 455 0160 FFF7FEFF 	 bl CO_eeprom_getAddr
+ 456 0164 0246     	 mov r2,r0
+ 457 0166 7B6A     	 ldr r3,[r7,#36]
+ 458 0168 9A61     	 str r2,[r3,#24]
+ 174:../CANopen/stack/storage/CO_storageEeprom.c ****                                               isAuto,
+ 175:../CANopen/stack/storage/CO_storageEeprom.c ****                                               entry->len,
+ 176:../CANopen/stack/storage/CO_storageEeprom.c ****                                               &eepromOvf);
+ 177:../CANopen/stack/storage/CO_storageEeprom.c ****         entry->offset = 0;
+ 459              	 .loc 1 177 0
+ 460 016a 7B6A     	 ldr r3,[r7,#36]
+ 461 016c 0022     	 movs r2,#0
+ 462 016e DA61     	 str r2,[r3,#28]
+ 178:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 179:../CANopen/stack/storage/CO_storageEeprom.c ****         /* verify if eeprom is too small */
+ 180:../CANopen/stack/storage/CO_storageEeprom.c ****         if (eepromOvf) {
+ 463              	 .loc 1 180 0
+ 464 0170 3B69     	 ldr r3,[r7,#16]
+ 465 0172 002B     	 cmp r3,#0
+ 466 0174 05D0     	 beq .L22
+ 181:../CANopen/stack/storage/CO_storageEeprom.c ****             *storageInitError = i;
+ 467              	 .loc 1 181 0
+ 468 0176 97F83E20 	 ldrb r2,[r7,#62]
+ 469 017a FB6E     	 ldr r3,[r7,#108]
+ 470 017c 1A60     	 str r2,[r3]
+ 182:../CANopen/stack/storage/CO_storageEeprom.c ****             return CO_ERROR_OUT_OF_MEMORY;
+ 471              	 .loc 1 182 0
+ 472 017e FE23     	 movs r3,#254
+ 473 0180 5FE0     	 b .L16
+ 474              	.L22:
+ 183:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 184:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 185:../CANopen/stack/storage/CO_storageEeprom.c ****         /* 32bit signature (which was stored in eeprom) is combined from
+ 186:../CANopen/stack/storage/CO_storageEeprom.c ****          * 16bit signature of the entry and 16bit CRC checksum of the data
+ 187:../CANopen/stack/storage/CO_storageEeprom.c ****          * block. 16bit signature of the entry is entry->len. */
+ 188:../CANopen/stack/storage/CO_storageEeprom.c ****         uint32_t signature = signatures[i];
+ 475              	 .loc 1 188 0
+ 476 0182 97F83E20 	 ldrb r2,[r7,#62]
+ 477 0186 FB6A     	 ldr r3,[r7,#44]
+ 478 0188 53F82230 	 ldr r3,[r3,r2,lsl#2]
+ 479 018c FB61     	 str r3,[r7,#28]
+ 189:../CANopen/stack/storage/CO_storageEeprom.c ****         uint16_t signatureInEeprom = (uint16_t)signature;
+ 480              	 .loc 1 189 0
+ 481 018e FB69     	 ldr r3,[r7,#28]
+ 482 0190 7B83     	 strh r3,[r7,#26]
+ 190:../CANopen/stack/storage/CO_storageEeprom.c ****         entry->crc = (uint16_t)(signature >> 16);
+ 483              	 .loc 1 190 0
+ 484 0192 FB69     	 ldr r3,[r7,#28]
+ 485 0194 1B0C     	 lsrs r3,r3,#16
+ 486 0196 9AB2     	 uxth r2,r3
+ 487 0198 7B6A     	 ldr r3,[r7,#36]
+ 488 019a 1A82     	 strh r2,[r3,#16]
+ 191:../CANopen/stack/storage/CO_storageEeprom.c ****         uint16_t signatureOfEntry = (uint16_t)entry->len;
+ 489              	 .loc 1 191 0
+ 490 019c 7B6A     	 ldr r3,[r7,#36]
+ 491 019e 5B68     	 ldr r3,[r3,#4]
+ 492 01a0 3B83     	 strh r3,[r7,#24]
+ 192:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 193:../CANopen/stack/storage/CO_storageEeprom.c ****         /* Verify two signatures */
+ 194:../CANopen/stack/storage/CO_storageEeprom.c ****         bool_t dataCorrupt = false;
+ 493              	 .loc 1 194 0
+ 494 01a2 0023     	 movs r3,#0
+ 495 01a4 BB63     	 str r3,[r7,#56]
+ 195:../CANopen/stack/storage/CO_storageEeprom.c ****         if (signatureInEeprom != signatureOfEntry) {
+ 496              	 .loc 1 195 0
+ 497 01a6 7A8B     	 ldrh r2,[r7,#26]
+ 498 01a8 3B8B     	 ldrh r3,[r7,#24]
+ 499 01aa 9A42     	 cmp r2,r3
+ 500 01ac 02D0     	 beq .L23
+ 196:../CANopen/stack/storage/CO_storageEeprom.c ****             dataCorrupt = true;
+ 501              	 .loc 1 196 0
+ 502 01ae 0123     	 movs r3,#1
+ 503 01b0 BB63     	 str r3,[r7,#56]
+ 504 01b2 1EE0     	 b .L24
+ 505              	.L23:
+ 197:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 198:../CANopen/stack/storage/CO_storageEeprom.c ****         else {
+ 199:../CANopen/stack/storage/CO_storageEeprom.c ****             /* Read data into storage location */
+ 200:../CANopen/stack/storage/CO_storageEeprom.c ****             CO_eeprom_readBlock(entry->storageModule, entry->addr,
+ 506              	 .loc 1 200 0
+ 507 01b4 7B6A     	 ldr r3,[r7,#36]
+ 508 01b6 D868     	 ldr r0,[r3,#12]
+ 509 01b8 7B6A     	 ldr r3,[r7,#36]
+ 510 01ba 1968     	 ldr r1,[r3]
+ 511 01bc 7B6A     	 ldr r3,[r7,#36]
+ 512 01be 9A69     	 ldr r2,[r3,#24]
+ 513 01c0 7B6A     	 ldr r3,[r7,#36]
+ 514 01c2 5B68     	 ldr r3,[r3,#4]
+ 515 01c4 FFF7FEFF 	 bl CO_eeprom_readBlock
+ 201:../CANopen/stack/storage/CO_storageEeprom.c ****                                 entry->eepromAddr, entry->len);
+ 202:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 203:../CANopen/stack/storage/CO_storageEeprom.c ****             /* Verify CRC, except for auto storage variables */
+ 204:../CANopen/stack/storage/CO_storageEeprom.c ****             if (!isAuto) {
+ 516              	 .loc 1 204 0
+ 517 01c8 3B6A     	 ldr r3,[r7,#32]
+ 518 01ca 002B     	 cmp r3,#0
+ 519 01cc 11D1     	 bne .L24
+ 520              	.LBB4:
+ 205:../CANopen/stack/storage/CO_storageEeprom.c ****                 uint16_t crc = crc16_ccitt(entry->addr, entry->len, 0);
+ 521              	 .loc 1 205 0
+ 522 01ce 7B6A     	 ldr r3,[r7,#36]
+ 523 01d0 1A68     	 ldr r2,[r3]
+ 524 01d2 7B6A     	 ldr r3,[r7,#36]
+ 525 01d4 5B68     	 ldr r3,[r3,#4]
+ 526 01d6 1046     	 mov r0,r2
+ 527 01d8 1946     	 mov r1,r3
+ 528 01da 0022     	 movs r2,#0
+ 529 01dc FFF7FEFF 	 bl crc16_ccitt
+ 530 01e0 0346     	 mov r3,r0
+ 531 01e2 FB82     	 strh r3,[r7,#22]
+ 206:../CANopen/stack/storage/CO_storageEeprom.c ****                 if (crc != entry->crc) {
+ 532              	 .loc 1 206 0
+ 533 01e4 7B6A     	 ldr r3,[r7,#36]
+ 534 01e6 1B8A     	 ldrh r3,[r3,#16]
+ 535 01e8 FA8A     	 ldrh r2,[r7,#22]
+ 536 01ea 9A42     	 cmp r2,r3
+ 537 01ec 01D0     	 beq .L24
+ 207:../CANopen/stack/storage/CO_storageEeprom.c ****                     dataCorrupt = true;
+ 538              	 .loc 1 207 0
+ 539 01ee 0123     	 movs r3,#1
+ 540 01f0 BB63     	 str r3,[r7,#56]
+ 541              	.L24:
+ 542              	.LBE4:
+ 208:../CANopen/stack/storage/CO_storageEeprom.c ****                 }
+ 209:../CANopen/stack/storage/CO_storageEeprom.c ****             }
+ 210:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 211:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 212:../CANopen/stack/storage/CO_storageEeprom.c ****         /* additional info in case of error */
+ 213:../CANopen/stack/storage/CO_storageEeprom.c ****         if (dataCorrupt) {
+ 543              	 .loc 1 213 0
+ 544 01f2 BB6B     	 ldr r3,[r7,#56]
+ 545 01f4 002B     	 cmp r3,#0
+ 546 01f6 13D0     	 beq .L25
+ 547              	.LBB5:
+ 214:../CANopen/stack/storage/CO_storageEeprom.c ****             uint32_t errorBit = entry->subIndexOD;
+ 548              	 .loc 1 214 0
+ 549 01f8 7B6A     	 ldr r3,[r7,#36]
+ 550 01fa 1B7A     	 ldrb r3,[r3,#8]
+ 551 01fc 7B63     	 str r3,[r7,#52]
+ 215:../CANopen/stack/storage/CO_storageEeprom.c ****             if (errorBit > 31) errorBit = 31;
+ 552              	 .loc 1 215 0
+ 553 01fe 7B6B     	 ldr r3,[r7,#52]
+ 554 0200 1F2B     	 cmp r3,#31
+ 555 0202 01D9     	 bls .L26
+ 556              	 .loc 1 215 0 is_stmt 0 discriminator 1
+ 557 0204 1F23     	 movs r3,#31
+ 558 0206 7B63     	 str r3,[r7,#52]
+ 559              	.L26:
+ 216:../CANopen/stack/storage/CO_storageEeprom.c ****             *storageInitError |= ((uint32_t) 1) << errorBit;
+ 560              	 .loc 1 216 0 is_stmt 1
+ 561 0208 FB6E     	 ldr r3,[r7,#108]
+ 562 020a 1A68     	 ldr r2,[r3]
+ 563 020c 7B6B     	 ldr r3,[r7,#52]
+ 564 020e 0121     	 movs r1,#1
+ 565 0210 01FA03F3 	 lsl r3,r1,r3
+ 566 0214 1A43     	 orrs r2,r2,r3
+ 567 0216 FB6E     	 ldr r3,[r7,#108]
+ 568 0218 1A60     	 str r2,[r3]
+ 217:../CANopen/stack/storage/CO_storageEeprom.c ****             ret = CO_ERROR_DATA_CORRUPT;
+ 569              	 .loc 1 217 0
+ 570 021a F323     	 movs r3,#243
+ 571 021c 87F83F30 	 strb r3,[r7,#63]
+ 572              	.L25:
+ 573              	.LBE5:
+ 574              	.LBE3:
+ 161:../CANopen/stack/storage/CO_storageEeprom.c ****         CO_storage_entry_t *entry = &entries[i];
+ 575              	 .loc 1 161 0 discriminator 2
+ 576 0220 97F83E30 	 ldrb r3,[r7,#62]
+ 577 0224 0133     	 adds r3,r3,#1
+ 578 0226 87F83E30 	 strb r3,[r7,#62]
+ 579              	.L19:
+ 161:../CANopen/stack/storage/CO_storageEeprom.c ****         CO_storage_entry_t *entry = &entries[i];
+ 580              	 .loc 1 161 0 is_stmt 0 discriminator 1
+ 581 022a 97F83E20 	 ldrb r2,[r7,#62]
+ 582 022e 97F86830 	 ldrb r3,[r7,#104]
+ 583 0232 9A42     	 cmp r2,r3
+ 584 0234 FFF461AF 	 bcc .L27
+ 585              	.LBE2:
+ 218:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 219:../CANopen/stack/storage/CO_storageEeprom.c ****     } /* for (entries) */
+ 220:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 221:../CANopen/stack/storage/CO_storageEeprom.c ****     storage->enabled = true;
+ 586              	 .loc 1 221 0 is_stmt 1
+ 587 0238 FB68     	 ldr r3,[r7,#12]
+ 588 023a 0122     	 movs r2,#1
+ 589 023c 5A63     	 str r2,[r3,#52]
+ 222:../CANopen/stack/storage/CO_storageEeprom.c ****     return ret;
+ 590              	 .loc 1 222 0
+ 591 023e 97F83F30 	 ldrb r3,[r7,#63]
+ 592              	.L16:
+ 593 0242 D546     	 mov sp,r10
+ 594 0244 5BB2     	 sxtb r3,r3
+ 223:../CANopen/stack/storage/CO_storageEeprom.c **** }
+ 595              	 .loc 1 223 0
+ 596 0246 1846     	 mov r0,r3
+ 597 0248 4037     	 adds r7,r7,#64
+ 598              	.LCFI13:
+ 599              	 .cfi_def_cfa_offset 32
+ 600 024a BD46     	 mov sp,r7
+ 601              	.LCFI14:
+ 602              	 .cfi_def_cfa_register 13
+ 603              	 
+ 604 024c BDE8F087 	 pop {r4,r5,r6,r7,r8,r9,r10,pc}
+ 605              	.L30:
+ 606              	 .align 2
+ 607              	.L29:
+ 608 0250 00000000 	 .word storeEeprom
+ 609 0254 00000000 	 .word restoreEeprom
+ 610              	 .cfi_endproc
+ 611              	.LFE35:
+ 613              	 .section .text.CO_storageEeprom_auto_process,"ax",%progbits
+ 614              	 .align 2
+ 615              	 .global CO_storageEeprom_auto_process
+ 616              	 .thumb
+ 617              	 .thumb_func
+ 619              	CO_storageEeprom_auto_process:
+ 620              	.LFB36:
+ 224:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 225:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 226:../CANopen/stack/storage/CO_storageEeprom.c **** /******************************************************************************/
+ 227:../CANopen/stack/storage/CO_storageEeprom.c **** void CO_storageEeprom_auto_process(CO_storage_t *storage, bool_t saveAll) {
+ 621              	 .loc 1 227 0
+ 622              	 .cfi_startproc
+ 623              	 
+ 624              	 
+ 625 0000 80B5     	 push {r7,lr}
+ 626              	.LCFI15:
+ 627              	 .cfi_def_cfa_offset 8
+ 628              	 .cfi_offset 7,-8
+ 629              	 .cfi_offset 14,-4
+ 630 0002 8AB0     	 sub sp,sp,#40
+ 631              	.LCFI16:
+ 632              	 .cfi_def_cfa_offset 48
+ 633 0004 00AF     	 add r7,sp,#0
+ 634              	.LCFI17:
+ 635              	 .cfi_def_cfa_register 7
+ 636 0006 7860     	 str r0,[r7,#4]
+ 637 0008 3960     	 str r1,[r7]
+ 228:../CANopen/stack/storage/CO_storageEeprom.c ****     /* verify arguments */
+ 229:../CANopen/stack/storage/CO_storageEeprom.c ****     if (storage == NULL || !storage->enabled) {
+ 638              	 .loc 1 229 0
+ 639 000a 7B68     	 ldr r3,[r7,#4]
+ 640 000c 002B     	 cmp r3,#0
+ 641 000e 03D0     	 beq .L32
+ 642              	 .loc 1 229 0 is_stmt 0 discriminator 1
+ 643 0010 7B68     	 ldr r3,[r7,#4]
+ 644 0012 5B6B     	 ldr r3,[r3,#52]
+ 645 0014 002B     	 cmp r3,#0
+ 646 0016 00D1     	 bne .L33
+ 647              	.L32:
+ 230:../CANopen/stack/storage/CO_storageEeprom.c ****         return;
+ 648              	 .loc 1 230 0 is_stmt 1
+ 649 0018 6BE0     	 b .L31
+ 650              	.L33:
+ 651              	.LBB6:
+ 231:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+ 232:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 233:../CANopen/stack/storage/CO_storageEeprom.c ****     /* loop through entries */
+ 234:../CANopen/stack/storage/CO_storageEeprom.c ****     for (uint8_t i = 0; i < storage->entriesCount; i++) {
+ 652              	 .loc 1 234 0
+ 653 001a 0023     	 movs r3,#0
+ 654 001c 87F82730 	 strb r3,[r7,#39]
+ 655 0020 60E0     	 b .L35
+ 656              	.L41:
+ 657              	.LBB7:
+ 235:../CANopen/stack/storage/CO_storageEeprom.c ****         CO_storage_entry_t *entry = &storage->entries[i];
+ 658              	 .loc 1 235 0
+ 659 0022 7B68     	 ldr r3,[r7,#4]
+ 660 0024 D96A     	 ldr r1,[r3,#44]
+ 661 0026 97F82720 	 ldrb r2,[r7,#39]
+ 662 002a 1346     	 mov r3,r2
+ 663 002c 9B00     	 lsls r3,r3,#2
+ 664 002e 1344     	 add r3,r3,r2
+ 665 0030 DB00     	 lsls r3,r3,#3
+ 666 0032 0B44     	 add r3,r3,r1
+ 667 0034 FB61     	 str r3,[r7,#28]
+ 236:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 237:../CANopen/stack/storage/CO_storageEeprom.c ****         if ((entry->attr & CO_storage_auto) == 0)
+ 668              	 .loc 1 237 0
+ 669 0036 FB69     	 ldr r3,[r7,#28]
+ 670 0038 5B7A     	 ldrb r3,[r3,#9]
+ 671 003a 03F00203 	 and r3,r3,#2
+ 672 003e 002B     	 cmp r3,#0
+ 673 0040 00D1     	 bne .L36
+ 238:../CANopen/stack/storage/CO_storageEeprom.c ****             continue;
+ 674              	 .loc 1 238 0
+ 675 0042 4AE0     	 b .L37
+ 676              	.L36:
+ 239:../CANopen/stack/storage/CO_storageEeprom.c **** 
+ 240:../CANopen/stack/storage/CO_storageEeprom.c ****         if (saveAll) {
+ 677              	 .loc 1 240 0
+ 678 0044 3B68     	 ldr r3,[r7]
+ 679 0046 002B     	 cmp r3,#0
+ 680 0048 21D0     	 beq .L38
+ 681              	.LBB8:
+ 241:../CANopen/stack/storage/CO_storageEeprom.c ****             /* update all bytes */
+ 242:../CANopen/stack/storage/CO_storageEeprom.c ****             for (size_t i = 0; i < entry->len; ) {
+ 682              	 .loc 1 242 0
+ 683 004a 0023     	 movs r3,#0
+ 684 004c 3B62     	 str r3,[r7,#32]
+ 685 004e 18E0     	 b .L39
+ 686              	.L40:
+ 687              	.LBB9:
+ 243:../CANopen/stack/storage/CO_storageEeprom.c ****                 uint8_t dataByteToUpdate = ((uint8_t *)(entry->addr))[i];
+ 688              	 .loc 1 243 0
+ 689 0050 FB69     	 ldr r3,[r7,#28]
+ 690 0052 1A68     	 ldr r2,[r3]
+ 691 0054 3B6A     	 ldr r3,[r7,#32]
+ 692 0056 1344     	 add r3,r3,r2
+ 693 0058 1B78     	 ldrb r3,[r3]
+ 694 005a FB76     	 strb r3,[r7,#27]
+ 244:../CANopen/stack/storage/CO_storageEeprom.c ****                 size_t eepromAddr = entry->eepromAddr + i;
+ 695              	 .loc 1 244 0
+ 696 005c FB69     	 ldr r3,[r7,#28]
+ 697 005e 9A69     	 ldr r2,[r3,#24]
+ 698 0060 3B6A     	 ldr r3,[r7,#32]
+ 699 0062 1344     	 add r3,r3,r2
+ 700 0064 7B61     	 str r3,[r7,#20]
+ 245:../CANopen/stack/storage/CO_storageEeprom.c ****                 if (CO_eeprom_updateByte(entry->storageModule,
+ 701              	 .loc 1 245 0
+ 702 0066 FB69     	 ldr r3,[r7,#28]
+ 703 0068 DA68     	 ldr r2,[r3,#12]
+ 704 006a FB7E     	 ldrb r3,[r7,#27]
+ 705 006c 1046     	 mov r0,r2
+ 706 006e 1946     	 mov r1,r3
+ 707 0070 7A69     	 ldr r2,[r7,#20]
+ 708 0072 FFF7FEFF 	 bl CO_eeprom_updateByte
+ 709 0076 0346     	 mov r3,r0
+ 710 0078 002B     	 cmp r3,#0
+ 711 007a 02D0     	 beq .L39
+ 246:../CANopen/stack/storage/CO_storageEeprom.c ****                                          dataByteToUpdate,
+ 247:../CANopen/stack/storage/CO_storageEeprom.c ****                                          eepromAddr)
+ 248:../CANopen/stack/storage/CO_storageEeprom.c ****                 ) {
+ 249:../CANopen/stack/storage/CO_storageEeprom.c ****                     i++;
+ 712              	 .loc 1 249 0
+ 713 007c 3B6A     	 ldr r3,[r7,#32]
+ 714 007e 0133     	 adds r3,r3,#1
+ 715 0080 3B62     	 str r3,[r7,#32]
+ 716              	.L39:
+ 717              	.LBE9:
+ 242:../CANopen/stack/storage/CO_storageEeprom.c ****                 uint8_t dataByteToUpdate = ((uint8_t *)(entry->addr))[i];
+ 718              	 .loc 1 242 0 discriminator 1
+ 719 0082 FB69     	 ldr r3,[r7,#28]
+ 720 0084 5A68     	 ldr r2,[r3,#4]
+ 721 0086 3B6A     	 ldr r3,[r7,#32]
+ 722 0088 9A42     	 cmp r2,r3
+ 723 008a E1D8     	 bhi .L40
+ 724              	.LBE8:
+ 725 008c 25E0     	 b .L37
+ 726              	.L38:
+ 727              	.LBB10:
+ 250:../CANopen/stack/storage/CO_storageEeprom.c ****                 }
+ 251:../CANopen/stack/storage/CO_storageEeprom.c ****             }
+ 252:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 253:../CANopen/stack/storage/CO_storageEeprom.c ****         else {
+ 254:../CANopen/stack/storage/CO_storageEeprom.c ****             /* update one data byte and if successful increment to next */
+ 255:../CANopen/stack/storage/CO_storageEeprom.c ****             uint8_t dataByteToUpdate = ((uint8_t*)(entry->addr))[entry->offset];
+ 728              	 .loc 1 255 0
+ 729 008e FB69     	 ldr r3,[r7,#28]
+ 730 0090 1A68     	 ldr r2,[r3]
+ 731 0092 FB69     	 ldr r3,[r7,#28]
+ 732 0094 DB69     	 ldr r3,[r3,#28]
+ 733 0096 1344     	 add r3,r3,r2
+ 734 0098 1B78     	 ldrb r3,[r3]
+ 735 009a FB74     	 strb r3,[r7,#19]
+ 256:../CANopen/stack/storage/CO_storageEeprom.c ****             size_t eepromAddr = entry->eepromAddr + entry->offset;
+ 736              	 .loc 1 256 0
+ 737 009c FB69     	 ldr r3,[r7,#28]
+ 738 009e 9A69     	 ldr r2,[r3,#24]
+ 739 00a0 FB69     	 ldr r3,[r7,#28]
+ 740 00a2 DB69     	 ldr r3,[r3,#28]
+ 741 00a4 1344     	 add r3,r3,r2
+ 742 00a6 FB60     	 str r3,[r7,#12]
+ 257:../CANopen/stack/storage/CO_storageEeprom.c ****             if (CO_eeprom_updateByte(entry->storageModule, dataByteToUpdate,
+ 743              	 .loc 1 257 0
+ 744 00a8 FB69     	 ldr r3,[r7,#28]
+ 745 00aa DA68     	 ldr r2,[r3,#12]
+ 746 00ac FB7C     	 ldrb r3,[r7,#19]
+ 747 00ae 1046     	 mov r0,r2
+ 748 00b0 1946     	 mov r1,r3
+ 749 00b2 FA68     	 ldr r2,[r7,#12]
+ 750 00b4 FFF7FEFF 	 bl CO_eeprom_updateByte
+ 751 00b8 0346     	 mov r3,r0
+ 752 00ba 002B     	 cmp r3,#0
+ 753 00bc 0DD0     	 beq .L37
+ 258:../CANopen/stack/storage/CO_storageEeprom.c ****                                      eepromAddr)
+ 259:../CANopen/stack/storage/CO_storageEeprom.c ****             ) {
+ 260:../CANopen/stack/storage/CO_storageEeprom.c ****                 if (++entry->offset >= entry->len) {
+ 754              	 .loc 1 260 0
+ 755 00be FB69     	 ldr r3,[r7,#28]
+ 756 00c0 DB69     	 ldr r3,[r3,#28]
+ 757 00c2 5A1C     	 adds r2,r3,#1
+ 758 00c4 FB69     	 ldr r3,[r7,#28]
+ 759 00c6 DA61     	 str r2,[r3,#28]
+ 760 00c8 FB69     	 ldr r3,[r7,#28]
+ 761 00ca DA69     	 ldr r2,[r3,#28]
+ 762 00cc FB69     	 ldr r3,[r7,#28]
+ 763 00ce 5B68     	 ldr r3,[r3,#4]
+ 764 00d0 9A42     	 cmp r2,r3
+ 765 00d2 02D3     	 bcc .L37
+ 261:../CANopen/stack/storage/CO_storageEeprom.c ****                     entry->offset = 0;
+ 766              	 .loc 1 261 0
+ 767 00d4 FB69     	 ldr r3,[r7,#28]
+ 768 00d6 0022     	 movs r2,#0
+ 769 00d8 DA61     	 str r2,[r3,#28]
+ 770              	.L37:
+ 771              	.LBE10:
+ 772              	.LBE7:
+ 234:../CANopen/stack/storage/CO_storageEeprom.c ****         CO_storage_entry_t *entry = &storage->entries[i];
+ 773              	 .loc 1 234 0 discriminator 2
+ 774 00da 97F82730 	 ldrb r3,[r7,#39]
+ 775 00de 0133     	 adds r3,r3,#1
+ 776 00e0 87F82730 	 strb r3,[r7,#39]
+ 777              	.L35:
+ 234:../CANopen/stack/storage/CO_storageEeprom.c ****         CO_storage_entry_t *entry = &storage->entries[i];
+ 778              	 .loc 1 234 0 is_stmt 0 discriminator 1
+ 779 00e4 7B68     	 ldr r3,[r7,#4]
+ 780 00e6 93F83030 	 ldrb r3,[r3,#48]
+ 781 00ea 97F82720 	 ldrb r2,[r7,#39]
+ 782 00ee 9A42     	 cmp r2,r3
+ 783 00f0 97D3     	 bcc .L41
+ 784              	.L31:
+ 785              	.LBE6:
+ 262:../CANopen/stack/storage/CO_storageEeprom.c ****                 }
+ 263:../CANopen/stack/storage/CO_storageEeprom.c ****             }
+ 264:../CANopen/stack/storage/CO_storageEeprom.c ****         }
+ 265:../CANopen/stack/storage/CO_storageEeprom.c ****     }
+ 266:../CANopen/stack/storage/CO_storageEeprom.c **** }
+ 786              	 .loc 1 266 0 is_stmt 1
+ 787 00f2 2837     	 adds r7,r7,#40
+ 788              	.LCFI18:
+ 789              	 .cfi_def_cfa_offset 8
+ 790 00f4 BD46     	 mov sp,r7
+ 791              	.LCFI19:
+ 792              	 .cfi_def_cfa_register 13
+ 793              	 
+ 794 00f6 80BD     	 pop {r7,pc}
+ 795              	 .cfi_endproc
+ 796              	.LFE36:
+ 798              	 .text
+ 799              	.Letext0:
+ 800              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\lib\\gcc\\arm-none-eabi\\4.9.3\\include\\stddef.h"
+ 801              	 .file 3 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 802              	 .file 4 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 803              	 .file 5 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/driver/CO_driver_target.h"
+ 804              	 .file 6 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_driver.h"
+ 805              	 .file 7 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_ODinterface.h"
+ 806              	 .file 8 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/storage/CO_storage.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 CO_storageEeprom.c
+    {standard input}:20     .text.storeEeprom:00000000 $t
+    {standard input}:24     .text.storeEeprom:00000000 storeEeprom
+    {standard input}:162    .text.restoreEeprom:00000000 $t
+    {standard input}:166    .text.restoreEeprom:00000000 restoreEeprom
+    {standard input}:243    .text.CO_storageEeprom_init:00000000 $t
+    {standard input}:248    .text.CO_storageEeprom_init:00000000 CO_storageEeprom_init
+    {standard input}:608    .text.CO_storageEeprom_init:00000250 $d
+    {standard input}:614    .text.CO_storageEeprom_auto_process:00000000 $t
+    {standard input}:619    .text.CO_storageEeprom_auto_process:00000000 CO_storageEeprom_auto_process
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+CO_eeprom_writeBlock
+crc16_ccitt
+CO_eeprom_getCrcBlock
+CO_eeprom_readBlock
+CO_eeprom_init
+CO_storage_init
+CO_eeprom_getAddr
+CO_eeprom_updateByte

@@ -1,0 +1,209 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "can_node_conf.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .rodata.CAN_NODE_0_gpio_out,"a",%progbits
+  20              	 .align 2
+  23              	CAN_NODE_0_gpio_out:
+  24 0000 00830248 	 .word 1208124160
+  25 0004 02       	 .byte 2
+  26 0005 000000   	 .space 3
+  27              	 .section .rodata.CAN_NODE_0_gpio_out_config,"a",%progbits
+  28              	 .align 2
+  31              	CAN_NODE_0_gpio_out_config:
+  32 0000 90       	 .byte -112
+  33 0001 000000   	 .space 3
+  34 0004 01000000 	 .word 1
+  35 0008 02       	 .byte 2
+  36 0009 000000   	 .space 3
+  37              	 .section .rodata.CAN_NODE_0_gpio_in,"a",%progbits
+  38              	 .align 2
+  41              	CAN_NODE_0_gpio_in:
+  42 0000 00830248 	 .word 1208124160
+  43 0004 0C       	 .byte 12
+  44 0005 000000   	 .space 3
+  45              	 .section .rodata.CAN_NODE_0_gpio_in_config,"a",%progbits
+  46              	 .align 2
+  49              	CAN_NODE_0_gpio_in_config:
+  50 0000 00000000 	 .space 12
+  50      00000000 
+  50      00000000 
+  51              	 .section .rodata.CAN_NODE_0_BitTimeConfig,"a",%progbits
+  52              	 .align 2
+  55              	CAN_NODE_0_BitTimeConfig:
+  56 0000 00449508 	 .word 144000000
+  57 0004 40420F00 	 .word 1000000
+  58 0008 401F     	 .short 8000
+  59 000a 0100     	 .short 1
+  60              	 .section .rodata.CAN_NODE_0_sr,"a",%progbits
+  61              	 .align 2
+  64              	CAN_NODE_0_sr:
+  65 0000 00000000 	 .space 4
+  66              	 .section .data.CAN_NODE_0_LMO_01,"aw",%progbits
+  67              	 .align 3
+  70              	CAN_NODE_0_LMO_01:
+  71 0000 40540148 	 .word 1208046656
+  72 0004 FF       	 .byte 255
+  73 0005 07       	 .byte 7
+  74 0006 00       	 .byte 0
+  75 0007 80       	 .byte 128
+  76 0008 FF       	 .byte 255
+  77 0009 07       	 .byte 7
+  78 000a 00       	 .byte 0
+  79 000b 00       	 .byte 0
+  80 000c 08       	 .byte 8
+  81 000d 000000   	 .space 3
+  82 0010 00000000 	 .word 0
+  83 0014 00000000 	 .word 0
+  84 0018 01       	 .byte 1
+  85 0019 00000000 	 .space 7
+  85      000000
+  86              	 .global CAN_NODE_0_LMO_01_Config
+  87              	 .section .rodata.CAN_NODE_0_LMO_01_Config,"a",%progbits
+  88              	 .align 2
+  91              	CAN_NODE_0_LMO_01_Config:
+  92 0000 00000000 	 .word CAN_NODE_0_LMO_01
+  93 0004 22       	 .byte 34
+  94 0005 00       	 .byte 0
+  95 0006 00       	 .byte 0
+  96 0007 00       	 .byte 0
+  97 0008 00       	 .byte 0
+  98 0009 000000   	 .space 3
+  99              	 .section .data.CAN_NODE_0_LMO_02,"aw",%progbits
+ 100              	 .align 3
+ 103              	CAN_NODE_0_LMO_02:
+ 104 0000 60540148 	 .word 1208046688
+ 105 0004 FF       	 .byte 255
+ 106 0005 07       	 .byte 7
+ 107 0006 00       	 .byte 0
+ 108 0007 A0       	 .byte 160
+ 109 0008 FF       	 .byte 255
+ 110 0009 07       	 .byte 7
+ 111 000a 00       	 .byte 0
+ 112 000b 00       	 .byte 0
+ 113 000c 08       	 .byte 8
+ 114 000d 000000   	 .space 3
+ 115 0010 00000000 	 .word 0
+ 116 0014 00000000 	 .word 0
+ 117 0018 00       	 .byte 0
+ 118 0019 00000000 	 .space 7
+ 118      000000
+ 119              	 .global CAN_NODE_0_LMO_02_Config
+ 120              	 .section .rodata.CAN_NODE_0_LMO_02_Config,"a",%progbits
+ 121              	 .align 2
+ 124              	CAN_NODE_0_LMO_02_Config:
+ 125 0000 00000000 	 .word CAN_NODE_0_LMO_02
+ 126 0004 23       	 .byte 35
+ 127 0005 00       	 .byte 0
+ 128 0006 01       	 .byte 1
+ 129 0007 00       	 .byte 0
+ 130 0008 01       	 .byte 1
+ 131 0009 000000   	 .space 3
+ 132              	 .global CAN_NODE_0
+ 133              	 .section .rodata.CAN_NODE_0,"a",%progbits
+ 134              	 .align 2
+ 137              	CAN_NODE_0:
+ 138 0000 00000000 	 .word GLOBAL_CAN_0
+ 139 0004 00420148 	 .word 1208041984
+ 140 0008 00000000 	 .word CAN_NODE_0_BitTimeConfig
+ 141 000c 00000000 	 .word CAN_NODE_0_LMO_01_Config
+ 142 0010 00000000 	 .word CAN_NODE_0_LMO_02_Config
+ 143 0014 00000000 	 .word 0
+ 144 0018 00000000 	 .word 0
+ 145 001c 00000000 	 .word 0
+ 146 0020 00000000 	 .word 0
+ 147 0024 00000000 	 .word 0
+ 148 0028 00000000 	 .word 0
+ 149 002c 00000000 	 .word 0
+ 150 0030 00000000 	 .word 0
+ 151 0034 00000000 	 .word 0
+ 152 0038 00000000 	 .word 0
+ 153 003c 00000000 	 .word 0
+ 154 0040 00000000 	 .word 0
+ 155 0044 00000000 	 .word 0
+ 156 0048 00000000 	 .word 0
+ 157 004c 00000000 	 .word 0
+ 158 0050 00000000 	 .word 0
+ 159 0054 00000000 	 .word 0
+ 160 0058 00000000 	 .word 0
+ 161 005c 00000000 	 .word 0
+ 162 0060 00000000 	 .word 0
+ 163 0064 00000000 	 .word 0
+ 164 0068 00000000 	 .word 0
+ 165 006c 00000000 	 .word 0
+ 166 0070 00000000 	 .word 0
+ 167 0074 00000000 	 .word 0
+ 168 0078 00000000 	 .word 0
+ 169 007c 00000000 	 .word 0
+ 170 0080 00000000 	 .word 0
+ 171 0084 00000000 	 .word 0
+ 172 0088 00000000 	 .word 0
+ 173 008c 00000000 	 .word CAN_NODE_0_sr
+ 174 0090 00000000 	 .word CAN_NODE_0_gpio_out
+ 175 0094 00000000 	 .word CAN_NODE_0_gpio_out_config
+ 176 0098 00000000 	 .word CAN_NODE_0_gpio_in
+ 177 009c 00000000 	 .word CAN_NODE_0_gpio_in_config
+ 178 00a0 02       	 .byte 2
+ 179 00a1 00       	 .byte 0
+ 180 00a2 02       	 .byte 2
+ 181 00a3 00       	 .byte 0
+ 182 00a4 00       	 .byte 0
+ 183 00a5 01       	 .byte 1
+ 184 00a6 00       	 .byte 0
+ 185 00a7 00       	 .byte 0
+ 186              	 .text
+ 187              	.Letext0:
+ 188              	 .file 1 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 189              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 190              	 .file 3 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/XMC4800.h"
+ 191              	 .file 4 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc_can.h"
+ 192              	 .file 5 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc_gpio.h"
+ 193              	 .file 6 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc4_gpio.h"
+ 194              	 .file 7 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/GLOBAL_CAN/global_can.h"
+ 195              	 .file 8 "../Dave/Generated/CAN_NODE/can_node.h"
+ 196              	 .file 9 "../Dave/Generated/CAN_NODE/can_node_conf.c"
+ 197              	 .file 10 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/cmsis_gcc.h"
+ 198              	 .file 11 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/core_cm4.h"
+ 199              	 .file 12 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/system_XMC4800.h"
+ 200              	 .file 13 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/GLOBAL_CAN/global_can_extern.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 can_node_conf.c
+    {standard input}:20     .rodata.CAN_NODE_0_gpio_out:00000000 $d
+    {standard input}:23     .rodata.CAN_NODE_0_gpio_out:00000000 CAN_NODE_0_gpio_out
+    {standard input}:28     .rodata.CAN_NODE_0_gpio_out_config:00000000 $d
+    {standard input}:31     .rodata.CAN_NODE_0_gpio_out_config:00000000 CAN_NODE_0_gpio_out_config
+    {standard input}:38     .rodata.CAN_NODE_0_gpio_in:00000000 $d
+    {standard input}:41     .rodata.CAN_NODE_0_gpio_in:00000000 CAN_NODE_0_gpio_in
+    {standard input}:46     .rodata.CAN_NODE_0_gpio_in_config:00000000 $d
+    {standard input}:49     .rodata.CAN_NODE_0_gpio_in_config:00000000 CAN_NODE_0_gpio_in_config
+    {standard input}:52     .rodata.CAN_NODE_0_BitTimeConfig:00000000 $d
+    {standard input}:55     .rodata.CAN_NODE_0_BitTimeConfig:00000000 CAN_NODE_0_BitTimeConfig
+    {standard input}:61     .rodata.CAN_NODE_0_sr:00000000 $d
+    {standard input}:64     .rodata.CAN_NODE_0_sr:00000000 CAN_NODE_0_sr
+    {standard input}:67     .data.CAN_NODE_0_LMO_01:00000000 $d
+    {standard input}:70     .data.CAN_NODE_0_LMO_01:00000000 CAN_NODE_0_LMO_01
+    {standard input}:91     .rodata.CAN_NODE_0_LMO_01_Config:00000000 CAN_NODE_0_LMO_01_Config
+    {standard input}:88     .rodata.CAN_NODE_0_LMO_01_Config:00000000 $d
+    {standard input}:100    .data.CAN_NODE_0_LMO_02:00000000 $d
+    {standard input}:103    .data.CAN_NODE_0_LMO_02:00000000 CAN_NODE_0_LMO_02
+    {standard input}:124    .rodata.CAN_NODE_0_LMO_02_Config:00000000 CAN_NODE_0_LMO_02_Config
+    {standard input}:121    .rodata.CAN_NODE_0_LMO_02_Config:00000000 $d
+    {standard input}:137    .rodata.CAN_NODE_0:00000000 CAN_NODE_0
+    {standard input}:134    .rodata.CAN_NODE_0:00000000 $d
+
+UNDEFINED SYMBOLS
+GLOBAL_CAN_0

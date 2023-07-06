@@ -1,0 +1,1301 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "EEPROM_25Series.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .text.ucSPI_TransmitReceive,"ax",%progbits
+  20              	 .align 2
+  21              	 .thumb
+  22              	 .thumb_func
+  24              	ucSPI_TransmitReceive:
+  25              	.LFB0:
+  26              	 .file 1 "../EEPROM/EEPROM_25Series_Hardware.h"
+   1:../EEPROM/EEPROM_25Series_Hardware.h **** /**
+   2:../EEPROM/EEPROM_25Series_Hardware.h ****   ******************************************************************************
+   3:../EEPROM/EEPROM_25Series_Hardware.h ****   * @file           : EEPROM_25Series_Hardware.h
+   4:../EEPROM/EEPROM_25Series_Hardware.h ****   *                   This library is made for SPI Communication with EEPROM
+   5:../EEPROM/EEPROM_25Series_Hardware.h ****   * @author         : Muhammed YILDIRIM
+   6:../EEPROM/EEPROM_25Series_Hardware.h ****   * @version        : 1.0
+   7:../EEPROM/EEPROM_25Series_Hardware.h ****   * @date           : June 2022
+   8:../EEPROM/EEPROM_25Series_Hardware.h ****   ******************************************************************************
+   9:../EEPROM/EEPROM_25Series_Hardware.h ****   * This program is made for Wat Motor Company
+  10:../EEPROM/EEPROM_25Series_Hardware.h ****   *
+  11:../EEPROM/EEPROM_25Series_Hardware.h ****   ******************************************************************************
+  12:../EEPROM/EEPROM_25Series_Hardware.h ****   */
+  13:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  14:../EEPROM/EEPROM_25Series_Hardware.h **** #ifndef __EEPROM_25_SERIES_HARDWARE__H_
+  15:../EEPROM/EEPROM_25Series_Hardware.h **** #define __EEPROM_25_SERIES_HARDWARE__H_
+  16:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  17:../EEPROM/EEPROM_25Series_Hardware.h **** //#define INFINEON
+  18:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  19:../EEPROM/EEPROM_25Series_Hardware.h **** /* Includes ------------------------------------------------------------------*/
+  20:../EEPROM/EEPROM_25Series_Hardware.h **** #include "stdint.h"
+  21:../EEPROM/EEPROM_25Series_Hardware.h **** #ifdef INFINEON
+  22:../EEPROM/EEPROM_25Series_Hardware.h **** #include <DAVE.h>
+  23:../EEPROM/EEPROM_25Series_Hardware.h **** #endif
+  24:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  25:../EEPROM/EEPROM_25Series_Hardware.h **** /* Defines -------------------------------------------------------------------*/
+  26:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  27:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  28:../EEPROM/EEPROM_25Series_Hardware.h **** /* Enum definitions ----------------------------------------------------------*/
+  29:../EEPROM/EEPROM_25Series_Hardware.h **** typedef enum
+  30:../EEPROM/EEPROM_25Series_Hardware.h **** {
+  31:../EEPROM/EEPROM_25Series_Hardware.h **** 	EEPROM_CS_STATE_LOW,
+  32:../EEPROM/EEPROM_25Series_Hardware.h **** 	EEPROM_CS_STATE_HIGH
+  33:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  34:../EEPROM/EEPROM_25Series_Hardware.h **** } Hardware_SPI_CS_State_t;
+  35:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  36:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  37:../EEPROM/EEPROM_25Series_Hardware.h **** /* Structure definitions -----------------------------------------------------*/
+  38:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  39:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  40:../EEPROM/EEPROM_25Series_Hardware.h **** /* Function prototypes -------------------------------------------------------*/
+  41:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  42:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  43:../EEPROM/EEPROM_25Series_Hardware.h **** /**
+  44:../EEPROM/EEPROM_25Series_Hardware.h ****   * @brief  Example static function
+  45:../EEPROM/EEPROM_25Series_Hardware.h ****   * @param  ucTxData: SPI transmit data
+  46:../EEPROM/EEPROM_25Series_Hardware.h ****   * @retval Receive value from SPI
+  47:../EEPROM/EEPROM_25Series_Hardware.h ****   */
+  48:../EEPROM/EEPROM_25Series_Hardware.h **** static inline uint8_t ucSPI_TransmitReceive ( const uint8_t ucTxData )
+  49:../EEPROM/EEPROM_25Series_Hardware.h **** {
+  27              	 .loc 1 49 0
+  28              	 .cfi_startproc
+  29              	 
+  30              	 
+  31              	 
+  32 0000 80B4     	 push {r7}
+  33              	.LCFI0:
+  34              	 .cfi_def_cfa_offset 4
+  35              	 .cfi_offset 7,-4
+  36 0002 85B0     	 sub sp,sp,#20
+  37              	.LCFI1:
+  38              	 .cfi_def_cfa_offset 24
+  39 0004 00AF     	 add r7,sp,#0
+  40              	.LCFI2:
+  41              	 .cfi_def_cfa_register 7
+  42 0006 0346     	 mov r3,r0
+  43 0008 FB71     	 strb r3,[r7,#7]
+  50:../EEPROM/EEPROM_25Series_Hardware.h **** 	volatile uint8_t ucRxData;
+  51:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  52:../EEPROM/EEPROM_25Series_Hardware.h **** 	// SPI Hardware Transmit Receive Function
+  53:../EEPROM/EEPROM_25Series_Hardware.h **** #ifdef INFINEON
+  54:../EEPROM/EEPROM_25Series_Hardware.h **** 	SPI_MASTER_Transfer(&SPI_MASTER_0, &ucTxData, &ucRxData, 1);
+  55:../EEPROM/EEPROM_25Series_Hardware.h **** #endif
+  56:../EEPROM/EEPROM_25Series_Hardware.h **** 	return ucRxData;
+  44              	 .loc 1 56 0
+  45 000a FB7B     	 ldrb r3,[r7,#15]
+  46 000c DBB2     	 uxtb r3,r3
+  57:../EEPROM/EEPROM_25Series_Hardware.h **** }
+  47              	 .loc 1 57 0
+  48 000e 1846     	 mov r0,r3
+  49 0010 1437     	 adds r7,r7,#20
+  50              	.LCFI3:
+  51              	 .cfi_def_cfa_offset 4
+  52 0012 BD46     	 mov sp,r7
+  53              	.LCFI4:
+  54              	 .cfi_def_cfa_register 13
+  55              	 
+  56 0014 5DF8047B 	 ldr r7,[sp],#4
+  57              	.LCFI5:
+  58              	 .cfi_restore 7
+  59              	 .cfi_def_cfa_offset 0
+  60 0018 7047     	 bx lr
+  61              	 .cfi_endproc
+  62              	.LFE0:
+  64 001a 00BF     	 .section .text.vSPI_ChipSelect,"ax",%progbits
+  65              	 .align 2
+  66              	 .thumb
+  67              	 .thumb_func
+  69              	vSPI_ChipSelect:
+  70              	.LFB1:
+  58:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  59:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  60:../EEPROM/EEPROM_25Series_Hardware.h **** static inline void vSPI_ChipSelect ( const Hardware_SPI_CS_State_t xState )
+  61:../EEPROM/EEPROM_25Series_Hardware.h **** {
+  71              	 .loc 1 61 0
+  72              	 .cfi_startproc
+  73              	 
+  74              	 
+  75              	 
+  76 0000 80B4     	 push {r7}
+  77              	.LCFI6:
+  78              	 .cfi_def_cfa_offset 4
+  79              	 .cfi_offset 7,-4
+  80 0002 83B0     	 sub sp,sp,#12
+  81              	.LCFI7:
+  82              	 .cfi_def_cfa_offset 16
+  83 0004 00AF     	 add r7,sp,#0
+  84              	.LCFI8:
+  85              	 .cfi_def_cfa_register 7
+  86 0006 0346     	 mov r3,r0
+  87 0008 FB71     	 strb r3,[r7,#7]
+  62:../EEPROM/EEPROM_25Series_Hardware.h **** 	// Chip Select IO Low or High State Function
+  63:../EEPROM/EEPROM_25Series_Hardware.h **** #ifdef INFINEON
+  64:../EEPROM/EEPROM_25Series_Hardware.h **** 	if (xState == EEPROM_CS_STATE_LOW)
+  65:../EEPROM/EEPROM_25Series_Hardware.h **** 		DIGITAL_IO_SetOutputLow(&DIGITAL_IO_0);
+  66:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  67:../EEPROM/EEPROM_25Series_Hardware.h **** 	else
+  68:../EEPROM/EEPROM_25Series_Hardware.h **** 		DIGITAL_IO_SetOutputHigh(&DIGITAL_IO_0);
+  69:../EEPROM/EEPROM_25Series_Hardware.h **** #endif
+  70:../EEPROM/EEPROM_25Series_Hardware.h **** 
+  71:../EEPROM/EEPROM_25Series_Hardware.h **** }
+  88              	 .loc 1 71 0
+  89 000a 0C37     	 adds r7,r7,#12
+  90              	.LCFI9:
+  91              	 .cfi_def_cfa_offset 4
+  92 000c BD46     	 mov sp,r7
+  93              	.LCFI10:
+  94              	 .cfi_def_cfa_register 13
+  95              	 
+  96 000e 5DF8047B 	 ldr r7,[sp],#4
+  97              	.LCFI11:
+  98              	 .cfi_restore 7
+  99              	 .cfi_def_cfa_offset 0
+ 100 0012 7047     	 bx lr
+ 101              	 .cfi_endproc
+ 102              	.LFE1:
+ 104              	 .section .text.xEEPROM_Init,"ax",%progbits
+ 105              	 .align 2
+ 106              	 .global xEEPROM_Init
+ 107              	 .thumb
+ 108              	 .thumb_func
+ 110              	xEEPROM_Init:
+ 111              	.LFB2:
+ 112              	 .file 2 "../EEPROM/EEPROM_25Series.c"
+   1:../EEPROM/EEPROM_25Series.c **** /**
+   2:../EEPROM/EEPROM_25Series.c ****   ******************************************************************************
+   3:../EEPROM/EEPROM_25Series.c ****   * @file           : EEPROM_25Series.c
+   4:../EEPROM/EEPROM_25Series.c ****   * @brief          : EEPROM XX25 Series EEPROM (AT25256B, CAV25256...) Library
+   5:../EEPROM/EEPROM_25Series.c ****   *                   This library based on SPI Communication
+   6:../EEPROM/EEPROM_25Series.c ****   ******************************************************************************
+   7:../EEPROM/EEPROM_25Series.c ****   * This program is made for Wat Motor Company
+   8:../EEPROM/EEPROM_25Series.c ****   *
+   9:../EEPROM/EEPROM_25Series.c ****   ******************************************************************************
+  10:../EEPROM/EEPROM_25Series.c ****   */
+  11:../EEPROM/EEPROM_25Series.c **** 
+  12:../EEPROM/EEPROM_25Series.c **** /* Includes ------------------------------------------------------------------*/
+  13:../EEPROM/EEPROM_25Series.c **** #include "EEPROM_25Series.h"
+  14:../EEPROM/EEPROM_25Series.c **** #include "EEPROM_25Series_Hardware.h"
+  15:../EEPROM/EEPROM_25Series.c **** #include <stdint.h>
+  16:../EEPROM/EEPROM_25Series.c **** 
+  17:../EEPROM/EEPROM_25Series.c **** 
+  18:../EEPROM/EEPROM_25Series.c **** /* Defines -------------------------------------------------------------------*/
+  19:../EEPROM/EEPROM_25Series.c **** /**
+  20:../EEPROM/EEPROM_25Series.c ****  *  EEPROM INSTRUCTION SET
+  21:../EEPROM/EEPROM_25Series.c ****  */
+  22:../EEPROM/EEPROM_25Series.c **** #define EEPROM_WRSR		                    ( 0b00000001 )      // 0x01
+  23:../EEPROM/EEPROM_25Series.c **** #define EEPROM_WRITE	                    ( 0b00000010 )      // 0x02
+  24:../EEPROM/EEPROM_25Series.c **** #define EEPROM_READ		                    ( 0b00000011 )      // 0x03
+  25:../EEPROM/EEPROM_25Series.c **** #define EEPROM_WRDI		                    ( 0b00000100 )      // 0x04
+  26:../EEPROM/EEPROM_25Series.c **** #define EEPROM_RDSR		                    ( 0b00000101 )      // 0x05
+  27:../EEPROM/EEPROM_25Series.c **** #define EEPROM_WREN		                    ( 0b00000110 ) 	    // 0x06
+  28:../EEPROM/EEPROM_25Series.c **** 
+  29:../EEPROM/EEPROM_25Series.c **** #define MAX_BUSY_WAIT						( 100 )
+  30:../EEPROM/EEPROM_25Series.c **** #define EEPROM_CHIP_SELECT_DELAY			( ) 				// Min 30 ns delay time
+  31:../EEPROM/EEPROM_25Series.c **** #define EEPROM_WRITE_TIMEOUT				( 400 )
+  32:../EEPROM/EEPROM_25Series.c **** 
+  33:../EEPROM/EEPROM_25Series.c **** 
+  34:../EEPROM/EEPROM_25Series.c **** /* Enum definitions ----------------------------------------------------------*/
+  35:../EEPROM/EEPROM_25Series.c **** 
+  36:../EEPROM/EEPROM_25Series.c **** /* Structure definitions -----------------------------------------------------*/
+  37:../EEPROM/EEPROM_25Series.c **** 
+  38:../EEPROM/EEPROM_25Series.c **** /* External variables --------------------------------------------------------*/
+  39:../EEPROM/EEPROM_25Series.c **** 
+  40:../EEPROM/EEPROM_25Series.c **** /* Private variables ---------------------------------------------------------*/
+  41:../EEPROM/EEPROM_25Series.c **** 
+  42:../EEPROM/EEPROM_25Series.c **** /* Private function prototypes -----------------------------------------------*/
+  43:../EEPROM/EEPROM_25Series.c **** static uint8_t ucEEPROM_ReadStatus ( void );
+  44:../EEPROM/EEPROM_25Series.c **** static EEPROM_Status_t xEEPROM_WritePage ( const uint16_t usStartAddress, const uint8_t *pucWriteDa
+  45:../EEPROM/EEPROM_25Series.c **** 
+  46:../EEPROM/EEPROM_25Series.c **** 
+  47:../EEPROM/EEPROM_25Series.c **** /* Functions ----------------------------------------------------------------*/
+  48:../EEPROM/EEPROM_25Series.c **** /**
+  49:../EEPROM/EEPROM_25Series.c ****   * @brief  Initialize EEPROM
+  50:../EEPROM/EEPROM_25Series.c ****   * @retval Status
+  51:../EEPROM/EEPROM_25Series.c ****   */
+  52:../EEPROM/EEPROM_25Series.c **** EEPROM_Status_t xEEPROM_Init ( void )
+  53:../EEPROM/EEPROM_25Series.c **** {
+ 113              	 .loc 2 53 0
+ 114              	 .cfi_startproc
+ 115              	 
+ 116              	 
+ 117 0000 80B5     	 push {r7,lr}
+ 118              	.LCFI12:
+ 119              	 .cfi_def_cfa_offset 8
+ 120              	 .cfi_offset 7,-8
+ 121              	 .cfi_offset 14,-4
+ 122 0002 00AF     	 add r7,sp,#0
+ 123              	.LCFI13:
+ 124              	 .cfi_def_cfa_register 7
+  54:../EEPROM/EEPROM_25Series.c **** 	return xEEPROM_IsReady();
+ 125              	 .loc 2 54 0
+ 126 0004 FFF7FEFF 	 bl xEEPROM_IsReady
+ 127 0008 0346     	 mov r3,r0
+  55:../EEPROM/EEPROM_25Series.c **** }
+ 128              	 .loc 2 55 0
+ 129 000a 1846     	 mov r0,r3
+ 130 000c 80BD     	 pop {r7,pc}
+ 131              	 .cfi_endproc
+ 132              	.LFE2:
+ 134 000e 00BF     	 .section .text.xEEPROM_IsReady,"ax",%progbits
+ 135              	 .align 2
+ 136              	 .global xEEPROM_IsReady
+ 137              	 .thumb
+ 138              	 .thumb_func
+ 140              	xEEPROM_IsReady:
+ 141              	.LFB3:
+  56:../EEPROM/EEPROM_25Series.c **** 
+  57:../EEPROM/EEPROM_25Series.c **** 
+  58:../EEPROM/EEPROM_25Series.c **** /**
+  59:../EEPROM/EEPROM_25Series.c ****   * @brief  EEPROM is ready or not
+  60:../EEPROM/EEPROM_25Series.c ****   * @retval Status
+  61:../EEPROM/EEPROM_25Series.c ****   */
+  62:../EEPROM/EEPROM_25Series.c **** EEPROM_Status_t xEEPROM_IsReady ( void )
+  63:../EEPROM/EEPROM_25Series.c **** {
+ 142              	 .loc 2 63 0
+ 143              	 .cfi_startproc
+ 144              	 
+ 145              	 
+ 146 0000 80B5     	 push {r7,lr}
+ 147              	.LCFI14:
+ 148              	 .cfi_def_cfa_offset 8
+ 149              	 .cfi_offset 7,-8
+ 150              	 .cfi_offset 14,-4
+ 151 0002 82B0     	 sub sp,sp,#8
+ 152              	.LCFI15:
+ 153              	 .cfi_def_cfa_offset 16
+ 154 0004 00AF     	 add r7,sp,#0
+ 155              	.LCFI16:
+ 156              	 .cfi_def_cfa_register 7
+  64:../EEPROM/EEPROM_25Series.c **** 	uint16_t usIndex;
+  65:../EEPROM/EEPROM_25Series.c **** 
+  66:../EEPROM/EEPROM_25Series.c **** 	for ( usIndex = 0; usIndex < MAX_BUSY_WAIT; usIndex++ )
+ 157              	 .loc 2 66 0
+ 158 0006 0023     	 movs r3,#0
+ 159 0008 FB80     	 strh r3,[r7,#6]
+ 160 000a 09E0     	 b .L7
+ 161              	.L10:
+  67:../EEPROM/EEPROM_25Series.c **** 	{
+  68:../EEPROM/EEPROM_25Series.c **** 	    if ( ucEEPROM_ReadStatus() )
+ 162              	 .loc 2 68 0
+ 163 000c FFF7FEFF 	 bl ucEEPROM_ReadStatus
+ 164 0010 0346     	 mov r3,r0
+ 165 0012 002B     	 cmp r3,#0
+ 166 0014 01D0     	 beq .L8
+  69:../EEPROM/EEPROM_25Series.c **** 		{
+  70:../EEPROM/EEPROM_25Series.c **** 			return EEPROM_STATUS_SUCCESS;
+ 167              	 .loc 2 70 0
+ 168 0016 0023     	 movs r3,#0
+ 169 0018 06E0     	 b .L9
+ 170              	.L8:
+  66:../EEPROM/EEPROM_25Series.c **** 	{
+ 171              	 .loc 2 66 0 discriminator 2
+ 172 001a FB88     	 ldrh r3,[r7,#6]
+ 173 001c 0133     	 adds r3,r3,#1
+ 174 001e FB80     	 strh r3,[r7,#6]
+ 175              	.L7:
+  66:../EEPROM/EEPROM_25Series.c **** 	{
+ 176              	 .loc 2 66 0 is_stmt 0 discriminator 1
+ 177 0020 FB88     	 ldrh r3,[r7,#6]
+ 178 0022 632B     	 cmp r3,#99
+ 179 0024 F2D9     	 bls .L10
+  71:../EEPROM/EEPROM_25Series.c **** 		}
+  72:../EEPROM/EEPROM_25Series.c **** 	}
+  73:../EEPROM/EEPROM_25Series.c **** 
+  74:../EEPROM/EEPROM_25Series.c **** 	return EEPROM_STATUS_ERROR;
+ 180              	 .loc 2 74 0 is_stmt 1
+ 181 0026 0123     	 movs r3,#1
+ 182              	.L9:
+  75:../EEPROM/EEPROM_25Series.c **** }
+ 183              	 .loc 2 75 0
+ 184 0028 1846     	 mov r0,r3
+ 185 002a 0837     	 adds r7,r7,#8
+ 186              	.LCFI17:
+ 187              	 .cfi_def_cfa_offset 8
+ 188 002c BD46     	 mov sp,r7
+ 189              	.LCFI18:
+ 190              	 .cfi_def_cfa_register 13
+ 191              	 
+ 192 002e 80BD     	 pop {r7,pc}
+ 193              	 .cfi_endproc
+ 194              	.LFE3:
+ 196              	 .section .text.ucEEPROM_ReadStatus,"ax",%progbits
+ 197              	 .align 2
+ 198              	 .thumb
+ 199              	 .thumb_func
+ 201              	ucEEPROM_ReadStatus:
+ 202              	.LFB4:
+  76:../EEPROM/EEPROM_25Series.c **** 
+  77:../EEPROM/EEPROM_25Series.c **** 
+  78:../EEPROM/EEPROM_25Series.c **** /**
+  79:../EEPROM/EEPROM_25Series.c ****   * @brief  Read Status EEPROM
+  80:../EEPROM/EEPROM_25Series.c ****   * @retval 1: if EEPROM is ready
+  81:../EEPROM/EEPROM_25Series.c ****   * 		0: if EEPROM is not ready
+  82:../EEPROM/EEPROM_25Series.c ****   */
+  83:../EEPROM/EEPROM_25Series.c **** static uint8_t ucEEPROM_ReadStatus ( void )
+  84:../EEPROM/EEPROM_25Series.c **** {
+ 203              	 .loc 2 84 0
+ 204              	 .cfi_startproc
+ 205              	 
+ 206              	 
+ 207 0000 80B5     	 push {r7,lr}
+ 208              	.LCFI19:
+ 209              	 .cfi_def_cfa_offset 8
+ 210              	 .cfi_offset 7,-8
+ 211              	 .cfi_offset 14,-4
+ 212 0002 82B0     	 sub sp,sp,#8
+ 213              	.LCFI20:
+ 214              	 .cfi_def_cfa_offset 16
+ 215 0004 00AF     	 add r7,sp,#0
+ 216              	.LCFI21:
+ 217              	 .cfi_def_cfa_register 7
+  85:../EEPROM/EEPROM_25Series.c **** 	volatile uint8_t ucTempData;
+  86:../EEPROM/EEPROM_25Series.c **** 
+  87:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_LOW);
+ 218              	 .loc 2 87 0
+ 219 0006 0020     	 movs r0,#0
+ 220 0008 FFF7FEFF 	 bl vSPI_ChipSelect
+  88:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(EEPROM_RDSR);
+ 221              	 .loc 2 88 0
+ 222 000c 0520     	 movs r0,#5
+ 223 000e FFF7FEFF 	 bl ucSPI_TransmitReceive
+  89:../EEPROM/EEPROM_25Series.c **** 	ucTempData = ucSPI_TransmitReceive(0x00);
+ 224              	 .loc 2 89 0
+ 225 0012 0020     	 movs r0,#0
+ 226 0014 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 227 0018 0346     	 mov r3,r0
+ 228 001a FB71     	 strb r3,[r7,#7]
+  90:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_HIGH);
+ 229              	 .loc 2 90 0
+ 230 001c 0120     	 movs r0,#1
+ 231 001e FFF7FEFF 	 bl vSPI_ChipSelect
+  91:../EEPROM/EEPROM_25Series.c **** 
+  92:../EEPROM/EEPROM_25Series.c **** 	return !(ucTempData & 0x01);
+ 232              	 .loc 2 92 0
+ 233 0022 FB79     	 ldrb r3,[r7,#7]
+ 234 0024 DBB2     	 uxtb r3,r3
+ 235 0026 03F00103 	 and r3,r3,#1
+ 236 002a 002B     	 cmp r3,#0
+ 237 002c 0CBF     	 ite eq
+ 238 002e 0123     	 moveq r3,#1
+ 239 0030 0023     	 movne r3,#0
+ 240 0032 DBB2     	 uxtb r3,r3
+  93:../EEPROM/EEPROM_25Series.c **** }
+ 241              	 .loc 2 93 0
+ 242 0034 1846     	 mov r0,r3
+ 243 0036 0837     	 adds r7,r7,#8
+ 244              	.LCFI22:
+ 245              	 .cfi_def_cfa_offset 8
+ 246 0038 BD46     	 mov sp,r7
+ 247              	.LCFI23:
+ 248              	 .cfi_def_cfa_register 13
+ 249              	 
+ 250 003a 80BD     	 pop {r7,pc}
+ 251              	 .cfi_endproc
+ 252              	.LFE4:
+ 254              	 .section .text.ucEEPROM_ReadByte,"ax",%progbits
+ 255              	 .align 2
+ 256              	 .global ucEEPROM_ReadByte
+ 257              	 .thumb
+ 258              	 .thumb_func
+ 260              	ucEEPROM_ReadByte:
+ 261              	.LFB5:
+  94:../EEPROM/EEPROM_25Series.c **** 
+  95:../EEPROM/EEPROM_25Series.c **** 
+  96:../EEPROM/EEPROM_25Series.c **** /**
+  97:../EEPROM/EEPROM_25Series.c ****   * @brief  Read byte given EEPROM address
+  98:../EEPROM/EEPROM_25Series.c ****   * @param  usAddress: Address
+  99:../EEPROM/EEPROM_25Series.c ****   */
+ 100:../EEPROM/EEPROM_25Series.c **** uint8_t ucEEPROM_ReadByte ( const uint16_t usAddress )
+ 101:../EEPROM/EEPROM_25Series.c **** {
+ 262              	 .loc 2 101 0
+ 263              	 .cfi_startproc
+ 264              	 
+ 265              	 
+ 266 0000 80B5     	 push {r7,lr}
+ 267              	.LCFI24:
+ 268              	 .cfi_def_cfa_offset 8
+ 269              	 .cfi_offset 7,-8
+ 270              	 .cfi_offset 14,-4
+ 271 0002 84B0     	 sub sp,sp,#16
+ 272              	.LCFI25:
+ 273              	 .cfi_def_cfa_offset 24
+ 274 0004 00AF     	 add r7,sp,#0
+ 275              	.LCFI26:
+ 276              	 .cfi_def_cfa_register 7
+ 277 0006 0346     	 mov r3,r0
+ 278 0008 FB80     	 strh r3,[r7,#6]
+ 102:../EEPROM/EEPROM_25Series.c **** 	volatile uint8_t ucTempData;
+ 103:../EEPROM/EEPROM_25Series.c **** 
+ 104:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_LOW);
+ 279              	 .loc 2 104 0
+ 280 000a 0020     	 movs r0,#0
+ 281 000c FFF7FEFF 	 bl vSPI_ChipSelect
+ 105:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(EEPROM_READ);
+ 282              	 .loc 2 105 0
+ 283 0010 0320     	 movs r0,#3
+ 284 0012 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 106:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive((usAddress >> 8) & 0xFF);
+ 285              	 .loc 2 106 0
+ 286 0016 FB88     	 ldrh r3,[r7,#6]
+ 287 0018 1B0A     	 lsrs r3,r3,#8
+ 288 001a 9BB2     	 uxth r3,r3
+ 289 001c DBB2     	 uxtb r3,r3
+ 290 001e 1846     	 mov r0,r3
+ 291 0020 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 107:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(usAddress & 0xFF);
+ 292              	 .loc 2 107 0
+ 293 0024 FB88     	 ldrh r3,[r7,#6]
+ 294 0026 DBB2     	 uxtb r3,r3
+ 295 0028 1846     	 mov r0,r3
+ 296 002a FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 108:../EEPROM/EEPROM_25Series.c **** 	ucTempData = ucSPI_TransmitReceive(0x00);
+ 297              	 .loc 2 108 0
+ 298 002e 0020     	 movs r0,#0
+ 299 0030 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 300 0034 0346     	 mov r3,r0
+ 301 0036 FB73     	 strb r3,[r7,#15]
+ 109:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_HIGH);
+ 302              	 .loc 2 109 0
+ 303 0038 0120     	 movs r0,#1
+ 304 003a FFF7FEFF 	 bl vSPI_ChipSelect
+ 110:../EEPROM/EEPROM_25Series.c **** 
+ 111:../EEPROM/EEPROM_25Series.c **** 	return ucTempData;
+ 305              	 .loc 2 111 0
+ 306 003e FB7B     	 ldrb r3,[r7,#15]
+ 307 0040 DBB2     	 uxtb r3,r3
+ 112:../EEPROM/EEPROM_25Series.c **** }
+ 308              	 .loc 2 112 0
+ 309 0042 1846     	 mov r0,r3
+ 310 0044 1037     	 adds r7,r7,#16
+ 311              	.LCFI27:
+ 312              	 .cfi_def_cfa_offset 8
+ 313 0046 BD46     	 mov sp,r7
+ 314              	.LCFI28:
+ 315              	 .cfi_def_cfa_register 13
+ 316              	 
+ 317 0048 80BD     	 pop {r7,pc}
+ 318              	 .cfi_endproc
+ 319              	.LFE5:
+ 321 004a 00BF     	 .section .text.usEEPROM_ReadWord,"ax",%progbits
+ 322              	 .align 2
+ 323              	 .global usEEPROM_ReadWord
+ 324              	 .thumb
+ 325              	 .thumb_func
+ 327              	usEEPROM_ReadWord:
+ 328              	.LFB6:
+ 113:../EEPROM/EEPROM_25Series.c **** 
+ 114:../EEPROM/EEPROM_25Series.c **** 
+ 115:../EEPROM/EEPROM_25Series.c **** /**
+ 116:../EEPROM/EEPROM_25Series.c ****   * @brief  Read one 16-bit word (little endian) from EEPROM address
+ 117:../EEPROM/EEPROM_25Series.c ****   * @param  usAddress: Address
+ 118:../EEPROM/EEPROM_25Series.c ****   */
+ 119:../EEPROM/EEPROM_25Series.c **** uint16_t usEEPROM_ReadWord ( const uint16_t usAddress )
+ 120:../EEPROM/EEPROM_25Series.c **** {
+ 329              	 .loc 2 120 0
+ 330              	 .cfi_startproc
+ 331              	 
+ 332              	 
+ 333 0000 80B5     	 push {r7,lr}
+ 334              	.LCFI29:
+ 335              	 .cfi_def_cfa_offset 8
+ 336              	 .cfi_offset 7,-8
+ 337              	 .cfi_offset 14,-4
+ 338 0002 84B0     	 sub sp,sp,#16
+ 339              	.LCFI30:
+ 340              	 .cfi_def_cfa_offset 24
+ 341 0004 00AF     	 add r7,sp,#0
+ 342              	.LCFI31:
+ 343              	 .cfi_def_cfa_register 7
+ 344 0006 0346     	 mov r3,r0
+ 345 0008 FB80     	 strh r3,[r7,#6]
+ 121:../EEPROM/EEPROM_25Series.c **** 	volatile uint16_t usTempData;
+ 122:../EEPROM/EEPROM_25Series.c **** 
+ 123:../EEPROM/EEPROM_25Series.c **** 	usTempData = ucEEPROM_ReadByte(usAddress);
+ 346              	 .loc 2 123 0
+ 347 000a FB88     	 ldrh r3,[r7,#6]
+ 348 000c 1846     	 mov r0,r3
+ 349 000e FFF7FEFF 	 bl ucEEPROM_ReadByte
+ 350 0012 0346     	 mov r3,r0
+ 351 0014 9BB2     	 uxth r3,r3
+ 352 0016 FB81     	 strh r3,[r7,#14]
+ 124:../EEPROM/EEPROM_25Series.c **** 	usTempData |= (uint16_t)ucEEPROM_ReadByte((usAddress + 1)) << 8;
+ 353              	 .loc 2 124 0
+ 354 0018 FB88     	 ldrh r3,[r7,#6]
+ 355 001a 0133     	 adds r3,r3,#1
+ 356 001c 9BB2     	 uxth r3,r3
+ 357 001e 1846     	 mov r0,r3
+ 358 0020 FFF7FEFF 	 bl ucEEPROM_ReadByte
+ 359 0024 0346     	 mov r3,r0
+ 360 0026 1B02     	 lsls r3,r3,#8
+ 361 0028 9AB2     	 uxth r2,r3
+ 362 002a FB89     	 ldrh r3,[r7,#14]
+ 363 002c 9BB2     	 uxth r3,r3
+ 364 002e 9BB2     	 uxth r3,r3
+ 365 0030 1343     	 orrs r3,r3,r2
+ 366 0032 9BB2     	 uxth r3,r3
+ 367 0034 9BB2     	 uxth r3,r3
+ 368 0036 FB81     	 strh r3,[r7,#14]
+ 125:../EEPROM/EEPROM_25Series.c **** 
+ 126:../EEPROM/EEPROM_25Series.c **** 	return usTempData;
+ 369              	 .loc 2 126 0
+ 370 0038 FB89     	 ldrh r3,[r7,#14]
+ 371 003a 9BB2     	 uxth r3,r3
+ 127:../EEPROM/EEPROM_25Series.c **** }
+ 372              	 .loc 2 127 0
+ 373 003c 1846     	 mov r0,r3
+ 374 003e 1037     	 adds r7,r7,#16
+ 375              	.LCFI32:
+ 376              	 .cfi_def_cfa_offset 8
+ 377 0040 BD46     	 mov sp,r7
+ 378              	.LCFI33:
+ 379              	 .cfi_def_cfa_register 13
+ 380              	 
+ 381 0042 80BD     	 pop {r7,pc}
+ 382              	 .cfi_endproc
+ 383              	.LFE6:
+ 385              	 .section .text.vEEPROM_WriteByte,"ax",%progbits
+ 386              	 .align 2
+ 387              	 .global vEEPROM_WriteByte
+ 388              	 .thumb
+ 389              	 .thumb_func
+ 391              	vEEPROM_WriteByte:
+ 392              	.LFB7:
+ 128:../EEPROM/EEPROM_25Series.c **** 
+ 129:../EEPROM/EEPROM_25Series.c **** 
+ 130:../EEPROM/EEPROM_25Series.c **** /**
+ 131:../EEPROM/EEPROM_25Series.c ****   * @brief  Write a byte to EEPROM address
+ 132:../EEPROM/EEPROM_25Series.c ****   * @param  usAddress: Address
+ 133:../EEPROM/EEPROM_25Series.c ****   * @param  ucValue: Value
+ 134:../EEPROM/EEPROM_25Series.c ****   */
+ 135:../EEPROM/EEPROM_25Series.c **** void vEEPROM_WriteByte ( const uint16_t usAddress, const uint8_t ucValue )
+ 136:../EEPROM/EEPROM_25Series.c **** {
+ 393              	 .loc 2 136 0
+ 394              	 .cfi_startproc
+ 395              	 
+ 396              	 
+ 397 0000 80B5     	 push {r7,lr}
+ 398              	.LCFI34:
+ 399              	 .cfi_def_cfa_offset 8
+ 400              	 .cfi_offset 7,-8
+ 401              	 .cfi_offset 14,-4
+ 402 0002 82B0     	 sub sp,sp,#8
+ 403              	.LCFI35:
+ 404              	 .cfi_def_cfa_offset 16
+ 405 0004 00AF     	 add r7,sp,#0
+ 406              	.LCFI36:
+ 407              	 .cfi_def_cfa_register 7
+ 408 0006 0346     	 mov r3,r0
+ 409 0008 0A46     	 mov r2,r1
+ 410 000a FB80     	 strh r3,[r7,#6]
+ 411 000c 1346     	 mov r3,r2
+ 412 000e 7B71     	 strb r3,[r7,#5]
+ 137:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_LOW);
+ 413              	 .loc 2 137 0
+ 414 0010 0020     	 movs r0,#0
+ 415 0012 FFF7FEFF 	 bl vSPI_ChipSelect
+ 138:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(EEPROM_WREN);		/* Write Enable */
+ 416              	 .loc 2 138 0
+ 417 0016 0620     	 movs r0,#6
+ 418 0018 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 139:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_HIGH);
+ 419              	 .loc 2 139 0
+ 420 001c 0120     	 movs r0,#1
+ 421 001e FFF7FEFF 	 bl vSPI_ChipSelect
+ 140:../EEPROM/EEPROM_25Series.c **** 
+ 141:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_LOW);
+ 422              	 .loc 2 141 0
+ 423 0022 0020     	 movs r0,#0
+ 424 0024 FFF7FEFF 	 bl vSPI_ChipSelect
+ 142:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(EEPROM_WRITE);
+ 425              	 .loc 2 142 0
+ 426 0028 0220     	 movs r0,#2
+ 427 002a FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 143:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive((usAddress >> 8) & 0xFF);
+ 428              	 .loc 2 143 0
+ 429 002e FB88     	 ldrh r3,[r7,#6]
+ 430 0030 1B0A     	 lsrs r3,r3,#8
+ 431 0032 9BB2     	 uxth r3,r3
+ 432 0034 DBB2     	 uxtb r3,r3
+ 433 0036 1846     	 mov r0,r3
+ 434 0038 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 144:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(usAddress & 0xFF);
+ 435              	 .loc 2 144 0
+ 436 003c FB88     	 ldrh r3,[r7,#6]
+ 437 003e DBB2     	 uxtb r3,r3
+ 438 0040 1846     	 mov r0,r3
+ 439 0042 FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 145:../EEPROM/EEPROM_25Series.c **** 	ucSPI_TransmitReceive(ucValue);
+ 440              	 .loc 2 145 0
+ 441 0046 7B79     	 ldrb r3,[r7,#5]
+ 442 0048 1846     	 mov r0,r3
+ 443 004a FFF7FEFF 	 bl ucSPI_TransmitReceive
+ 146:../EEPROM/EEPROM_25Series.c **** 	vSPI_ChipSelect(EEPROM_CS_STATE_HIGH);
+ 444              	 .loc 2 146 0
+ 445 004e 0120     	 movs r0,#1
+ 446 0050 FFF7FEFF 	 bl vSPI_ChipSelect
+ 147:../EEPROM/EEPROM_25Series.c **** 
+ 148:../EEPROM/EEPROM_25Series.c **** }
+ 447              	 .loc 2 148 0
+ 448 0054 0837     	 adds r7,r7,#8
+ 449              	.LCFI37:
+ 450              	 .cfi_def_cfa_offset 8
+ 451 0056 BD46     	 mov sp,r7
+ 452              	.LCFI38:
+ 453              	 .cfi_def_cfa_register 13
+ 454              	 
+ 455 0058 80BD     	 pop {r7,pc}
+ 456              	 .cfi_endproc
+ 457              	.LFE7:
+ 459 005a 00BF     	 .section .text.vEEPROM_WriteWord,"ax",%progbits
+ 460              	 .align 2
+ 461              	 .global vEEPROM_WriteWord
+ 462              	 .thumb
+ 463              	 .thumb_func
+ 465              	vEEPROM_WriteWord:
+ 466              	.LFB8:
+ 149:../EEPROM/EEPROM_25Series.c **** 
+ 150:../EEPROM/EEPROM_25Series.c **** 
+ 151:../EEPROM/EEPROM_25Series.c **** /**
+ 152:../EEPROM/EEPROM_25Series.c ****   * @brief  Write a word value to EEPROM address
+ 153:../EEPROM/EEPROM_25Series.c ****   * @param  usAddress: Address
+ 154:../EEPROM/EEPROM_25Series.c ****   * @param  usValue: Value
+ 155:../EEPROM/EEPROM_25Series.c ****   */
+ 156:../EEPROM/EEPROM_25Series.c **** void vEEPROM_WriteWord ( const uint16_t usAddress, const uint16_t usValue )
+ 157:../EEPROM/EEPROM_25Series.c **** {
+ 467              	 .loc 2 157 0
+ 468              	 .cfi_startproc
+ 469              	 
+ 470              	 
+ 471 0000 80B5     	 push {r7,lr}
+ 472              	.LCFI39:
+ 473              	 .cfi_def_cfa_offset 8
+ 474              	 .cfi_offset 7,-8
+ 475              	 .cfi_offset 14,-4
+ 476 0002 82B0     	 sub sp,sp,#8
+ 477              	.LCFI40:
+ 478              	 .cfi_def_cfa_offset 16
+ 479 0004 00AF     	 add r7,sp,#0
+ 480              	.LCFI41:
+ 481              	 .cfi_def_cfa_register 7
+ 482 0006 0346     	 mov r3,r0
+ 483 0008 0A46     	 mov r2,r1
+ 484 000a FB80     	 strh r3,[r7,#6]
+ 485 000c 1346     	 mov r3,r2
+ 486 000e BB80     	 strh r3,[r7,#4]
+ 158:../EEPROM/EEPROM_25Series.c **** 	vEEPROM_WriteByte(usAddress, usValue);
+ 487              	 .loc 2 158 0
+ 488 0010 BB88     	 ldrh r3,[r7,#4]
+ 489 0012 DBB2     	 uxtb r3,r3
+ 490 0014 FA88     	 ldrh r2,[r7,#6]
+ 491 0016 1046     	 mov r0,r2
+ 492 0018 1946     	 mov r1,r3
+ 493 001a FFF7FEFF 	 bl vEEPROM_WriteByte
+ 159:../EEPROM/EEPROM_25Series.c **** 	vEEPROM_WriteByte(usAddress+1, ((usValue>>8) & 0xFF));
+ 494              	 .loc 2 159 0
+ 495 001e FB88     	 ldrh r3,[r7,#6]
+ 496 0020 0133     	 adds r3,r3,#1
+ 497 0022 9AB2     	 uxth r2,r3
+ 498 0024 BB88     	 ldrh r3,[r7,#4]
+ 499 0026 1B0A     	 lsrs r3,r3,#8
+ 500 0028 9BB2     	 uxth r3,r3
+ 501 002a DBB2     	 uxtb r3,r3
+ 502 002c 1046     	 mov r0,r2
+ 503 002e 1946     	 mov r1,r3
+ 504 0030 FFF7FEFF 	 bl vEEPROM_WriteByte
+ 160:../EEPROM/EEPROM_25Series.c **** }
+ 505              	 .loc 2 160 0
+ 506 0034 0837     	 adds r7,r7,#8
+ 507              	.LCFI42:
+ 508              	 .cfi_def_cfa_offset 8
+ 509 0036 BD46     	 mov sp,r7
+ 510              	.LCFI43:
+ 511              	 .cfi_def_cfa_register 13
+ 512              	 
+ 513 0038 80BD     	 pop {r7,pc}
+ 514              	 .cfi_endproc
+ 515              	.LFE8:
+ 517 003a 00BF     	 .section .text.vEEPROM_UpdateByte,"ax",%progbits
+ 518              	 .align 2
+ 519              	 .global vEEPROM_UpdateByte
+ 520              	 .thumb
+ 521              	 .thumb_func
+ 523              	vEEPROM_UpdateByte:
+ 524              	.LFB9:
+ 161:../EEPROM/EEPROM_25Series.c **** 
+ 162:../EEPROM/EEPROM_25Series.c **** 
+ 163:../EEPROM/EEPROM_25Series.c **** /**
+ 164:../EEPROM/EEPROM_25Series.c ****   * @brief  Update byte to EEPROM address
+ 165:../EEPROM/EEPROM_25Series.c ****   * @param  usAddress: Address
+ 166:../EEPROM/EEPROM_25Series.c ****   * @param  usValue: Value
+ 167:../EEPROM/EEPROM_25Series.c ****   */
+ 168:../EEPROM/EEPROM_25Series.c **** void vEEPROM_UpdateByte ( const uint16_t usAddress, const uint8_t ucValue )
+ 169:../EEPROM/EEPROM_25Series.c **** {
+ 525              	 .loc 2 169 0
+ 526              	 .cfi_startproc
+ 527              	 
+ 528              	 
+ 529 0000 80B5     	 push {r7,lr}
+ 530              	.LCFI44:
+ 531              	 .cfi_def_cfa_offset 8
+ 532              	 .cfi_offset 7,-8
+ 533              	 .cfi_offset 14,-4
+ 534 0002 82B0     	 sub sp,sp,#8
+ 535              	.LCFI45:
+ 536              	 .cfi_def_cfa_offset 16
+ 537 0004 00AF     	 add r7,sp,#0
+ 538              	.LCFI46:
+ 539              	 .cfi_def_cfa_register 7
+ 540 0006 0346     	 mov r3,r0
+ 541 0008 0A46     	 mov r2,r1
+ 542 000a FB80     	 strh r3,[r7,#6]
+ 543 000c 1346     	 mov r3,r2
+ 544 000e 7B71     	 strb r3,[r7,#5]
+ 170:../EEPROM/EEPROM_25Series.c **** 	if ( ucEEPROM_ReadByte(usAddress) != ucValue )
+ 545              	 .loc 2 170 0
+ 546 0010 FB88     	 ldrh r3,[r7,#6]
+ 547 0012 1846     	 mov r0,r3
+ 548 0014 FFF7FEFF 	 bl ucEEPROM_ReadByte
+ 549 0018 0346     	 mov r3,r0
+ 550 001a 1A46     	 mov r2,r3
+ 551 001c 7B79     	 ldrb r3,[r7,#5]
+ 552 001e 9342     	 cmp r3,r2
+ 553 0020 05D0     	 beq .L19
+ 171:../EEPROM/EEPROM_25Series.c **** 	{
+ 172:../EEPROM/EEPROM_25Series.c **** 		vEEPROM_WriteByte(usAddress, ucValue);
+ 554              	 .loc 2 172 0
+ 555 0022 FA88     	 ldrh r2,[r7,#6]
+ 556 0024 7B79     	 ldrb r3,[r7,#5]
+ 557 0026 1046     	 mov r0,r2
+ 558 0028 1946     	 mov r1,r3
+ 559 002a FFF7FEFF 	 bl vEEPROM_WriteByte
+ 560              	.L19:
+ 173:../EEPROM/EEPROM_25Series.c **** 	}
+ 174:../EEPROM/EEPROM_25Series.c **** }
+ 561              	 .loc 2 174 0
+ 562 002e 0837     	 adds r7,r7,#8
+ 563              	.LCFI47:
+ 564              	 .cfi_def_cfa_offset 8
+ 565 0030 BD46     	 mov sp,r7
+ 566              	.LCFI48:
+ 567              	 .cfi_def_cfa_register 13
+ 568              	 
+ 569 0032 80BD     	 pop {r7,pc}
+ 570              	 .cfi_endproc
+ 571              	.LFE9:
+ 573              	 .section .text.vEEPROM_UpdateWord,"ax",%progbits
+ 574              	 .align 2
+ 575              	 .global vEEPROM_UpdateWord
+ 576              	 .thumb
+ 577              	 .thumb_func
+ 579              	vEEPROM_UpdateWord:
+ 580              	.LFB10:
+ 175:../EEPROM/EEPROM_25Series.c **** 
+ 176:../EEPROM/EEPROM_25Series.c **** 
+ 177:../EEPROM/EEPROM_25Series.c **** /**
+ 178:../EEPROM/EEPROM_25Series.c ****   * @brief  Update word to EEPROM address
+ 179:../EEPROM/EEPROM_25Series.c ****   * @param  usAddress: Address
+ 180:../EEPROM/EEPROM_25Series.c ****   * @param  usValue: Value
+ 181:../EEPROM/EEPROM_25Series.c ****   */
+ 182:../EEPROM/EEPROM_25Series.c **** void vEEPROM_UpdateWord ( const uint16_t usAddress, const uint16_t usValue )
+ 183:../EEPROM/EEPROM_25Series.c **** {
+ 581              	 .loc 2 183 0
+ 582              	 .cfi_startproc
+ 583              	 
+ 584              	 
+ 585 0000 80B5     	 push {r7,lr}
+ 586              	.LCFI49:
+ 587              	 .cfi_def_cfa_offset 8
+ 588              	 .cfi_offset 7,-8
+ 589              	 .cfi_offset 14,-4
+ 590 0002 84B0     	 sub sp,sp,#16
+ 591              	.LCFI50:
+ 592              	 .cfi_def_cfa_offset 24
+ 593 0004 00AF     	 add r7,sp,#0
+ 594              	.LCFI51:
+ 595              	 .cfi_def_cfa_register 7
+ 596 0006 0346     	 mov r3,r0
+ 597 0008 0A46     	 mov r2,r1
+ 598 000a FB80     	 strh r3,[r7,#6]
+ 599 000c 1346     	 mov r3,r2
+ 600 000e BB80     	 strh r3,[r7,#4]
+ 184:../EEPROM/EEPROM_25Series.c **** 	volatile uint16_t usWordData = usEEPROM_ReadWord(usAddress);
+ 601              	 .loc 2 184 0
+ 602 0010 FB88     	 ldrh r3,[r7,#6]
+ 603 0012 1846     	 mov r0,r3
+ 604 0014 FFF7FEFF 	 bl usEEPROM_ReadWord
+ 605 0018 0346     	 mov r3,r0
+ 606 001a FB81     	 strh r3,[r7,#14]
+ 185:../EEPROM/EEPROM_25Series.c **** 
+ 186:../EEPROM/EEPROM_25Series.c **** 	if ( usWordData != usValue )
+ 607              	 .loc 2 186 0
+ 608 001c FB89     	 ldrh r3,[r7,#14]
+ 609 001e 9BB2     	 uxth r3,r3
+ 610 0020 BA88     	 ldrh r2,[r7,#4]
+ 611 0022 9A42     	 cmp r2,r3
+ 612 0024 05D0     	 beq .L21
+ 187:../EEPROM/EEPROM_25Series.c **** 	{
+ 188:../EEPROM/EEPROM_25Series.c **** 		vEEPROM_WriteWord (usAddress, usValue);
+ 613              	 .loc 2 188 0
+ 614 0026 FA88     	 ldrh r2,[r7,#6]
+ 615 0028 BB88     	 ldrh r3,[r7,#4]
+ 616 002a 1046     	 mov r0,r2
+ 617 002c 1946     	 mov r1,r3
+ 618 002e FFF7FEFF 	 bl vEEPROM_WriteWord
+ 619              	.L21:
+ 189:../EEPROM/EEPROM_25Series.c **** 	}
+ 190:../EEPROM/EEPROM_25Series.c **** }
+ 620              	 .loc 2 190 0
+ 621 0032 1037     	 adds r7,r7,#16
+ 622              	.LCFI52:
+ 623              	 .cfi_def_cfa_offset 8
+ 624 0034 BD46     	 mov sp,r7
+ 625              	.LCFI53:
+ 626              	 .cfi_def_cfa_register 13
+ 627              	 
+ 628 0036 80BD     	 pop {r7,pc}
+ 629              	 .cfi_endproc
+ 630              	.LFE10:
+ 632              	 .section .text.xEEPROM_WritePage,"ax",%progbits
+ 633              	 .align 2
+ 634              	 .thumb
+ 635              	 .thumb_func
+ 637              	xEEPROM_WritePage:
+ 638              	.LFB11:
+ 191:../EEPROM/EEPROM_25Series.c **** 
+ 192:../EEPROM/EEPROM_25Series.c **** 
+ 193:../EEPROM/EEPROM_25Series.c **** /**
+ 194:../EEPROM/EEPROM_25Series.c ****   * @brief  Write data to EEPROM given address and data size
+ 195:../EEPROM/EEPROM_25Series.c ****   * @param  usStartAddress: Start address EPPROM
+ 196:../EEPROM/EEPROM_25Series.c ****   * @param  pucWriteData: Address of data to write
+ 197:../EEPROM/EEPROM_25Series.c ****   * @param  usDataSize: Size of data to write
+ 198:../EEPROM/EEPROM_25Series.c ****   * @retval Status
+ 199:../EEPROM/EEPROM_25Series.c ****   */
+ 200:../EEPROM/EEPROM_25Series.c **** static EEPROM_Status_t xEEPROM_WritePage ( const uint16_t usStartAddress, const uint8_t *pucWriteDa
+ 201:../EEPROM/EEPROM_25Series.c **** {
+ 639              	 .loc 2 201 0
+ 640              	 .cfi_startproc
+ 641              	 
+ 642              	 
+ 643 0000 80B5     	 push {r7,lr}
+ 644              	.LCFI54:
+ 645              	 .cfi_def_cfa_offset 8
+ 646              	 .cfi_offset 7,-8
+ 647              	 .cfi_offset 14,-4
+ 648 0002 84B0     	 sub sp,sp,#16
+ 649              	.LCFI55:
+ 650              	 .cfi_def_cfa_offset 24
+ 651 0004 00AF     	 add r7,sp,#0
+ 652              	.LCFI56:
+ 653              	 .cfi_def_cfa_register 7
+ 654 0006 0346     	 mov r3,r0
+ 655 0008 3960     	 str r1,[r7]
+ 656 000a FB80     	 strh r3,[r7,#6]
+ 657 000c 1346     	 mov r3,r2
+ 658 000e 7B71     	 strb r3,[r7,#5]
+ 202:../EEPROM/EEPROM_25Series.c **** 	EEPROM_Status_t status;
+ 203:../EEPROM/EEPROM_25Series.c **** 	uint16_t usIndex;
+ 204:../EEPROM/EEPROM_25Series.c **** 	uint16_t usWaitIndex;
+ 205:../EEPROM/EEPROM_25Series.c **** 
+ 206:../EEPROM/EEPROM_25Series.c **** 	status = xEEPROM_IsReady();
+ 659              	 .loc 2 206 0
+ 660 0010 FFF7FEFF 	 bl xEEPROM_IsReady
+ 661 0014 0346     	 mov r3,r0
+ 662 0016 FB73     	 strb r3,[r7,#15]
+ 207:../EEPROM/EEPROM_25Series.c **** 
+ 208:../EEPROM/EEPROM_25Series.c **** 	for ( usIndex = 0; usIndex < ucDataSize; usIndex++ )
+ 663              	 .loc 2 208 0
+ 664 0018 0023     	 movs r3,#0
+ 665 001a BB81     	 strh r3,[r7,#12]
+ 666 001c 25E0     	 b .L24
+ 667              	.L29:
+ 209:../EEPROM/EEPROM_25Series.c **** 	{
+ 210:../EEPROM/EEPROM_25Series.c **** 		vEEPROM_WriteByte((usStartAddress+usIndex), pucWriteData[usIndex]);
+ 668              	 .loc 2 210 0
+ 669 001e FA88     	 ldrh r2,[r7,#6]
+ 670 0020 BB89     	 ldrh r3,[r7,#12]
+ 671 0022 1344     	 add r3,r3,r2
+ 672 0024 99B2     	 uxth r1,r3
+ 673 0026 BB89     	 ldrh r3,[r7,#12]
+ 674 0028 3A68     	 ldr r2,[r7]
+ 675 002a 1344     	 add r3,r3,r2
+ 676 002c 1B78     	 ldrb r3,[r3]
+ 677 002e 0846     	 mov r0,r1
+ 678 0030 1946     	 mov r1,r3
+ 679 0032 FFF7FEFF 	 bl vEEPROM_WriteByte
+ 211:../EEPROM/EEPROM_25Series.c **** 
+ 212:../EEPROM/EEPROM_25Series.c **** 		for ( usWaitIndex = 0; usWaitIndex <= EEPROM_WRITE_TIMEOUT; usWaitIndex++ )
+ 680              	 .loc 2 212 0
+ 681 0036 0023     	 movs r3,#0
+ 682 0038 7B81     	 strh r3,[r7,#10]
+ 683 003a 0FE0     	 b .L25
+ 684              	.L28:
+ 213:../EEPROM/EEPROM_25Series.c **** 		{
+ 214:../EEPROM/EEPROM_25Series.c **** 			if ( usWaitIndex == EEPROM_WRITE_TIMEOUT )
+ 685              	 .loc 2 214 0
+ 686 003c 7B89     	 ldrh r3,[r7,#10]
+ 687 003e B3F5C87F 	 cmp r3,#400
+ 688 0042 08D1     	 bne .L26
+ 215:../EEPROM/EEPROM_25Series.c **** 			{
+ 216:../EEPROM/EEPROM_25Series.c **** 				status = xEEPROM_IsReady();
+ 689              	 .loc 2 216 0
+ 690 0044 FFF7FEFF 	 bl xEEPROM_IsReady
+ 691 0048 0346     	 mov r3,r0
+ 692 004a FB73     	 strb r3,[r7,#15]
+ 217:../EEPROM/EEPROM_25Series.c **** 
+ 218:../EEPROM/EEPROM_25Series.c **** 				if ( status != EEPROM_STATUS_SUCCESS )
+ 693              	 .loc 2 218 0
+ 694 004c FB7B     	 ldrb r3,[r7,#15]
+ 695 004e 002B     	 cmp r3,#0
+ 696 0050 01D0     	 beq .L26
+ 219:../EEPROM/EEPROM_25Series.c **** 					return status;
+ 697              	 .loc 2 219 0
+ 698 0052 FB7B     	 ldrb r3,[r7,#15]
+ 699 0054 0FE0     	 b .L27
+ 700              	.L26:
+ 212:../EEPROM/EEPROM_25Series.c **** 		{
+ 701              	 .loc 2 212 0 discriminator 2
+ 702 0056 7B89     	 ldrh r3,[r7,#10]
+ 703 0058 0133     	 adds r3,r3,#1
+ 704 005a 7B81     	 strh r3,[r7,#10]
+ 705              	.L25:
+ 212:../EEPROM/EEPROM_25Series.c **** 		{
+ 706              	 .loc 2 212 0 is_stmt 0 discriminator 1
+ 707 005c 7B89     	 ldrh r3,[r7,#10]
+ 708 005e B3F5C87F 	 cmp r3,#400
+ 709 0062 EBD9     	 bls .L28
+ 208:../EEPROM/EEPROM_25Series.c **** 	{
+ 710              	 .loc 2 208 0 is_stmt 1 discriminator 2
+ 711 0064 BB89     	 ldrh r3,[r7,#12]
+ 712 0066 0133     	 adds r3,r3,#1
+ 713 0068 BB81     	 strh r3,[r7,#12]
+ 714              	.L24:
+ 208:../EEPROM/EEPROM_25Series.c **** 	{
+ 715              	 .loc 2 208 0 is_stmt 0 discriminator 1
+ 716 006a 7B79     	 ldrb r3,[r7,#5]
+ 717 006c 9BB2     	 uxth r3,r3
+ 718 006e BA89     	 ldrh r2,[r7,#12]
+ 719 0070 9A42     	 cmp r2,r3
+ 720 0072 D4D3     	 bcc .L29
+ 220:../EEPROM/EEPROM_25Series.c **** 			}
+ 221:../EEPROM/EEPROM_25Series.c **** 		}
+ 222:../EEPROM/EEPROM_25Series.c **** 
+ 223:../EEPROM/EEPROM_25Series.c **** 	}
+ 224:../EEPROM/EEPROM_25Series.c **** 
+ 225:../EEPROM/EEPROM_25Series.c **** 	return status;
+ 721              	 .loc 2 225 0 is_stmt 1
+ 722 0074 FB7B     	 ldrb r3,[r7,#15]
+ 723              	.L27:
+ 226:../EEPROM/EEPROM_25Series.c **** }
+ 724              	 .loc 2 226 0
+ 725 0076 1846     	 mov r0,r3
+ 726 0078 1037     	 adds r7,r7,#16
+ 727              	.LCFI57:
+ 728              	 .cfi_def_cfa_offset 8
+ 729 007a BD46     	 mov sp,r7
+ 730              	.LCFI58:
+ 731              	 .cfi_def_cfa_register 13
+ 732              	 
+ 733 007c 80BD     	 pop {r7,pc}
+ 734              	 .cfi_endproc
+ 735              	.LFE11:
+ 737 007e 00BF     	 .section .text.vEEPROM_Write,"ax",%progbits
+ 738              	 .align 2
+ 739              	 .global vEEPROM_Write
+ 740              	 .thumb
+ 741              	 .thumb_func
+ 743              	vEEPROM_Write:
+ 744              	.LFB12:
+ 227:../EEPROM/EEPROM_25Series.c **** 
+ 228:../EEPROM/EEPROM_25Series.c **** 
+ 229:../EEPROM/EEPROM_25Series.c **** /**
+ 230:../EEPROM/EEPROM_25Series.c ****   * @brief  Write data to EEPROM given address and data size
+ 231:../EEPROM/EEPROM_25Series.c ****   * @param  usStartAddress: Start address EPPROM
+ 232:../EEPROM/EEPROM_25Series.c ****   * @param  pucWriteData: Address of data to write
+ 233:../EEPROM/EEPROM_25Series.c ****   * @param  usDataSize: Size of data to write
+ 234:../EEPROM/EEPROM_25Series.c ****   * @retval Status
+ 235:../EEPROM/EEPROM_25Series.c ****   */
+ 236:../EEPROM/EEPROM_25Series.c **** EEPROM_Status_t vEEPROM_Write ( const uint16_t usStartAddress, const uint8_t *pucWriteData, const u
+ 237:../EEPROM/EEPROM_25Series.c **** {
+ 745              	 .loc 2 237 0
+ 746              	 .cfi_startproc
+ 747              	 
+ 748              	 
+ 749 0000 80B5     	 push {r7,lr}
+ 750              	.LCFI59:
+ 751              	 .cfi_def_cfa_offset 8
+ 752              	 .cfi_offset 7,-8
+ 753              	 .cfi_offset 14,-4
+ 754 0002 86B0     	 sub sp,sp,#24
+ 755              	.LCFI60:
+ 756              	 .cfi_def_cfa_offset 32
+ 757 0004 00AF     	 add r7,sp,#0
+ 758              	.LCFI61:
+ 759              	 .cfi_def_cfa_register 7
+ 760 0006 0346     	 mov r3,r0
+ 761 0008 3960     	 str r1,[r7]
+ 762 000a FB80     	 strh r3,[r7,#6]
+ 763 000c 1346     	 mov r3,r2
+ 764 000e BB80     	 strh r3,[r7,#4]
+ 238:../EEPROM/EEPROM_25Series.c **** 	EEPROM_Status_t status;
+ 239:../EEPROM/EEPROM_25Series.c **** 	uint16_t usIndex;
+ 240:../EEPROM/EEPROM_25Series.c **** 	uint16_t usPacketIndex;
+ 241:../EEPROM/EEPROM_25Series.c **** 	uint16_t usNumberBytesPacket;
+ 242:../EEPROM/EEPROM_25Series.c **** 	uint16_t usNumberBytesWastePacket;
+ 243:../EEPROM/EEPROM_25Series.c **** 
+ 244:../EEPROM/EEPROM_25Series.c **** 	usPacketIndex = 0;
+ 765              	 .loc 2 244 0
+ 766 0010 0023     	 movs r3,#0
+ 767 0012 7B82     	 strh r3,[r7,#18]
+ 245:../EEPROM/EEPROM_25Series.c **** 	usNumberBytesPacket = usDataSize / EEPROM_PAGE_SIZE;
+ 768              	 .loc 2 245 0
+ 769 0014 BB88     	 ldrh r3,[r7,#4]
+ 770 0016 9B09     	 lsrs r3,r3,#6
+ 771 0018 3B82     	 strh r3,[r7,#16]
+ 246:../EEPROM/EEPROM_25Series.c **** 	usNumberBytesWastePacket = usDataSize % EEPROM_PAGE_SIZE;
+ 772              	 .loc 2 246 0
+ 773 001a BB88     	 ldrh r3,[r7,#4]
+ 774 001c 03F03F03 	 and r3,r3,#63
+ 775 0020 FB81     	 strh r3,[r7,#14]
+ 247:../EEPROM/EEPROM_25Series.c **** 
+ 248:../EEPROM/EEPROM_25Series.c **** 	for ( usIndex = 0; usIndex < usNumberBytesPacket; usIndex++)
+ 776              	 .loc 2 248 0
+ 777 0022 0023     	 movs r3,#0
+ 778 0024 BB82     	 strh r3,[r7,#20]
+ 779 0026 18E0     	 b .L31
+ 780              	.L34:
+ 249:../EEPROM/EEPROM_25Series.c **** 	{
+ 250:../EEPROM/EEPROM_25Series.c **** 		status = xEEPROM_WritePage((usStartAddress + usPacketIndex), (pucWriteData + usPacketIndex), EEPR
+ 781              	 .loc 2 250 0
+ 782 0028 FA88     	 ldrh r2,[r7,#6]
+ 783 002a 7B8A     	 ldrh r3,[r7,#18]
+ 784 002c 1344     	 add r3,r3,r2
+ 785 002e 99B2     	 uxth r1,r3
+ 786 0030 7B8A     	 ldrh r3,[r7,#18]
+ 787 0032 3A68     	 ldr r2,[r7]
+ 788 0034 1344     	 add r3,r3,r2
+ 789 0036 0846     	 mov r0,r1
+ 790 0038 1946     	 mov r1,r3
+ 791 003a 4022     	 movs r2,#64
+ 792 003c FFF7FEFF 	 bl xEEPROM_WritePage
+ 793 0040 0346     	 mov r3,r0
+ 794 0042 FB75     	 strb r3,[r7,#23]
+ 251:../EEPROM/EEPROM_25Series.c **** 		usPacketIndex += EEPROM_PAGE_SIZE;
+ 795              	 .loc 2 251 0
+ 796 0044 7B8A     	 ldrh r3,[r7,#18]
+ 797 0046 4033     	 adds r3,r3,#64
+ 798 0048 7B82     	 strh r3,[r7,#18]
+ 252:../EEPROM/EEPROM_25Series.c **** 
+ 253:../EEPROM/EEPROM_25Series.c **** 		if (status != EEPROM_STATUS_SUCCESS)
+ 799              	 .loc 2 253 0
+ 800 004a FB7D     	 ldrb r3,[r7,#23]
+ 801 004c 002B     	 cmp r3,#0
+ 802 004e 01D0     	 beq .L32
+ 254:../EEPROM/EEPROM_25Series.c **** 		{
+ 255:../EEPROM/EEPROM_25Series.c **** 			return status;
+ 803              	 .loc 2 255 0
+ 804 0050 FB7D     	 ldrb r3,[r7,#23]
+ 805 0052 1AE0     	 b .L33
+ 806              	.L32:
+ 248:../EEPROM/EEPROM_25Series.c **** 	{
+ 807              	 .loc 2 248 0 discriminator 2
+ 808 0054 BB8A     	 ldrh r3,[r7,#20]
+ 809 0056 0133     	 adds r3,r3,#1
+ 810 0058 BB82     	 strh r3,[r7,#20]
+ 811              	.L31:
+ 248:../EEPROM/EEPROM_25Series.c **** 	{
+ 812              	 .loc 2 248 0 is_stmt 0 discriminator 1
+ 813 005a BA8A     	 ldrh r2,[r7,#20]
+ 814 005c 3B8A     	 ldrh r3,[r7,#16]
+ 815 005e 9A42     	 cmp r2,r3
+ 816 0060 E2D3     	 bcc .L34
+ 256:../EEPROM/EEPROM_25Series.c **** 		}
+ 257:../EEPROM/EEPROM_25Series.c **** 	}
+ 258:../EEPROM/EEPROM_25Series.c **** 
+ 259:../EEPROM/EEPROM_25Series.c **** 	if (usNumberBytesWastePacket)
+ 817              	 .loc 2 259 0 is_stmt 1
+ 818 0062 FB89     	 ldrh r3,[r7,#14]
+ 819 0064 002B     	 cmp r3,#0
+ 820 0066 0FD0     	 beq .L35
+ 260:../EEPROM/EEPROM_25Series.c **** 	{
+ 261:../EEPROM/EEPROM_25Series.c **** 		status = xEEPROM_WritePage((usStartAddress + usPacketIndex), (pucWriteData + usPacketIndex), usNu
+ 821              	 .loc 2 261 0
+ 822 0068 FA88     	 ldrh r2,[r7,#6]
+ 823 006a 7B8A     	 ldrh r3,[r7,#18]
+ 824 006c 1344     	 add r3,r3,r2
+ 825 006e 99B2     	 uxth r1,r3
+ 826 0070 7B8A     	 ldrh r3,[r7,#18]
+ 827 0072 3A68     	 ldr r2,[r7]
+ 828 0074 1A44     	 add r2,r2,r3
+ 829 0076 FB89     	 ldrh r3,[r7,#14]
+ 830 0078 DBB2     	 uxtb r3,r3
+ 831 007a 0846     	 mov r0,r1
+ 832 007c 1146     	 mov r1,r2
+ 833 007e 1A46     	 mov r2,r3
+ 834 0080 FFF7FEFF 	 bl xEEPROM_WritePage
+ 835 0084 0346     	 mov r3,r0
+ 836 0086 FB75     	 strb r3,[r7,#23]
+ 837              	.L35:
+ 262:../EEPROM/EEPROM_25Series.c **** 	}
+ 263:../EEPROM/EEPROM_25Series.c **** 
+ 264:../EEPROM/EEPROM_25Series.c **** 	return status;
+ 838              	 .loc 2 264 0
+ 839 0088 FB7D     	 ldrb r3,[r7,#23]
+ 840              	.L33:
+ 265:../EEPROM/EEPROM_25Series.c **** }
+ 841              	 .loc 2 265 0
+ 842 008a 1846     	 mov r0,r3
+ 843 008c 1837     	 adds r7,r7,#24
+ 844              	.LCFI62:
+ 845              	 .cfi_def_cfa_offset 8
+ 846 008e BD46     	 mov sp,r7
+ 847              	.LCFI63:
+ 848              	 .cfi_def_cfa_register 13
+ 849              	 
+ 850 0090 80BD     	 pop {r7,pc}
+ 851              	 .cfi_endproc
+ 852              	.LFE12:
+ 854 0092 00BF     	 .section .text.vEEPROM_Read,"ax",%progbits
+ 855              	 .align 2
+ 856              	 .global vEEPROM_Read
+ 857              	 .thumb
+ 858              	 .thumb_func
+ 860              	vEEPROM_Read:
+ 861              	.LFB13:
+ 266:../EEPROM/EEPROM_25Series.c **** 
+ 267:../EEPROM/EEPROM_25Series.c **** 
+ 268:../EEPROM/EEPROM_25Series.c **** /**
+ 269:../EEPROM/EEPROM_25Series.c ****   * @brief  Read data to EEPROM given address and data size
+ 270:../EEPROM/EEPROM_25Series.c ****   * @param  usStartAddress: Start address EPPROM
+ 271:../EEPROM/EEPROM_25Series.c ****   * @param  pucWriteData: Address of data to write
+ 272:../EEPROM/EEPROM_25Series.c ****   * @param  usDataSize: Size of data to write
+ 273:../EEPROM/EEPROM_25Series.c ****   * @retval Status
+ 274:../EEPROM/EEPROM_25Series.c ****   */
+ 275:../EEPROM/EEPROM_25Series.c **** EEPROM_Status_t vEEPROM_Read ( const uint16_t usStartAddress, uint8_t *pucReadData, const uint16_t 
+ 276:../EEPROM/EEPROM_25Series.c **** {
+ 862              	 .loc 2 276 0
+ 863              	 .cfi_startproc
+ 864              	 
+ 865              	 
+ 866 0000 90B5     	 push {r4,r7,lr}
+ 867              	.LCFI64:
+ 868              	 .cfi_def_cfa_offset 12
+ 869              	 .cfi_offset 4,-12
+ 870              	 .cfi_offset 7,-8
+ 871              	 .cfi_offset 14,-4
+ 872 0002 85B0     	 sub sp,sp,#20
+ 873              	.LCFI65:
+ 874              	 .cfi_def_cfa_offset 32
+ 875 0004 00AF     	 add r7,sp,#0
+ 876              	.LCFI66:
+ 877              	 .cfi_def_cfa_register 7
+ 878 0006 0346     	 mov r3,r0
+ 879 0008 3960     	 str r1,[r7]
+ 880 000a FB80     	 strh r3,[r7,#6]
+ 881 000c 1346     	 mov r3,r2
+ 882 000e BB80     	 strh r3,[r7,#4]
+ 277:../EEPROM/EEPROM_25Series.c **** 	uint16_t usIndex;
+ 278:../EEPROM/EEPROM_25Series.c **** 
+ 279:../EEPROM/EEPROM_25Series.c **** 	for ( usIndex = 0; usIndex < usDataSize; usIndex++ )
+ 883              	 .loc 2 279 0
+ 884 0010 0023     	 movs r3,#0
+ 885 0012 FB81     	 strh r3,[r7,#14]
+ 886 0014 0EE0     	 b .L37
+ 887              	.L38:
+ 280:../EEPROM/EEPROM_25Series.c **** 	{
+ 281:../EEPROM/EEPROM_25Series.c **** 		pucReadData[usIndex] = ucEEPROM_ReadByte((usStartAddress+usIndex));
+ 888              	 .loc 2 281 0 discriminator 3
+ 889 0016 FB89     	 ldrh r3,[r7,#14]
+ 890 0018 3A68     	 ldr r2,[r7]
+ 891 001a D418     	 adds r4,r2,r3
+ 892 001c FA88     	 ldrh r2,[r7,#6]
+ 893 001e FB89     	 ldrh r3,[r7,#14]
+ 894 0020 1344     	 add r3,r3,r2
+ 895 0022 9BB2     	 uxth r3,r3
+ 896 0024 1846     	 mov r0,r3
+ 897 0026 FFF7FEFF 	 bl ucEEPROM_ReadByte
+ 898 002a 0346     	 mov r3,r0
+ 899 002c 2370     	 strb r3,[r4]
+ 279:../EEPROM/EEPROM_25Series.c **** 	{
+ 900              	 .loc 2 279 0 discriminator 3
+ 901 002e FB89     	 ldrh r3,[r7,#14]
+ 902 0030 0133     	 adds r3,r3,#1
+ 903 0032 FB81     	 strh r3,[r7,#14]
+ 904              	.L37:
+ 279:../EEPROM/EEPROM_25Series.c **** 	{
+ 905              	 .loc 2 279 0 is_stmt 0 discriminator 1
+ 906 0034 FA89     	 ldrh r2,[r7,#14]
+ 907 0036 BB88     	 ldrh r3,[r7,#4]
+ 908 0038 9A42     	 cmp r2,r3
+ 909 003a ECD3     	 bcc .L38
+ 282:../EEPROM/EEPROM_25Series.c **** 	}
+ 283:../EEPROM/EEPROM_25Series.c **** 
+ 284:../EEPROM/EEPROM_25Series.c **** 	return xEEPROM_IsReady();
+ 910              	 .loc 2 284 0 is_stmt 1
+ 911 003c FFF7FEFF 	 bl xEEPROM_IsReady
+ 912 0040 0346     	 mov r3,r0
+ 285:../EEPROM/EEPROM_25Series.c **** }
+ 913              	 .loc 2 285 0
+ 914 0042 1846     	 mov r0,r3
+ 915 0044 1437     	 adds r7,r7,#20
+ 916              	.LCFI67:
+ 917              	 .cfi_def_cfa_offset 12
+ 918 0046 BD46     	 mov sp,r7
+ 919              	.LCFI68:
+ 920              	 .cfi_def_cfa_register 13
+ 921              	 
+ 922 0048 90BD     	 pop {r4,r7,pc}
+ 923              	 .cfi_endproc
+ 924              	.LFE13:
+ 926 004a 00BF     	 .text
+ 927              	.Letext0:
+ 928              	 .file 3 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 929              	 .file 4 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 930              	 .file 5 "../EEPROM/EEPROM_25Series.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 EEPROM_25Series.c
+    {standard input}:20     .text.ucSPI_TransmitReceive:00000000 $t
+    {standard input}:24     .text.ucSPI_TransmitReceive:00000000 ucSPI_TransmitReceive
+    {standard input}:65     .text.vSPI_ChipSelect:00000000 $t
+    {standard input}:69     .text.vSPI_ChipSelect:00000000 vSPI_ChipSelect
+    {standard input}:105    .text.xEEPROM_Init:00000000 $t
+    {standard input}:110    .text.xEEPROM_Init:00000000 xEEPROM_Init
+    {standard input}:140    .text.xEEPROM_IsReady:00000000 xEEPROM_IsReady
+    {standard input}:135    .text.xEEPROM_IsReady:00000000 $t
+    {standard input}:201    .text.ucEEPROM_ReadStatus:00000000 ucEEPROM_ReadStatus
+    {standard input}:197    .text.ucEEPROM_ReadStatus:00000000 $t
+    {standard input}:255    .text.ucEEPROM_ReadByte:00000000 $t
+    {standard input}:260    .text.ucEEPROM_ReadByte:00000000 ucEEPROM_ReadByte
+    {standard input}:322    .text.usEEPROM_ReadWord:00000000 $t
+    {standard input}:327    .text.usEEPROM_ReadWord:00000000 usEEPROM_ReadWord
+    {standard input}:386    .text.vEEPROM_WriteByte:00000000 $t
+    {standard input}:391    .text.vEEPROM_WriteByte:00000000 vEEPROM_WriteByte
+    {standard input}:460    .text.vEEPROM_WriteWord:00000000 $t
+    {standard input}:465    .text.vEEPROM_WriteWord:00000000 vEEPROM_WriteWord
+    {standard input}:518    .text.vEEPROM_UpdateByte:00000000 $t
+    {standard input}:523    .text.vEEPROM_UpdateByte:00000000 vEEPROM_UpdateByte
+    {standard input}:574    .text.vEEPROM_UpdateWord:00000000 $t
+    {standard input}:579    .text.vEEPROM_UpdateWord:00000000 vEEPROM_UpdateWord
+    {standard input}:633    .text.xEEPROM_WritePage:00000000 $t
+    {standard input}:637    .text.xEEPROM_WritePage:00000000 xEEPROM_WritePage
+    {standard input}:738    .text.vEEPROM_Write:00000000 $t
+    {standard input}:743    .text.vEEPROM_Write:00000000 vEEPROM_Write
+    {standard input}:855    .text.vEEPROM_Read:00000000 $t
+    {standard input}:860    .text.vEEPROM_Read:00000000 vEEPROM_Read
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

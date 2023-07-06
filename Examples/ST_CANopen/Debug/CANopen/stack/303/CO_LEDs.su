@@ -1,0 +1,2 @@
+../CANopen/stack/303/CO_LEDs.c:31:18:CO_LEDs_init	24	static
+../CANopen/stack/303/CO_LEDs.c:47:6:CO_LEDs_process	40	static

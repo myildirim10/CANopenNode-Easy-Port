@@ -1,0 +1,10 @@
+../CANopen/driver/CO_driver_blank.c:34:6:CO_CANsetConfigurationMode	16	static
+../CANopen/driver/CO_driver_blank.c:40:6:CO_CANsetNormalMode	16	static
+../CANopen/driver/CO_driver_blank.c:48:18:CO_CANmodule_init	32	static
+../CANopen/driver/CO_driver_blank.c:117:6:CO_CANmodule_disable	16	static
+../CANopen/driver/CO_driver_blank.c:125:18:CO_CANrxBufferInit	32	static
+../CANopen/driver/CO_driver_blank.c:165:13:CO_CANtxBufferInit	32	static
+../CANopen/driver/CO_driver_blank.c:198:18:CO_CANsend	24	static
+../CANopen/driver/CO_driver_blank.c:231:6:CO_CANclearPendingSyncPDOs	32	static
+../CANopen/driver/CO_driver_blank.c:271:6:CO_CANmodule_process	24	static
+../CANopen/driver/CO_driver_blank.c:323:6:CO_CANinterrupt	56	static

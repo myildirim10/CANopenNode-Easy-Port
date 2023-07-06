@@ -1,0 +1,1765 @@
+package Model.APPS.SPI_MASTER.v4_3_30.Templates;
+
+import Model.APPS.SPI_MASTER.v4_3_30.SPI_MASTER
+
+out.print("""
+/**
+ * @cond
+ ***********************************************************************************************************************
+ *
+ * Copyright (c) 2015-2020, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2015-02-16:
+ *     - Initial version<br>
+ *
+ * 2015-02-20:
+ *     - Guard is generated for dx0_input. This helps to cross check the dynamic mode change support<br>
+ *
+ * 2015-05-08:
+ *     - Bug fix for code generation if advanced pin configuration is not enabled.<br>
+ *     - Seperate code generation for full duplex mode<br>
+ *     - Conditional code generation for parity error<br>
+ *     - XMC_SPI_CH_EnableFEM() and XMC_SPI_CH_SetBitOrderLsbFirst() are generated conditionally<br>
+ *     - Configuration for Leading/Training is added<br>
+ *
+ * 2015-06-20:
+ *     - Code generation for parity error is generated after selecting the parity type and enabling the callback in 
+ *        interrupt settings tab.<br>
+ *     - word_length is added to SPI_MASTER_DYNAMIC_CONFIG_t, to support runtime change.<br>
+ *     - Clock settings are updated with combo. So defined a map locally for clcok settings.
+ *
+ * 2015-07-07:
+ *     - DYNAMIC_CONFIG_t is renamed as RUNTIME_t
+ *
+ * 2015-09-01:
+ *     - 'gpio_mode_alternate_function' is renamed as 'gpio_output_alternate_function' and extended to support XMC14 devices.
+ *
+ * 2015-09-30:
+ *     - dummy read are added for setena bit field.
+ *
+ * 2015-10-14:
+ *     - new variable "spi_master_config_mode" to store the actual mode generated during initialisation.
+ *     - bug fix: node pointer assignment for protocol event is generated always.  
+ *     - XMC_USIC_CH_TriggerServiceRequest() is generated during init,  
+ *     - receive start disable event is removed from the DMA callback to support the higher baudrate.
+ *
+ * 2016-01-20:
+ *     - In DMA mode, TDV flag polling is added to ensure last byte is shifted out from the buffer.
+ *
+ * 2019-07-11:
+ *     - Configure polarity of slave select signal based on UI setting.
+ *
+ * @endcond
+ *
+ */
+
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+#include "spi_master.h"
+
+/***********************************************************************************************************************
+* LOCAL ROUTINES
+***********************************************************************************************************************/
+#if (SPI_MASTER_INTERRUPT_TRANSMIT_MODE == 1U)
+/*
+ * Function implements the data transmission. It is called from the transmit interrupt service handler.
+ * Function pushes data to the output block and releases control. It is called again when the previous data is
+ * transmitted. When transmit FIFO is used, the function sets the trigger limit based on the size of data to be
+ * transmitted. This makes sure that the CPU usage is optimum.
+ *
+ * Note: The API is only meant for internal use. The implementation should not be modified.
+ */
+extern void SPI_MASTER_lTransmitHandler(const SPI_MASTER_t * const handle);
+#endif
+#if (SPI_MASTER_INTERRUPT_RECEIVE_MODE == 1U)
+/*
+ * Function implements the data reception. It is called from the receive interrupt service handler.
+ * Function reads data from the receive block and updates the receive buffer. It is called again when the data is
+ * received again. When receive FIFO is used, the function sets the trigger limit based on the size of data to be
+ * received. This makes sure that the CPU usage is optimum.
+ *
+ * Note: The API is only meant for internal use. The implementation should not be modified.
+ */
+extern void SPI_MASTER_lReceiveHandler(const SPI_MASTER_t * const handle);
+#endif
+#if (SPI_MASTER_PARITY_ERROR == 1U)
+/*
+ * Function monitors the configured protocol interrupt flags. It is called from the protocol interrupt service handler.
+ * Function reads the status of the SPI_MASTER channel and checks for configured flags in the APP GUI. If any callback
+ * function is provided in the APP UI, it will be called when the selected flag is set.
+ *
+ * Note: The API is only meant for internal use. The implementation should not be modified.
+ */
+extern void SPI_MASTER_lProtocolHandler(const SPI_MASTER_t * const handle);
+#endif
+/***********************************************************************************************************************
+* DATA STRUCTURES
+***********************************************************************************************************************/
+""");
+Map oper_mode = [
+    'Half Duplex' : 'XMC_SPI_CH_MODE_STANDARD_HALFDUPLEX',
+    'Full Duplex' : 'XMC_SPI_CH_MODE_STANDARD',
+    'Dual SPI'    : 'XMC_SPI_CH_MODE_DUAL',
+    'Quad SPI'    : 'XMC_SPI_CH_MODE_QUAD'
+    ]
+
+Map clock_settings = [
+    0 : 'XMC_SPI_CH_BRG_SHIFT_CLOCK_PASSIVE_LEVEL_0_DELAY_DISABLED',
+    1 : 'XMC_SPI_CH_BRG_SHIFT_CLOCK_PASSIVE_LEVEL_0_DELAY_ENABLED',
+    2 : 'XMC_SPI_CH_BRG_SHIFT_CLOCK_PASSIVE_LEVEL_1_DELAY_ENABLED',
+    3 : 'XMC_SPI_CH_BRG_SHIFT_CLOCK_PASSIVE_LEVEL_1_DELAY_DISABLED'
+    ]
+
+Map output_strength = [
+    "Don't Care"                : "Don't Care",
+    "Medium Driver"             : "XMC_GPIO_OUTPUT_STRENGTH_MEDIUM",
+    "Weak Driver"               : "XMC_GPIO_OUTPUT_STRENGTH_WEAK",
+    "Strong Driver Soft Edge"   : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_SOFT_EDGE",
+    "Strong Driver Slow Edge"   : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_SLOW_EDGE",
+    "Strong Driver Sharp Edge"  : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_SHARP_EDGE",
+    "Strong Driver Medium Edge" : "XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE"    
+    ]
+
+Map gpio_output_alternate_function = [
+    "Push Pull" : ['XMC_GPIO_MODE_OUTPUT_PUSH_PULL', 'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT1',
+                   'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT2', 'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT3',
+                   'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT4', 'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT5',
+                   'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT6','XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT7',
+                   'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT8', 'XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT9'],
+    "Open Drain": ['XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN', 'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT1',
+                   'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT2', 'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT3', 
+                   'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT4', 'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT5',
+                   'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT6', 'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT7',
+                   'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT8', 'XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT9']
+
+    ]
+Map gpio_input_hysteresis = [
+    'Standard' : 'XMC_GPIO_INPUT_HYSTERESIS_STANDARD',
+    'Large'    : 'XMC_GPIO_INPUT_HYSTERESIS_LARGE',
+]
+
+Map input_logic = [
+    'Tristate'                          : 'XMC_GPIO_MODE_INPUT_TRISTATE',
+    'Pull Down'                         : 'XMC_GPIO_MODE_INPUT_PULL_DOWN',
+    'Pull Up'                           : 'XMC_GPIO_MODE_INPUT_PULL_UP',
+    'Continuous Sampling Mode'          : 'XMC_GPIO_MODE_INPUT_SAMPLING',
+    'Inverted Tristate'                 : 'XMC_GPIO_MODE_INPUT_INVERTED_TRISTATE',
+    'Inverted Pull Down'                : 'XMC_GPIO_MODE_INPUT_INVERTED_PULL_DOWN',
+    'Inverted Pull Up'                  : 'XMC_GPIO_MODE_INPUT_INVERTED_PULL_UP',
+    'Inverted Continuous Sampling Mode' : 'XMC_GPIO_MODE_INPUT_INVERTED_SAMPLING'
+    ]
+
+Map fifo_size = [
+    0 : 'XMC_USIC_CH_FIFO_DISABLED',
+    1 : 'XMC_USIC_CH_FIFO_SIZE_2WORDS',
+    2 : 'XMC_USIC_CH_FIFO_SIZE_4WORDS',
+    3 : 'XMC_USIC_CH_FIFO_SIZE_8WORDS',
+    4 : 'XMC_USIC_CH_FIFO_SIZE_16WORDS',
+    5 : 'XMC_USIC_CH_FIFO_SIZE_32WORDS',
+    6 : 'XMC_USIC_CH_FIFO_SIZE_64WORDS'
+    ]
+
+Map parity_mode_stettings = [
+    'None' : 'XMC_USIC_CH_PARITY_MODE_NONE',
+    'Even' : 'XMC_USIC_CH_PARITY_MODE_EVEN',
+    'Odd'  : 'XMC_USIC_CH_PARITY_MODE_ODD'
+    ]
+
+Map transfer_mode_stettings = [
+    'Interrupt': 'SPI_MASTER_TRANSFER_MODE_INTERRUPT',
+    'DMA'      : 'SPI_MASTER_TRANSFER_MODE_DMA',
+    'Direct'   : 'SPI_MASTER_TRANSFER_MODE_DIRECT'
+    ]
+
+Map receive_input = [
+    0 : 'SPI_MASTER_INPUT_A',
+    1 : 'SPI_MASTER_INPUT_B',
+    2 : 'SPI_MASTER_INPUT_C',
+    3 : 'SPI_MASTER_INPUT_D',
+    4 : 'SPI_MASTER_INPUT_E',
+    5 : 'SPI_MASTER_INPUT_F',
+    6 : 'SPI_MASTER_INPUT_G'
+    ]
+
+Map gpio_hw_control =[
+    0 : 'XMC_GPIO_HWCTRL_DISABLED',
+    1 : 'XMC_GPIO_HWCTRL_PERIPHERAL1',
+    2 : 'XMC_GPIO_HWCTRL_PERIPHERAL2'
+    ]
+
+Map slave_select_resource =[
+    'selo0' : 'XMC_SPI_CH_SLAVE_SELECT_0',
+    'selo1' : 'XMC_SPI_CH_SLAVE_SELECT_1',
+    'selo2' : 'XMC_SPI_CH_SLAVE_SELECT_2',
+    'selo3' : 'XMC_SPI_CH_SLAVE_SELECT_3',
+    'selo4' : 'XMC_SPI_CH_SLAVE_SELECT_4',
+    'selo5' : 'XMC_SPI_CH_SLAVE_SELECT_5',
+    'selo6' : 'XMC_SPI_CH_SLAVE_SELECT_6',
+    'selo7' : 'XMC_SPI_CH_SLAVE_SELECT_7'
+    ]
+
+String spi_master_space(Integer no_of_spaces)
+{
+    String space = " "
+    for(int i = 1; i < no_of_spaces; i++)
+    {
+        space+= " "
+    }
+    return space
+}
+
+Integer FIFO_size_reg
+
+for (SPI_MASTER appIns : appInstancesList ) {
+    List MappedUri     = null
+    List Dma_Tx_MappedUri = null
+    List Dma_Rx_MappedUri = null    
+    List TxInterrupt_Uri = null
+    List RxInterrupt_Uri = null
+    List ErrInterrupt_Uri = null
+    String UnitInst     = null
+    String ChannelInst = null
+    List MOSI0pinUri = null
+    String MOSI0portNo = null
+    String MOSI0pinNo     = null
+    List CLKOutpinUri = null
+    String CLKOutportNo = null
+    String CLKOutpinNo = null
+    appInst   = appIns.getInstanceLabel()
+    MappedUri = appIns.hwres_usic_channel.getSolverUri()
+    
+  if (MappedUri != null) {      
+    UnitInst = MappedUri[4]
+    ChannelInst = MappedUri[6]
+    Integer actual_baudrate = 0;
+    TxInterrupt_Uri = appIns.hwres_cpu_nvic_interrupt_tx.getSolverUri();
+    RxInterrupt_Uri = appIns.hwres_cpu_nvic_interrupt_rx.getSolverUri();
+    ErrInterrupt_Uri = appIns.hwres_cpu_nvic_interrupt_error.getSolverUri();
+    MOSI0pinUri = appIns.hwres_port_pad_spi_mosi_0.getSolverUri()
+    MOSI0portNo = MOSI0pinUri[4]
+    MOSI0pinNo     = MOSI0pinUri[6]
+    CLKOutpinUri = appIns.hwres_port_pad_spi_sclkout.getSolverUri()
+    CLKOutportNo = CLKOutpinUri[4]
+    CLKOutpinNo = CLKOutpinUri[6]
+    boolean xmc1_family = false 
+    String family = daveEnv.project.selectedDevice.deviceId.family
+    String Dma_Tx_Module = null
+    String Dma_Rx_Module = null
+    String Dma_Tx_Channel = null
+    String Dma_Rx_Channel = null
+    
+    if (family == "XMC4")
+    {
+      Dma_Tx_MappedUri = appIns.hwres_dma_channel_tx.getSolverUri()
+      Dma_Rx_MappedUri = appIns.hwres_dma_channel_rx.getSolverUri()
+    }
+    
+    if ((appIns.gcombo_transmit_mode.value == "DMA") && (Dma_Tx_MappedUri != null))
+    {
+      if(Dma_Tx_MappedUri[3] == "dma4") {
+        Dma_Tx_Module = 1;
+      } else {
+        Dma_Tx_Module = 0;
+      }
+      Dma_Tx_Channel = Dma_Tx_MappedUri[6];
+    } 
+    if ((appIns.gcombo_receive_mode.value == "DMA") && (Dma_Rx_MappedUri != null))
+    {
+      if(Dma_Rx_MappedUri[3] == "dma4") {
+        Dma_Rx_Module = 1;
+      } else {
+        Dma_Rx_Module = 0;
+      }
+      Dma_Rx_Channel = Dma_Rx_MappedUri[6];
+    }
+    /**********************************Dummy read*************************************/
+    appIns.hwres_port_pad_spi_sclkout.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_0.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_1.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_2.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_3.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_4.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_5.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_6.getRegValue("HWSEL","hwsel_hw")
+    appIns.hwres_port_pad_spi_ss_7.getRegValue("HWSEL","hwsel_hw")
+    
+    appIns.hwres_port_pad_spi_mosi_0.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_mosi_1.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_mosi_2.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_mosi_3.getRegValue("PDISC","pdisc_pdis")    
+    appIns.hwres_port_pad_spi_sclkout.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_0.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_1.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_2.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_3.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_4.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_5.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_6.getRegValue("PDISC","pdisc_pdis")
+    appIns.hwres_port_pad_spi_ss_7.getRegValue("PDISC","pdisc_pdis")
+    
+    appIns.hwres_usic_channel.getRegValue("CCR","ccr_hpcen")
+    appIns.hwres_usic_channel.getRegValue("INPR","inpr_pinp")
+    appIns.hwres_usic_channel.getRegValue("DX3CR","dx3cr_dsel")
+    appIns.hwres_usic_channel.getRegValue("DX4CR","dx4cr_dsel")
+    appIns.hwres_usic_channel.getRegValue("DX5CR","dx5cr_dsel")
+    appIns.hwres_cpu_nvic_interrupt_tx.getRegValue("ISER","iser_setena")
+    appIns.hwres_cpu_nvic_interrupt_rx.getRegValue("ISER","iser_setena")
+    appIns.hwres_cpu_nvic_interrupt_error.getRegValue("ISER","iser_setena")
+    appIns.hwres_cpu_nvic_interrupt_tx.getRegValue("intcr","intcr_insel")
+    appIns.hwres_cpu_nvic_interrupt_rx.getRegValue("intcr","intcr_insel")
+    appIns.hwres_cpu_nvic_interrupt_error.getRegValue("intcr","intcr_insel")
+    /*********************************************************************************/
+    List MOSI1pinUri = null
+    String MOSI1portNo = null
+    String MOSI1pinNo = null
+    List MOSI2pinUri = null
+    String MOSI2portNo = null
+    String MOSI2pinNo = null
+    List MOSI3pinUri = null
+    String MOSI3portNo = null
+    String MOSI3pinNo = null
+
+    List SS0pinUri = null
+    String SS0portNo = null
+    String SS0pinNo = null
+    List SS1pinUri = null
+    String SS1portNo = null
+    String SS1pinNo = null
+    List SS2pinUri = null
+    String SS2portNo = null
+    String SS2pinNo = null
+    List SS3pinUri = null
+    String SS3portNo = null
+    String SS3pinNo = null
+    List SS4pinUri = null
+    String SS4portNo = null
+    String SS4pinNo = null
+    List SS5pinUri = null
+    String SS5portNo = null
+    String SS5pinNo = null
+    List SS6pinUri = null
+    String SS6portNo = null
+    String SS6pinNo = null
+    List SS7pinUri = null
+    String SS7portNo = null
+    String SS7pinNo = null
+    String Tx_node = null
+    String Rx_node = null
+    String Err_node = null
+    List slave_select_port_handlers = ['NULL','NULL','NULL','NULL','NULL','NULL','NULL','NULL']
+    List slave_select_config_handlers = ['NULL','NULL','NULL','NULL','NULL','NULL','NULL','NULL']
+    
+    if(family == 'XMC1')
+    {
+      xmc1_family = true
+    }
+    if (appIns.gcombo_transmit_mode.value == "Interrupt")
+    {
+      Tx_node = TxInterrupt_Uri[-1]
+    }
+    if (appIns.gcombo_receive_mode.value == "Interrupt")
+    {
+      Rx_node = RxInterrupt_Uri[-1]
+    }
+    if((appIns.gcheck_parity_error.value) && (appIns.gcombo_parity.value != "None"))
+    {
+      Err_node = ErrInterrupt_Uri[-1]
+    }
+    if(appIns.gcombo_oprmode.value != "Half Duplex"){
+        MOSI1pinUri    = appIns.hwres_port_pad_spi_mosi_1.getSolverUri()
+        MOSI1portNo = MOSI1pinUri[4]
+        MOSI1pinNo     = MOSI1pinUri[6]
+    }
+    if(appIns.gcombo_oprmode.value == "Quad SPI"){
+        MOSI2pinUri = appIns.hwres_port_pad_spi_mosi_2.getSolverUri()
+        MOSI2portNo = MOSI2pinUri[4]
+        MOSI2pinNo     = MOSI2pinUri[6]
+        MOSI3pinUri = appIns.hwres_port_pad_spi_mosi_3.getSolverUri()
+        MOSI3portNo = MOSI3pinUri[4]
+        MOSI3pinNo     = MOSI3pinUri[6]
+    }
+    if(appIns.gint_slave_select_lines.value > 0){
+        SS0pinUri = appIns.hwres_port_pad_spi_ss_0.getSolverUri()
+        SS0portNo = SS0pinUri[4]
+        SS0pinNo = SS0pinUri[6]
+        slave_select_port_handlers[0] = '&'+appInst+'_SS_0'
+        slave_select_config_handlers[0] = '&'+appInst+'_SS_0_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 1){
+        SS1pinUri = appIns.hwres_port_pad_spi_ss_1.getSolverUri()
+        SS1portNo = SS1pinUri[4]
+        SS1pinNo = SS1pinUri[6]
+        slave_select_port_handlers[1] = '&'+appInst+'_SS_1'
+        slave_select_config_handlers[1] = '&'+appInst+'_SS_1_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 2){
+        SS2pinUri = appIns.hwres_port_pad_spi_ss_2.getSolverUri()
+        SS2portNo = SS2pinUri[4]
+        SS2pinNo = SS2pinUri[6]
+        slave_select_port_handlers[2] = '&'+appInst+'_SS_2'
+        slave_select_config_handlers[2] = '&'+appInst+'_SS_2_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 3){
+        SS3pinUri = appIns.hwres_port_pad_spi_ss_3.getSolverUri()
+        SS3portNo = SS3pinUri[4]
+        SS3pinNo = SS3pinUri[6]
+        slave_select_port_handlers[3] = '&'+appInst+'_SS_3'
+        slave_select_config_handlers[3] = '&'+appInst+'_SS_3_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 4){
+        SS4pinUri = appIns.hwres_port_pad_spi_ss_4.getSolverUri()
+        SS4portNo = SS4pinUri[4]
+        SS4pinNo = SS4pinUri[6]
+        slave_select_port_handlers[4] = '&'+appInst+'_SS_4'
+        slave_select_config_handlers[4] = '&'+appInst+'_SS_4_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 5){
+        SS5pinUri = appIns.hwres_port_pad_spi_ss_5.getSolverUri()
+        SS5portNo = SS5pinUri[4]
+        SS5pinNo = SS5pinUri[6]
+        slave_select_port_handlers[5] = '&'+appInst+'_SS_5'
+        slave_select_config_handlers[5] = '&'+appInst+'_SS_5_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 6){
+        SS6pinUri = appIns.hwres_port_pad_spi_ss_6.getSolverUri()
+        SS6portNo = SS6pinUri[4]
+        SS6pinNo = SS6pinUri[6]
+        slave_select_port_handlers[6] = '&'+appInst+'_SS_6'
+        slave_select_config_handlers[6] = '&'+appInst+'_SS_6_Config'
+    }
+    if(appIns.gint_slave_select_lines.value > 7){
+        SS7pinUri = appIns.hwres_port_pad_spi_ss_7.getSolverUri()
+        SS7portNo = SS7pinUri[4]
+        SS7pinNo = SS7pinUri[6]
+        slave_select_port_handlers[7] = '&'+appInst+'_SS_7'
+        slave_select_config_handlers[7] = '&'+appInst+'_SS_7_Config'
+    }
+    actual_baudrate = (appIns.gfloat_actual_bus_speed.value) * 1000
+
+if (appIns.gcombo_transmit_mode.value == "DMA") {
+out.print("""void ${appInst}_DMA_tx_handler(XMC_DMA_CH_EVENT_t event);\n""")
+}
+
+if (appIns.gcombo_receive_mode.value == "DMA") {
+out.print("""void ${appInst}_DMA_rx_handler(XMC_DMA_CH_EVENT_t event);""")
+}    
+    
+out.print("""
+static SPI_MASTER_STATUS_t ${appInst}_lInit(void);""")
+    
+if(appIns.gcombo_oprmode.value == "Full Duplex"){
+    /* Tx pin configuration */
+    out.print("""
+/* Data Transmit pin from SPI_MASTER */
+const SPI_MASTER_GPIO_t ${appInst}_MOSI = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE,
+  .pin  = (uint8_t)${MOSI0pinNo}
+};         
+                                      
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_MOSI_Config = 
+{ 
+  .port_config = 
+  {""");
+if (appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+if(appIns.gcheck_enablepinconfig.value == false) {
+if(appIns.gcombo_oprmode.value == "Half Duplex") {
+out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Open Drain'][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+      } else if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI")) {
+        out.print("""\n${spi_master_space(4)}.mode =(XMC_GPIO_MODE_t) (${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]} | P${MOSI0portNo}_${MOSI0pinNo}_AF_U${UnitInst}C${ChannelInst}_DOUT0),""")
+}
+else {
+out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+      }
+    } else {
+      if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI")) {
+        out.print("""\n${spi_master_space(4)}.mode =(XMC_GPIO_MODE_t) (${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]} | P${MOSI0portNo}_${MOSI0pinNo}_AF_U${UnitInst}C${ChannelInst}_DOUT0),""")
+} else {
+out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+      }
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+if(xmc1_family == false) {
+  if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_txpin_driverstrength.value != "Don't Care"))
+    out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_txpin_driverstrength.value]}""");
+  else
+    out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+}
+out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.hw_control = ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_0.getRegValue("HWSEL","hwsel_hw").toInteger()]}
+};""")
+    
+//Rx pin configuration
+               out.print("""\n
+/* Data Receive pin for SPI_MASTER */
+const SPI_MASTER_GPIO_t ${appInst}_MISO = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE,
+  .pin  = (uint8_t)${MOSI1pinNo}
+};
+
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_MISO_Config = 
+{
+  .port_config = 
+  {""")
+  if(appIns.gcheck_enablepinconfig.value == false) {
+    out.print("""\n${spi_master_space(4)}.mode = XMC_GPIO_MODE_INPUT_TRISTATE,""")
+  } else {
+    out.print("""\n${spi_master_space(4)}.mode = ${input_logic[appIns.gcombo_rxpincharacteristics.value]},""")
+  }
+  if(xmc1_family == true) {
+    out.print("""\n${spi_master_space(2)}.input_hysteresis = ${gpio_input_hysteresis[appIns.gcombo_hysteresis.value]}""")
+  }
+               out.print("""
+  },
+                        """)
+  out.print("""
+};""");
+}
+else
+{
+    out.print("""
+const SPI_MASTER_GPIO_t ${appInst}_MOSI0 = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE,
+  .pin  = (uint8_t)${MOSI0pinNo}
+};         
+                                      
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_MOSI0_Config = 
+{ 
+  .port_config = 
+  {""");
+          if (appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+            if(appIns.gcheck_enablepinconfig.value == false) {
+              if(appIns.gcombo_oprmode.value == "Half Duplex") {
+                out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Open Drain'][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+      } else if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI")) {
+        out.print("""\n${spi_master_space(4)}.mode =(XMC_GPIO_MODE_t) (${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]} | P${MOSI0portNo}_${MOSI0pinNo}_AF_U${UnitInst}C${ChannelInst}_DOUT0),""")
+              }
+              else {
+                out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+      }
+    } else {
+      if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI")) {
+        out.print("""\n${spi_master_space(4)}.mode =(XMC_GPIO_MODE_t) (${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]} | P${MOSI0portNo}_${MOSI0pinNo}_AF_U${UnitInst}C${ChannelInst}_DOUT0),""")
+              } else {
+                out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+      }                 
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+          if(xmc1_family == false) {
+            if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_txpin_driverstrength.value != "Don't Care"))
+              out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_txpin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+          }
+          out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.hw_control = ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_0.getRegValue("HWSEL","hwsel_hw").toInteger()]}
+        };""")
+}
+          
+if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI")){ 
+                   out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_MOSI1 = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE,
+  .pin  = (uint8_t)${MOSI1pinNo}
+};     
+                                          
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_MOSI1_Config = 
+{ 
+  .port_config = 
+  {""");
+  if (appIns.hwres_port_pad_spi_mosi_1.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {       
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_1.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_1.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_txpin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_txpin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.hw_control = ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_1.getRegValue("HWSEL","hwsel_hw").toInteger()]}
+};""")
+}
+
+if(appIns.gcombo_oprmode.value == "Quad SPI"){
+                    out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_MOSI2 = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${MOSI2portNo}_BASE,
+  .pin  = (uint8_t)${MOSI2pinNo}
+};     
+
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_MOSI2_Config = 
+{ 
+  .port_config = 
+  {""");
+  if (appIns.hwres_port_pad_spi_mosi_2.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {       
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_2.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_2.getRegValue("IOCR","iocr_pcr").toInteger()]},""");                 
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_txpin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_txpin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.hw_control = ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_2.getRegValue("HWSEL","hwsel_hw").toInteger()]}
+};""")
+}
+
+if(appIns.gcombo_oprmode.value == "Quad SPI"){
+                    out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_MOSI3 = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${MOSI3portNo}_BASE,
+  .pin  = (uint8_t)${MOSI3pinNo}
+};     
+
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_MOSI3_Config = 
+{ 
+  .port_config = 
+  {""");
+  if (appIns.hwres_port_pad_spi_mosi_3.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {       
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_mosi_3.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_txpincharactristics.value][appIns.hwres_port_pad_spi_mosi_3.getRegValue("IOCR","iocr_pcr").toInteger()]},""");                 
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_txpin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_txpin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.hw_control = ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_3.getRegValue("HWSEL","hwsel_hw").toInteger()]}
+};""")
+}
+
+out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SCLKOUT = 
+{
+  .port = (XMC_GPIO_PORT_t *)PORT${CLKOutportNo}_BASE,
+  .pin  = (uint8_t)${CLKOutpinNo}
+};     
+
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SCLKOUT_Config = 
+{ 
+  .port_config = 
+  {""");
+  if (appIns.hwres_port_pad_spi_sclkout.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_sclkout.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_clkoutpin_charactristics.value][appIns.hwres_port_pad_spi_sclkout.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_clkoutpin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_clkoutpin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""
+}
+};""")
+
+
+if(appIns.gint_slave_select_lines.value > 0){ 
+            out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_0 =
+{
+.port = (XMC_GPIO_PORT_t *)PORT${SS0portNo}_BASE,
+.pin  = (uint8_t)${SS0pinNo}
+};
+
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_0_Config =
+{
+.port_config =
+{""");
+
+  if (appIns.hwres_port_pad_spi_ss_0.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_0.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_0.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 1){ 
+             out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_1 =
+{
+.port = (XMC_GPIO_PORT_t *)PORT${SS1portNo}_BASE,
+.pin  = (uint8_t)${SS1pinNo}
+};
+                             
+SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_1_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_1.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_1.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_1.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_1.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 2){ 
+           out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_2 =
+{
+.port = (XMC_GPIO_PORT_t *)PORT${SS2portNo}_BASE,
+.pin  = (uint8_t)${SS2pinNo}
+};
+                                 
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_2_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_2.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_2.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_2.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_2.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 3){ 
+              out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_3 =
+{
+.port = (XMC_GPIO_PORT_t *)PORT${SS3portNo}_BASE,
+.pin  = (uint8_t)${SS3pinNo}
+};
+                             
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_3_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_3.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_3.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_3.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_3.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 4){ 
+               out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_4 = {
+.port = (XMC_GPIO_PORT_t *)PORT${SS4portNo}_BASE,
+.pin  = (uint8_t)${SS4pinNo}
+};
+                             
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_4_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_4.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_4.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_4.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_4.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 5){ 
+                out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_5 = {
+.port = (XMC_GPIO_PORT_t *)PORT${SS5portNo}_BASE,
+.pin  = (uint8_t)${SS5pinNo}
+};
+                             
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_5_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_5.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_5.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_5.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_5.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 6){ 
+                out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_6 = {
+.port = (XMC_GPIO_PORT_t *)PORT${SS6portNo}_BASE,
+.pin  = (uint8_t)${SS6pinNo}
+};
+                         
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_6_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_6.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_6.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_6.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_6.getSolverValue()]}
+};""")
+}
+
+if(appIns.gint_slave_select_lines.value > 7){ 
+                out.print("""\n
+const SPI_MASTER_GPIO_t ${appInst}_SS_7 = {
+.port = (XMC_GPIO_PORT_t *)PORT${SS7portNo}_BASE,
+.pin  = (uint8_t)${SS7pinNo}
+};
+                                  
+const SPI_MASTER_GPIO_CONFIG_t ${appInst}_SS_7_Config =
+{
+.port_config =
+{""");
+  if (appIns.hwres_port_pad_spi_ss_7.getRegValue("IOCR","iocr_oe").toInteger() == 1)  {
+    if(appIns.gcheck_enablepinconfig.value == false) {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function['Push Pull'][appIns.hwres_port_pad_spi_ss_7.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    } else {
+      out.print("""\n${spi_master_space(4)}.mode = ${gpio_output_alternate_function[appIns.gcombo_sspin_charactristics.value][appIns.hwres_port_pad_spi_ss_7.getRegValue("IOCR","iocr_pcr").toInteger()]},""");
+    }
+  }
+  out.print("""\n${spi_master_space(4)}.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH""");
+  if(xmc1_family == false) {
+    if((appIns.gcheck_enablepinconfig.value == true) && (appIns.gcombo_sspin_driverstrength.value != "Don't Care"))
+      out.print(""",\n${spi_master_space(4)}.output_strength = ${output_strength[appIns.gcombo_sspin_driverstrength.value]}""");
+    else
+      out.print(""",\n${spi_master_space(4)}.output_strength = XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE""");
+  }
+  out.print("""\n${spi_master_space(2)}},""");
+  out.print("""\n${spi_master_space(2)}.slave_select_ch = ${slave_select_resource[appIns.sv_slave_select_7.getSolverValue()]}
+};""")
+    }
+
+              out.print("""\n
+XMC_SPI_CH_CONFIG_t ${appInst}_Channel_Config =
+{
+  .baudrate = ${actual_baudrate}U,
+  .bus_mode = (XMC_SPI_CH_BUS_MODE_t)XMC_SPI_CH_BUS_MODE_MASTER,
+  .selo_inversion = ${appIns.gcheck_selo_polarity.value ? "XMC_SPI_CH_SLAVE_SEL_INV_TO_MSLS" : "XMC_SPI_CH_SLAVE_SEL_SAME_AS_MSLS"},
+  .parity_mode = ${parity_mode_stettings[appIns.gcombo_parity.value]}
+};
+              """);
+
+if(appIns.gcombo_transmit_mode.value == 'DMA')
+{    
+    out.print("""\n
+XMC_DMA_CH_CONFIG_t ${appInst}_dma_ch_tx_config =
+{
+  .src_transfer_width = (uint32_t)${if(appIns.gint_word_length.value <= 8)
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_8'
+                                    else
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_16'
+                                    },
+  .dst_transfer_width = (uint32_t)${if(appIns.gint_word_length.value <= 8)
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_8'
+                                    else
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_16'
+                                    },
+  .src_address_count_mode = (uint32_t)XMC_DMA_CH_ADDRESS_COUNT_MODE_INCREMENT,
+  .dst_address_count_mode = (uint32_t)XMC_DMA_CH_ADDRESS_COUNT_MODE_NO_CHANGE,
+  .src_burst_length = (uint32_t)${if(appIns.gint_word_length.value <= 8)
+                                    'XMC_DMA_CH_BURST_LENGTH_8'
+                                  else
+                                    'XMC_DMA_CH_BURST_LENGTH_4'
+                                  },
+  .dst_burst_length = (uint32_t)XMC_DMA_CH_BURST_LENGTH_1,
+  .transfer_flow = (uint32_t)XMC_DMA_CH_TRANSFER_FLOW_M2P_DMA,
+  .transfer_type = XMC_DMA_CH_TRANSFER_TYPE_SINGLE_BLOCK,
+  .dst_handshaking = XMC_DMA_CH_DST_HANDSHAKING_HARDWARE,
+  .dst_peripheral_request = DMA_PERIPHERAL_REQUEST(${appIns.hwres_dma_channel_tx.getRegValue("cfgh", "cfgh_dest_per")}, ${appIns.hwres_dlr_channel_tx.getRegValue("dlr", "srsel_rs")}),
+  .enable_interrupt = true
+};
+              """);
+}          
+
+if(appIns.gcombo_receive_mode.value == 'DMA')
+{
+    out.print("""\n
+XMC_DMA_CH_CONFIG_t ${appInst}_dma_ch_rx_config =
+{
+  .src_transfer_width = (uint32_t)${if(appIns.gint_word_length.value <= 8)
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_8'
+                                    else
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_16'
+                                    },
+  .dst_transfer_width = (uint32_t)${if(appIns.gint_word_length.value <= 8)
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_8'
+                                    else
+                                      'XMC_DMA_CH_TRANSFER_WIDTH_16'
+                                    },
+  .src_address_count_mode = (uint32_t)XMC_DMA_CH_ADDRESS_COUNT_MODE_NO_CHANGE,
+  .dst_address_count_mode = (uint32_t)XMC_DMA_CH_ADDRESS_COUNT_MODE_INCREMENT,
+  .src_burst_length = (uint32_t)XMC_DMA_CH_BURST_LENGTH_1,
+  .dst_burst_length = (uint32_t)${if(appIns.gint_word_length.value <= 8)
+                                     'XMC_DMA_CH_BURST_LENGTH_8'
+                                  else
+                                     'XMC_DMA_CH_BURST_LENGTH_4'
+                                 },
+  .transfer_flow = (uint32_t)XMC_DMA_CH_TRANSFER_FLOW_P2M_DMA,
+  .transfer_type = XMC_DMA_CH_TRANSFER_TYPE_SINGLE_BLOCK,
+  .src_handshaking = XMC_DMA_CH_SRC_HANDSHAKING_HARDWARE,
+  .src_peripheral_request = DMA_PERIPHERAL_REQUEST(${appIns.hwres_dma_channel_rx.getRegValue("cfgh", "cfgh_src_per")}, ${appIns.hwres_dlr_channel_rx.getRegValue("dlr", "srsel_rs")}),
+  .enable_interrupt = true
+};
+              """);
+}
+          
+          
+              out.print("""\n
+const SPI_MASTER_CONFIG_t ${appInst}_Config  = 
+{
+  .channel_config          = &${appInst}_Channel_Config,
+  .fptr_spi_master_config  = ${appInst}_lInit,
+  /* FIFO configuration */
+  .tx_fifo_size            = (XMC_USIC_CH_FIFO_SIZE_t)${if((appIns.gcheck_enabletxfifo.value) && (appIns.gcombo_transmit_mode.value != "DMA"))
+                               fifo_size[appIns.hwres_usic_channel.getRegValue("TBCTR","tbctr_size").toInteger()]
+                             else
+                               'XMC_USIC_CH_FIFO_DISABLED'
+                            },
+  .rx_fifo_size            = (XMC_USIC_CH_FIFO_SIZE_t)${if((appIns.gcheck_enablerxfifo.value) && (appIns.gcombo_receive_mode.value != "DMA")) 
+                              fifo_size[appIns.hwres_usic_channel.getRegValue("RBCTR","rbctr_size").toInteger()]
+                             else
+                               'XMC_USIC_CH_FIFO_DISABLED'
+                            },
+  /* Clock Settings */
+  .shift_clk_passive_level = ${clock_settings[appIns.gcombo_clock_settings.options.indexOf(appIns.gcombo_clock_settings.value)]}, 
+  .slave_select_lines      = (uint8_t)${appIns.gint_slave_select_lines.value},
+  .leading_trailing_delay  = (uint8_t)${appIns.gint_desired_leading_trailing_delay.value},
+  .spi_master_config_mode  = ${oper_mode[appIns.gcombo_oprmode.value]}, /* spi master initial mode configured mode */
+  .transmit_mode           = ${transfer_mode_stettings[appIns.gcombo_transmit_mode.value]},
+  .receive_mode            = ${transfer_mode_stettings[appIns.gcombo_receive_mode.value]},
+   """);
+  /* Call back event handlers */
+  if((appIns.gcheck_end_transmission.value) && (appIns.gstring_tx_callback.value != "") && (appIns.gcombo_transmit_mode.value != "Direct")) { out.print("""
+  .tx_cbhandler            = ${appIns.gstring_tx_callback.value},""");
+  } else {out.print("""
+  .tx_cbhandler            = NULL,""");
+  }
+  if((appIns.gcheck_end_reception.value) && (appIns.gstring_rx_callback.value != "") && (appIns.gcombo_receive_mode.value != "Direct")) { out.print("""
+  .rx_cbhandler            = ${appIns.gstring_rx_callback.value},""");
+  } else {out.print("""
+  .rx_cbhandler            = NULL,""");
+  }
+  if((appIns.gcheck_parity_error.value) && (appIns.gcombo_parity.value != "None") && (appIns.gstring_parity_error_callback.value != "")) { out.print("""
+  .parity_cbhandler        = ${appIns.gstring_parity_error_callback.value},""");
+  } else {out.print("""
+  .parity_cbhandler        = NULL,""");
+  }
+  /* Port configuration */
+  switch (appIns.gcombo_oprmode.value)
+  {
+     case "Full Duplex": 
+      out.print("""
+  .mosi_0_pin              = &${appInst}_MOSI, /*!< mosi0 pin pointer*/
+  .mosi_0_pin_config       = &${appInst}_MOSI_Config,
+  .mosi_1_pin              = &${appInst}_MISO,
+  .mosi_1_pin_config       = &${appInst}_MISO_Config,
+  .mosi_2_pin              = NULL,
+  .mosi_2_pin_config       = NULL,
+  .mosi_3_pin              = NULL,
+  .mosi_3_pin_config       = NULL,""");
+   break;
+    case "Half Duplex":
+      out.print("""
+  .mosi_0_pin              = &${appInst}_MOSI0, /*!< mosi0 pin pointer*/
+  .mosi_0_pin_config       = &${appInst}_MOSI0_Config,
+  .mosi_1_pin              = NULL,
+  .mosi_1_pin_config       = NULL,
+  .mosi_2_pin              = NULL,
+  .mosi_2_pin_config       = NULL,
+  .mosi_3_pin              = NULL,
+  .mosi_3_pin_config       = NULL,""");
+   break;
+    case "Dual SPI":
+      out.print("""
+  .mosi_0_pin              = &${appInst}_MOSI0, /*!< mosi0 pin pointer*/
+  .mosi_0_pin_config       = &${appInst}_MOSI0_Config,
+  .mosi_1_pin              = &${appInst}_MOSI1,
+  .mosi_1_pin_config       = &${appInst}_MOSI1_Config,
+  .mosi_2_pin              = NULL,
+  .mosi_2_pin_config       = NULL,
+  .mosi_3_pin              = NULL,
+  .mosi_3_pin_config       = NULL,""");
+   break;
+    case "Quad SPI":
+      out.print("""
+  .mosi_0_pin              = &${appInst}_MOSI0, /*!< mosi0 pin pointer*/
+  .mosi_0_pin_config       = &${appInst}_MOSI0_Config,
+  .mosi_1_pin              = &${appInst}_MOSI1,
+  .mosi_1_pin_config       = &${appInst}_MOSI1_Config,
+  .mosi_2_pin              = &${appInst}_MOSI2,
+  .mosi_2_pin_config       = &${appInst}_MOSI2_Config,
+  .mosi_3_pin              = &${appInst}_MOSI3,
+  .mosi_3_pin_config       = &${appInst}_MOSI3_Config,""");
+   break;
+  }
+          out.print("""
+  .sclk_out_pin_config     = &${appInst}_SCLKOUT_Config,
+  .sclk_out_pin            = &${appInst}_SCLKOUT,
+  .slave_select_pin        = {${slave_select_port_handlers[0]}, ${slave_select_port_handlers[1]},
+                              ${slave_select_port_handlers[2]}, ${slave_select_port_handlers[3]},
+                              ${slave_select_port_handlers[4]}, ${slave_select_port_handlers[5]},
+                              ${slave_select_port_handlers[7]}, ${slave_select_port_handlers[7]}
+                             },
+  .slave_select_pin_config = {${slave_select_config_handlers[0]}, ${slave_select_config_handlers[1]},
+                              ${slave_select_config_handlers[2]}, ${slave_select_config_handlers[3]},
+                              ${slave_select_config_handlers[4]}, ${slave_select_config_handlers[5]},
+                              ${slave_select_config_handlers[7]}, ${slave_select_config_handlers[7]}
+                             },
+""");
+ if((appIns.gcombo_transmit_mode.value != "DMA") && (appIns.gcheck_enabletxfifo.value == true))
+ {
+ out.print("""\n  .tx_sr   = (SPI_MASTER_SR_ID_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("tbctr","tbctr_stbinp")},""");
+ }
+ else
+ {
+ out.print("""\n  .tx_sr   = (SPI_MASTER_SR_ID_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_tbinp")},""");
+ }
+ if((appIns.gcombo_receive_mode.value != "DMA") && (appIns.gcheck_enablerxfifo.value == true))
+ {
+ out.print("""\n  .rx_sr   = (SPI_MASTER_SR_ID_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_srbinp")},""");
+ }
+ else
+ {
+ out.print("""\n  .rx_sr   = (SPI_MASTER_SR_ID_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_rinp")},""");
+ }
+ if((appIns.gcheck_parity_error.value) && (appIns.gcombo_parity.value != "None"))
+ {
+ out.print("""\n  .parity_sr= (SPI_MASTER_SR_ID_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_pinp")},""");
+ }
+                  out.print("""
+};
+                           """)
+                  
+                  out.print("""
+SPI_MASTER_RUNTIME_t ${appInst}_runtime =
+{
+  .spi_master_mode = ${oper_mode[appIns.gcombo_oprmode.value]}, /* spi master transmission mode */
+  .word_length     = ${appIns.gint_word_length.value}U,
+                       """)
+                  out.print("""
+  ${'#ifdef USIC'+UnitInst+'_C'+ChannelInst+'_DX0_P'+MOSI1portNo+'_'+MOSI1pinNo}
+  .dx0_input = """)
+  if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI"))
+  {
+      out.print("""${'(SPI_MASTER_INPUT_t)USIC'+UnitInst+'_C'+ChannelInst+'_DX0_P'+MOSI1portNo+'_'+MOSI1pinNo+','}""")
+  }else{ 
+      out.print("""${receive_input[appIns.hwres_usic_channel.getRegValue("DX0CR","dx0cr_dsel").toInteger()]},""")
+  }
+  out.print("""
+  #else
+  .dx0_input = SPI_MASTER_INPUT_INVALID,
+  #endif
+
+  ${'#ifdef USIC'+UnitInst+'_C'+ChannelInst+'_DX0_P'+MOSI0portNo+'_'+MOSI0pinNo}
+  .dx0_input_half_duplex = """)
+  if((appIns.gcombo_oprmode.value == "Dual SPI") || (appIns.gcombo_oprmode.value == "Quad SPI"))
+  {
+      out.print("""${'(SPI_MASTER_INPUT_t)USIC'+UnitInst+'_C'+ChannelInst+'_DX0_P'+MOSI0portNo+'_'+MOSI0pinNo+','}""")
+  }else{ 
+      out.print("""${receive_input[appIns.hwres_usic_channel.getRegValue("DX0CR","dx0cr_dsel").toInteger()]},""")
+  }
+  out.print("""
+  #else
+  .dx0_input_half_duplex = SPI_MASTER_INPUT_INVALID,
+  #endif
+                           """)
+                 out.print("""
+  .tx_data_dummy = false,
+  .rx_data_dummy = true,
+  .tx_busy = false,
+  .rx_busy = false
+};
+                  """);
+                  
+                  out.print("""
+SPI_MASTER_t ${appInst} =
+{
+  .channel = XMC_SPI${UnitInst}_CH${ChannelInst}, /* USIC channel */
+  .config  = &${appInst}_Config, /* spi master configuration structure pointer */
+  .runtime = &${appInst}_runtime,""")
+if ((appIns.gcombo_transmit_mode.value  == "DMA") || (appIns.gcombo_receive_mode.value  == "DMA"))
+{         out.print("""
+  .global_dma = &${appIns.appres_global_dma.getInstanceLabel()},""")
+}
+if (appIns.gcombo_transmit_mode.value  == "DMA")
+{                out.print("""  
+  .dma_ch_tx_number = ${Dma_Tx_Channel}U, /* DMA Transmit channel */
+  .dma_ch_tx_config = &${appInst}_dma_ch_tx_config,""")
+}
+if (appIns.gcombo_receive_mode.value  == "DMA")
+{               out.print("""
+  .dma_ch_rx_number = ${Dma_Rx_Channel}U, /* DMA Receive channel */
+  .dma_ch_rx_config = &${appInst}_dma_ch_rx_config,""")
+}
+                out.print("""
+};
+                          """)                        
+                  
+                  out.print("""
+/*
+ * @brief Configure the port registers and data input registers of SPI channel
+ *
+ * @param[in] handle Pointer to an object of SPI_MASTER configuration
+ */
+static SPI_MASTER_STATUS_t ${appInst}_lInit(void)
+{
+  SPI_MASTER_STATUS_t status;
+  status = SPI_MASTER_STATUS_SUCCESS; """)
+ if ((appIns.gcombo_transmit_mode.value  == "DMA") || (appIns.gcombo_receive_mode.value  == "DMA"))
+ {
+                    out.print("""
+  status =  (SPI_MASTER_STATUS_t)GLOBAL_DMA_Init(&${appIns.appres_global_dma.getInstanceLabel()});
+  if (status == SPI_MASTER_STATUS_SUCCESS)
+  {            
+                            """)
+ }                
+ if (appIns.gcombo_transmit_mode.value  == "DMA")
+ {                  out.print("""
+  (void)XMC_DMA_CH_Init(XMC_DMA${Dma_Tx_Module}, ${Dma_Tx_Channel}U, &${appInst}_dma_ch_tx_config);
+  /*"Interrupt Settings" configuration for "transmit" and/or "receive"*/
+  XMC_DMA_CH_EnableEvent(XMC_DMA${Dma_Tx_Module}, ${Dma_Tx_Channel}U, (uint32_t)XMC_DMA_CH_EVENT_TRANSFER_COMPLETE);
+  XMC_DMA_CH_SetEventHandler(XMC_DMA${Dma_Tx_Module}, ${Dma_Tx_Channel}U, ${appInst}_DMA_tx_handler);
+                             """)
+}
+if (appIns.gcombo_receive_mode.value  == "DMA")
+{                  out.print("""
+  (void)XMC_DMA_CH_Init(XMC_DMA${Dma_Rx_Module}, ${Dma_Rx_Channel}U, &${appInst}_dma_ch_rx_config);
+  /*"Interrupt Settings" configuration for "transmit" and/or "receive"*/
+  XMC_DMA_CH_EnableEvent(XMC_DMA${Dma_Rx_Module}, ${Dma_Rx_Channel}U, (uint32_t)XMC_DMA_CH_EVENT_TRANSFER_COMPLETE);
+  XMC_DMA_CH_SetEventHandler(XMC_DMA${Dma_Rx_Module}, ${Dma_Rx_Channel}U, ${appInst}_DMA_rx_handler);
+                             """)
+}
+                   out.print("""
+  /* LLD initialization */
+  XMC_SPI_CH_Init(XMC_SPI${UnitInst}_CH${ChannelInst}, &${appInst}_Channel_Config);
+                             """)
+if(appIns.gcheck_frame_end_mode.value == false)
+{
+                   out.print("""
+  XMC_SPI_CH_DisableFEM(XMC_SPI${UnitInst}_CH${ChannelInst});
+                              """)
+}
+        
+if(appIns.gcombo_bit_order.value == 'Transmit/receive MSB first')
+{
+        out.print("""
+  XMC_SPI_CH_SetBitOrderMsbFirst(XMC_SPI${UnitInst}_CH${ChannelInst});
+          """)
+}
+
+       out.print("""
+  XMC_SPI_CH_SetWordLength(XMC_SPI${UnitInst}_CH${ChannelInst}, (uint8_t)${appIns.gint_word_length.value});
+
+  XMC_SPI_CH_SetFrameLength(XMC_SPI${UnitInst}_CH${ChannelInst}, (uint8_t)${appIns.gint_frame_length.value});
+
+  /* Configure the clock polarity and clock delay */
+  XMC_SPI_CH_ConfigureShiftClockOutput(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                       ${clock_settings[appIns.gcombo_clock_settings.options.indexOf(appIns.gcombo_clock_settings.value)]},
+                                       XMC_SPI_CH_BRG_SHIFT_CLOCK_OUTPUT_SCLK);
+  /* Configure Leading/Trailing delay */
+  XMC_SPI_CH_SetSlaveSelectDelay(XMC_SPI${UnitInst}_CH${ChannelInst}, ${appIns.gint_desired_leading_trailing_delay.value}U);
+
+               """)
+  
+if(appIns.gint_desired_interword_delay.value > 0)
+              out.print("""
+  /* Configure the inter word delay */
+  XMC_SPI_CH_SetInterwordDelaySCLK(XMC_SPI${UnitInst}_CH${ChannelInst}, ${appIns.gint_desired_interword_delay.value}U);
+  /* Enable inter word delay */
+  XMC_SPI_CH_EnableInterwordDelay(XMC_SPI${UnitInst}_CH${ChannelInst});
+                """)
+
+switch(appIns.gcombo_oprmode.value)    
+{
+case "Full Duplex":
+    out.print("""
+  /* Configure the input pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE, (uint8_t)${MOSI1pinNo}, &${appInst}_MISO_Config.port_config);
+
+  /* Configure the data input line selected */
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN0, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX0CR","dx0cr_dsel").toInteger()]});""")
+
+if(daveEnv.project.selectedDevice.deviceId.family == "XMC1")
+{
+  out.print("""
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN1, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX3CR","dx3cr_dsel").toInteger()]});
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN2, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX4CR","dx4cr_dsel").toInteger()]});
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN3, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX5CR","dx5cr_dsel").toInteger()]});""")
+}
+  out.print("""
+  /* Start the SPI_Channel */
+  XMC_SPI_CH_Start(XMC_SPI${UnitInst}_CH${ChannelInst});
+
+  /* Configure the output pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, &${appInst}_MOSI_Config.port_config);
+    """)
+    break;
+case "Half Duplex":
+    out.print("""
+  /* Configure the data input lines */
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN0, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX0CR","dx0cr_dsel").toInteger()]});""")
+
+if(daveEnv.project.selectedDevice.deviceId.family == "XMC1")
+{
+  out.print("""
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN1, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX3CR","dx3cr_dsel").toInteger()]});
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN2, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX4CR","dx4cr_dsel").toInteger()]});
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN3, (uint8_t)${receive_input[appIns.hwres_usic_channel.getRegValue("DX5CR","dx5cr_dsel").toInteger()]});""")
+}
+  out.print("""
+
+  /* Start the SPI_Channel */
+  XMC_SPI_CH_Start(XMC_SPI${UnitInst}_CH${ChannelInst});
+
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, &${appInst}_MOSI0_Config.port_config);
+
+  /* Configure the Hardware control mode selected for the pin */
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_0.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+    """)
+    break;
+case "Dual SPI":
+    out.print("""
+  /* Configure the data input line in loop back mode */
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN0, (uint8_t)SPI_MASTER_INPUT_G);
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN1, (uint8_t)SPI_MASTER_INPUT_G);
+
+  /* Start the SPI_Channel */
+  XMC_SPI_CH_Start(XMC_SPI${UnitInst}_CH${ChannelInst});
+
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, &${appInst}_MOSI0_Config.port_config);
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE, (uint8_t)${MOSI1pinNo}, &${appInst}_MOSI1_Config.port_config);
+
+  /* Configure the Hardware control mode selected for the pin */
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_0.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE, (uint8_t)${MOSI1pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_1.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+    """)
+    break;
+case "Quad SPI":
+    out.print("""
+  /* Configure the data input line in loop back mode */
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN0, (uint8_t)SPI_MASTER_INPUT_G);
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN1, (uint8_t)SPI_MASTER_INPUT_G);
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN2, (uint8_t)SPI_MASTER_INPUT_G);
+  XMC_SPI_CH_SetInputSource(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_INPUT_DIN3, (uint8_t)SPI_MASTER_INPUT_G);
+
+  /* Start the SPI_Channel */
+  XMC_SPI_CH_Start(XMC_SPI${UnitInst}_CH${ChannelInst});
+
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, &${appInst}_MOSI0_Config.port_config);
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE, (uint8_t)${MOSI1pinNo}, &${appInst}_MOSI1_Config.port_config);
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI2portNo}_BASE, (uint8_t)${MOSI2pinNo}, &${appInst}_MOSI2_Config.port_config);
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${MOSI3portNo}_BASE, (uint8_t)${MOSI3pinNo}, &${appInst}_MOSI3_Config.port_config);
+
+  /* Configure the Hardware control mode selected for the pin */
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI0portNo}_BASE, (uint8_t)${MOSI0pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_0.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI1portNo}_BASE, (uint8_t)${MOSI1pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_1.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI2portNo}_BASE, (uint8_t)${MOSI2pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_2.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+  XMC_GPIO_SetHardwareControl((XMC_GPIO_PORT_t *)PORT${MOSI3portNo}_BASE, (uint8_t)${MOSI3pinNo}, ${gpio_hw_control[appIns.hwres_port_pad_spi_mosi_3.getRegValue("HWSEL","hwsel_hw").toInteger()]});
+    """)
+    break;
+default:
+    break;
+}
+out.print("""
+  /* Initialize SPI SCLK out pin */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${CLKOutportNo}_BASE, (uint8_t)${CLKOutpinNo}, &${appInst}_SCLKOUT_Config.port_config);
+""");
+
+ /* Initialize slave select lines */
+if(appIns.gint_slave_select_lines.value > 0)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS0portNo}_BASE, (uint8_t)${SS0pinNo}, &${appInst}_SS_0_Config.port_config);
+  XMC_SPI_CH_EnableSlaveSelect(XMC_SPI${UnitInst}_CH${ChannelInst}, ${slave_select_resource[appIns.sv_slave_select_0.getSolverValue()]});
+""")
+}
+if(appIns.gint_slave_select_lines.value > 1)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS1portNo}_BASE, (uint8_t)${SS1pinNo}, &${appInst}_SS_1_Config.port_config);
+""")
+}
+if(appIns.gint_slave_select_lines.value > 2)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS2portNo}_BASE, (uint8_t)${SS2pinNo}, &${appInst}_SS_2_Config.port_config);
+""")
+}
+if(appIns.gint_slave_select_lines.value > 3)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS3portNo}_BASE, (uint8_t)${SS3pinNo}, &${appInst}_SS_3_Config.port_config);
+""")
+}
+if(appIns.gint_slave_select_lines.value > 4)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS4portNo}_BASE, (uint8_t)${SS4pinNo}, &${appInst}_SS_4_Config.port_config);
+""")
+}
+if(appIns.gint_slave_select_lines.value > 5)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS5portNo}_BASE, (uint8_t)${SS5pinNo}, &${appInst}_SS_5_Config.port_config);
+""")
+}
+if(appIns.gint_slave_select_lines.value > 6)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS6portNo}_BASE, (uint8_t)${SS6pinNo}, &${appInst}_SS_6_Config.port_config);
+""")
+}
+if(appIns.gint_slave_select_lines.value > 7)
+{
+out.print("""
+  /* Configure the pin properties */
+  XMC_GPIO_Init((XMC_GPIO_PORT_t *)PORT${SS7portNo}_BASE, (uint8_t)${SS7pinNo}, &${appInst}_SS_7_Config.port_config);
+""")
+}
+
+if((appIns.hwres_usic_channel.getRegValue("ccr","ccr_tbien").toInteger() == 1) || (appIns.hwres_usic_channel.getRegValue("ccr","ccr_rsien").toInteger() == 1))
+{
+out.print("""
+  XMC_USIC_CH_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                      XMC_USIC_CH_INTERRUPT_NODE_POINTER_TRANSMIT_BUFFER,
+                                      (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_tbinp")});""");
+}
+
+if(appIns.hwres_usic_channel.getRegValue("ccr","ccr_rien").toInteger() == 1)
+{
+out.print("""
+  XMC_USIC_CH_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                      XMC_USIC_CH_INTERRUPT_NODE_POINTER_RECEIVE,
+                                      (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_rinp")});""");
+}
+if(appIns.hwres_usic_channel.getRegValue("ccr","ccr_aien").toInteger() == 1)
+{
+out.print("""
+  XMC_USIC_CH_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                      XMC_USIC_CH_INTERRUPT_NODE_POINTER_ALTERNATE_RECEIVE,
+                                      (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_ainp")});""");
+}
+
+out.print("""
+  XMC_USIC_CH_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                      XMC_USIC_CH_INTERRUPT_NODE_POINTER_PROTOCOL,
+                                      (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_pinp")});
+            """);
+
+
+if((appIns.gcheck_parity_error.value) && (appIns.gcombo_parity.value != "None"))
+{
+    out.print("""
+  XMC_SPI_CH_EnableEvent(XMC_SPI${UnitInst}_CH${ChannelInst}, XMC_SPI_CH_EVENT_PARITY_ERROR);
+             """)
+}
+
+if ((appIns.gcheck_enabletxfifo.value) && (appIns.gcombo_transmit_mode.value != "DMA"))
+{
+    out.print("""
+  /* Configure transmit FIFO settings */
+  XMC_USIC_CH_TXFIFO_Configure(XMC_SPI${UnitInst}_CH${ChannelInst},
+                               ${appIns.hwres_usic_channel.getRegValue("TBCTR","tbctr_dptr")}U,
+                               (XMC_USIC_CH_FIFO_SIZE_t)${fifo_size[appIns.hwres_usic_channel.getRegValue("TBCTR","tbctr_size").toInteger()]},
+                               1U);
+
+  /* Configure the service interrupt nodes for standard transmit FIFO events */
+               """)
+  if(appIns.hwres_usic_channel.getRegValue("tbctr","tbctr_stbien").toInteger() == 1)
+  {
+  out.print("""
+  XMC_USIC_CH_TXFIFO_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                             XMC_USIC_CH_TXFIFO_INTERRUPT_NODE_POINTER_STANDARD,
+                                             (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("tbctr","tbctr_stbinp")});""");
+  }
+  if(appIns.hwres_usic_channel.getRegValue("tbctr","tbctr_tberien").toInteger() == 1)
+  {
+  out.print("""
+  XMC_USIC_CH_TXFIFO_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                             XMC_USIC_CH_TXFIFO_INTERRUPT_NODE_POINTER_ALTERNATE,
+                                             (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("tbctr","tbctr_atbinp")});""");
+  }
+}
+if((appIns.gcheck_enablerxfifo.value) && (appIns.gcombo_receive_mode.value != "DMA"))
+{
+  FIFO_size_reg = appIns.hwres_usic_channel.getRegValue("RBCTR","rbctr_size")
+  
+  if(appIns.gcombo_receive_mode.value == "Direct")
+  {
+      out.print("""
+  /* Configure receive FIFO settings */
+  XMC_USIC_CH_RXFIFO_Configure(XMC_SPI${UnitInst}_CH${ChannelInst},
+                               ${appIns.hwres_usic_channel.getRegValue("RBCTR","rbctr_dptr")}U,
+                               (XMC_USIC_CH_FIFO_SIZE_t)${fifo_size[FIFO_size_reg]},
+                               ${(2**FIFO_size_reg)-1}U);
+             """)
+  }
+  else
+  {
+    out.print("""
+  /* Configure receive FIFO settings */
+  XMC_USIC_CH_RXFIFO_Configure(XMC_SPI${UnitInst}_CH${ChannelInst},
+                               ${appIns.hwres_usic_channel.getRegValue("RBCTR","rbctr_dptr")}U,
+                               (XMC_USIC_CH_FIFO_SIZE_t)${fifo_size[FIFO_size_reg]},
+                               0U);
+             """)
+  /* Configure the service interrupt nodes for standard receive FIFO events */
+  }
+  if(appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_srbien").toInteger() == 1)
+  {
+  out.print("""
+  XMC_USIC_CH_RXFIFO_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                             XMC_USIC_CH_RXFIFO_INTERRUPT_NODE_POINTER_STANDARD,
+                                             (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_srbinp")});""");
+  }
+  if((appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_arbien").toInteger() == 1) ||
+     (appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_rberien").toInteger() == 1))
+  {
+  out.print("""
+  XMC_USIC_CH_RXFIFO_SetInterruptNodePointer(XMC_SPI${UnitInst}_CH${ChannelInst},
+                                             XMC_USIC_CH_RXFIFO_INTERRUPT_NODE_POINTER_ALTERNATE,
+                                             (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_arbinp")});""");
+  }
+}
+
+if (appIns.gcombo_transmit_mode.value == "Interrupt")
+{
+    if (xmc1_family == true)
+    {
+    out.print("""
+  /* Set priority of the Transmit interrupt */
+  NVIC_SetPriority((IRQn_Type)${Tx_node}, ${appIns.ginterruptprio_tx.priorityValue}U);
+    """);
+   if(daveEnv.project.selectedDevice.deviceId.series == "4")
+   {
+  /* For XMC14 single node is being shared with multiple devices */
+    if (appIns.gcheck_enabletxfifo.value == true && appIns.gcheck_enabletxfifo.enabled == true)
+    {
+      out.print("""
+  XMC_SCU_SetInterruptControl(${Tx_node},   XMC_SCU_IRQCTRL_USIC${UnitInst}_SR${appIns.hwres_usic_channel.getRegValue("tbctr","tbctr_stbinp")}_IRQ${Tx_node});""");
+    }
+    else
+    {
+      out.print("""
+  XMC_SCU_SetInterruptControl(${Tx_node}, XMC_SCU_IRQCTRL_USIC${UnitInst}_SR${appIns.hwres_usic_channel.getRegValue("inpr","inpr_tbinp")}_IRQ${Tx_node});""");
+    }
+   }
+    }
+    else
+    {
+    out.print("""
+  /* Set priority of the Transmit interrupt */
+  NVIC_SetPriority((IRQn_Type)${Tx_node}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), ${appIns.ginterruptprio_tx.priorityValue}U, ${appIns.ginterruptprio_tx.subPriorityValue}U));
+     """);
+    }
+    out.print("""
+  /* Enable Transmit interrupt */
+  NVIC_EnableIRQ((IRQn_Type)${Tx_node});
+             """);
+}
+
+if (appIns.gcombo_receive_mode.value == "Interrupt")
+{
+    if (xmc1_family == true)
+    {
+    out.print("""
+  /* Set priority of the Receive interrupt */
+  NVIC_SetPriority((IRQn_Type)${Rx_node}, ${appIns.ginterruptprio_rx.priorityValue}U);
+    """);    
+  
+  if(daveEnv.project.selectedDevice.deviceId.series == "4")
+  {
+  /* For XMC14 single node is being shared with multiple devices */
+    if (appIns.gcheck_enablerxfifo.value == true && appIns.gcheck_enablerxfifo.enabled == true)
+    {
+      out.print("""
+  XMC_SCU_SetInterruptControl(${Rx_node},   XMC_SCU_IRQCTRL_USIC${UnitInst}_SR${appIns.hwres_usic_channel.getRegValue("rbctr","rbctr_srbinp")}_IRQ${Rx_node});""");
+    }
+    else
+    {
+      out.print("""
+  XMC_SCU_SetInterruptControl(${Rx_node}, XMC_SCU_IRQCTRL_USIC${UnitInst}_SR${appIns.hwres_usic_channel.getRegValue("inpr","inpr_rinp")}_IRQ${Rx_node});""");
+    }
+   }
+    }
+    else
+    {
+    out.print("""
+  /* Set priority of the Receive interrupt */
+  NVIC_SetPriority((IRQn_Type)${Rx_node}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), ${appIns.ginterruptprio_rx.priorityValue}U, ${appIns.ginterruptprio_rx.subPriorityValue}U));
+    """);
+    }
+    out.print("""
+  /* Enable Receive interrupt */
+  NVIC_EnableIRQ((IRQn_Type)${Rx_node});
+    """);
+}
+
+if ((appIns.gcheck_parity_error.value == true) && (appIns.gcombo_parity.value != "None"))
+{
+  if (xmc1_family == true)
+  {
+    out.print("""
+  /* Set priority of the Parity error interrupt */
+  NVIC_SetPriority((IRQn_Type)${Err_node}, ${appIns.ginterruptprio_error.priorityValue}U);
+             """);         
+  if(daveEnv.project.selectedDevice.deviceId.series == "4")
+  {
+    out.print("""
+  /* For XMC14 single node is being shared with multiple devices */
+  XMC_SCU_SetInterruptControl(${Err_node}, XMC_SCU_IRQCTRL_USIC${UnitInst}_SR${appIns.hwres_usic_channel.getRegValue("inpr","inpr_pinp")}_IRQ${Err_node});""");
+  }
+  }
+  else
+  {
+      out.print("""
+  /* Set priority of the Parity error interrupt */
+  NVIC_SetPriority((IRQn_Type)${Err_node}, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), ${appIns.ginterruptprio_error.priorityValue}U, ${appIns.ginterruptprio_error.subPriorityValue}U));
+              """);
+  }
+  out.print("""
+  /* Enable Parity Error interrupt */
+  NVIC_EnableIRQ((IRQn_Type)${Err_node});
+            """);
+}
+
+if(appIns.gcombo_transmit_mode.value  == "DMA")
+{
+    out.print("""
+  XMC_USIC_CH_TriggerServiceRequest(XMC_SPI${UnitInst}_CH${ChannelInst}, (uint32_t)SPI_MASTER_SR_ID_${appIns.hwres_usic_channel.getRegValue("inpr","inpr_tbinp")});""")
+}
+
+if ((appIns.gcombo_transmit_mode.value  == "DMA") || (appIns.gcombo_receive_mode.value  == "DMA"))
+{
+ out.print("""
+}            
+""")
+}
+
+out.print("""
+  return status;
+}""") 
+
+/*Interrupt handlers*/
+if (appIns.gcombo_transmit_mode.value == "Interrupt")
+{
+out.print("""
+/*Transmit ISR*/
+void ${appInst}_tx_handler()
+{
+  SPI_MASTER_lTransmitHandler(&${appInst});
+}
+""");
+}
+
+if (appIns.gcombo_transmit_mode.value == "DMA")
+{
+out.print("""
+/*Transmit ISR*/
+void ${appInst}_DMA_tx_handler(XMC_DMA_CH_EVENT_t event)
+{
+  if (event == XMC_DMA_CH_EVENT_TRANSFER_COMPLETE)
+  {
+    while(XMC_USIC_CH_GetTransmitBufferStatus(XMC_SPI${UnitInst}_CH${ChannelInst}) == XMC_USIC_CH_TBUF_STATUS_BUSY);
+    ${appInst}.runtime->tx_busy = false;""")
+  if(appIns.gcheck_end_transmission.value == true)
+  {
+  out.print("""
+    ${appIns.gstring_tx_callback.value}();
+           """)
+  }
+out.print("""
+  }
+}
+""");
+}
+
+if (appIns.gcombo_receive_mode.value == "Interrupt")
+{
+out.print("""
+/*Receive ISR*/
+void ${appInst}_rx_handler()
+{
+  SPI_MASTER_lReceiveHandler(&${appInst});
+}
+""");
+}
+
+if (appIns.gcombo_receive_mode.value == "DMA")
+{
+out.print("""
+/*Receive ISR*/
+void ${appInst}_DMA_rx_handler(XMC_DMA_CH_EVENT_t event)
+{
+  if (event == XMC_DMA_CH_EVENT_TRANSFER_COMPLETE)
+  {
+    XMC_SPI_CH_DisableEvent(XMC_SPI${UnitInst}_CH${ChannelInst}, (uint32_t)((uint32_t)XMC_SPI_CH_EVENT_STANDARD_RECEIVE | (uint32_t)XMC_SPI_CH_EVENT_ALTERNATIVE_RECEIVE));
+    ${appInst}.runtime->tx_data_dummy = false;
+    ${appInst}.runtime->rx_data_dummy = true;
+    ${appInst}.runtime->rx_busy = false;""")
+  if (appIns.gcheck_end_reception.value == true)
+  {
+  out.print("""
+    ${appIns.gstring_rx_callback.value}();
+             """)
+  }
+out.print("""
+  }
+}
+""");
+}
+
+if((appIns.gcheck_parity_error.value) && (appIns.gcombo_parity.value != "None"))
+{
+out.print("""
+/*Error ISR*/
+void ${appInst}_err_handler()
+{
+  SPI_MASTER_lProtocolHandler(&${appInst});
+}
+""");
+}
+} else {
+              out.print("""
+      /* SPI_MASTER App is not mapped for app instant: ${appInst} */
+                     """);
+  } 
+}/* End of for loop */

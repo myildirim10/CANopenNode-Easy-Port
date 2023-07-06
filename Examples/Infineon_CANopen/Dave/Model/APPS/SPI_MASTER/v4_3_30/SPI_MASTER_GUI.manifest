@@ -1,0 +1,163 @@
+package Model.APPS.SPI_MASTER.v4_3_30;
+
+/* Import statements */
+import ifx.davex.app.manifest.*
+
+abstract class SPI_MASTER_GUI extends AppManifest {
+	/* Begin : UI variable section */
+	 public GTab gtab_advanced_settings;
+	 public GTab gtab_interrupt_settings;
+	 public GTab gtab_pin_settings;
+	 public GTab gtab_dummy;
+	 public GInteger gint_slave_select_lines;
+	 public GInteger gint_word_length;
+	 public GInteger gint_frame_length;
+	 public GInteger gint_desired_leading_trailing_delay;
+	 public GInteger gint_desired_interword_delay;
+	 public GCombo gcombo_oprmode;
+	 public GCombo gcombo_parity;
+	 public GCombo gcombo_transmit_mode;
+	 public GCombo gcombo_receive_mode;
+	 public GCombo gcombo_bit_order;
+	 public GCombo gcombo_clock_settings;
+	 public GCombo gcombo_txfifosize;
+	 public GCombo gcombo_rxfifosize;
+	 public GCombo gcombo_txpincharactristics;
+	 public GCombo gcombo_txpin_driverstrength;
+	 public GCombo gcombo_clkoutpin_charactristics;
+	 public GCombo gcombo_clkoutpin_driverstrength;
+	 public GCombo gcombo_sspin_charactristics;
+	 public GCombo gcombo_sspin_driverstrength;
+	 public GCombo gcombo_rxpincharacteristics;
+	 public GCombo gcombo_hysteresis;
+	 public GFloat gfloat_desired_bus_speed;
+	 public GFloat gfloat_actual_bus_speed;
+	 public GFloat gfloat_actual_leading_trailing_delay;
+	 public GFloat gfloat_actual_interword_delay;
+	 public GString gstring_tx_callback;
+	 public GString gstring_rx_callback;
+	 public GString gstring_parity_error_callback;
+	 public GCheck gcheck_selo_polarity;
+	 public GCheck gcheck_frame_end_mode;
+	 public GCheck gcheck_enabletxfifo;
+	 public GCheck gcheck_enablerxfifo;
+	 public GCheck gcheck_end_transmission;
+	 public GCheck gcheck_end_reception;
+	 public GCheck gcheck_parity_error;
+	 public GCheck gcheck_enablepinconfig;
+	 public GLabel glabel_parity;
+	 public GLabel glabel_transmit_mode;
+	 public GLabel glabel_receive_mode;
+	 public GLabel glabel_clock_settings;
+	 public GLabel glabel_txfifosize;
+	 public GLabel glabel_rxfifosize;
+	 public GLabel glabel_txpincharactristics;
+	 public GLabel glabel_txpin_driverstrength;
+	 public GLabel glabel_clkoutpin_charactristics;
+	 public GLabel glabel_clkoutpin_driverstrength;
+	 public GLabel glabel_sspin_charactristics;
+	 public GLabel glabel_sspin_driverstrength;
+	 public GLabel glabel_rxpincharacteristics;
+	 public GLabel glabel_hysteresis;
+	 public GLabel glabel_tx_callback;
+	 public GLabel glabel_rx_callback;
+	 public GLabel glabel_parity_error_callback;
+	 public GGroup ggroup_protocol_handling;
+	 public GGroup ggroup_fifo_settings;
+	 public GGroup ggroup_transmit_interrupt;
+	 public GGroup ggroup_receive_interrupt;
+	 public GGroup ggroup_error_handling;
+	 public GGroup ggroup_txpinconfig;
+	 public GGroup ggroup_clkoutpinconfig;
+	 public GGroup ggroup_sspinconfig;
+	 public GGroup ggroup_rxpinconfig;
+	 public GInterruptPrio ginterruptprio_tx;
+	 public GInterruptPrio ginterruptprio_rx;
+	 public GInterruptPrio ginterruptprio_error;
+	 public GMessage gmessage_protocol_handling;
+	 public GMessage gmessage_tx_callback_empty;
+	 public GMessage gmessage_rx_callback_empty;
+	 public GMessage gmessage_receive_priority_info;
+	 public GMessage gmessage_parity_error_callback_empty;
+
+	 public SPI_MASTER_GUI(DaveEnv daveEnv){
+
+	 gtab_advanced_settings = GTab(widgetName:"gtab_advanced_settings", text:"Advanced Settings", enabled:true, visible:true)
+	 gtab_interrupt_settings = GTab(widgetName:"gtab_interrupt_settings", text:"Interrupt Settings", enabled:true, visible:true)
+	 gtab_pin_settings = GTab(widgetName:"gtab_pin_settings", text:"Pin Settings", enabled:true, visible:true)
+	 gtab_dummy = GTab(widgetName:"gtab_dummy", text:"Dummy Tab", enabled:true, visible:true)
+	 gint_slave_select_lines = GInteger(widgetName:"gint_slave_select_lines", value:1, minValue:0, maxValue:8, enabled:true, visible:true, isMandatoryValue:false)
+	 gint_word_length = GInteger(widgetName:"gint_word_length", value:8, minValue:1, maxValue:16, enabled:true, visible:true, isMandatoryValue:false)
+	 gint_frame_length = GInteger(widgetName:"gint_frame_length", value:64, minValue:1, maxValue:64, enabled:true, visible:true, isMandatoryValue:false)
+	 gint_desired_leading_trailing_delay = GInteger(widgetName:"gint_desired_leading_trailing_delay", value:2, minValue:1, maxValue:32, enabled:true, visible:true, isMandatoryValue:false)
+	 gint_desired_interword_delay = GInteger(widgetName:"gint_desired_interword_delay", value:0, minValue:0, maxValue:32, enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_oprmode = GCombo(widgetName:"gcombo_oprmode", options:["Full Duplex","Half Duplex","Dual SPI","Quad SPI"], value:"Full Duplex", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_parity = GCombo(widgetName:"gcombo_parity", options:["None","Even","Odd"], value:"None", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_transmit_mode = GCombo(widgetName:"gcombo_transmit_mode", options:["Interrupt","DMA","Direct"], value:"Interrupt", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_receive_mode = GCombo(widgetName:"gcombo_receive_mode", options:["Interrupt","DMA","Direct"], value:"Interrupt", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_bit_order = GCombo(widgetName:"gcombo_bit_order", options:["Transmit/receive MSB first","Transmit/receive LSB first"], value:"Transmit/receive MSB first", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_clock_settings = GCombo(widgetName:"gcombo_clock_settings", options:["Low if inactive, transmit on rising clock edge, receive on falling clock edge","Low if inactive, transmit on falling clock edge, receive on rising clock edge","High if inactive, transmit on rising clock edge, receive on falling clock edge","High if inactive, transmit on falling clock edge, receive on rising clock edge"], value:"Low if inactive, transmit on rising clock edge, receive on falling clock edge", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_txfifosize = GCombo(widgetName:"gcombo_txfifosize", options:["2","4","8","16","32"], value:"16", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_rxfifosize = GCombo(widgetName:"gcombo_rxfifosize", options:["2","4","8","16","32"], value:"16", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_txpincharactristics = GCombo(widgetName:"gcombo_txpincharactristics", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_txpin_driverstrength = GCombo(widgetName:"gcombo_txpin_driverstrength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_clkoutpin_charactristics = GCombo(widgetName:"gcombo_clkoutpin_charactristics", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_clkoutpin_driverstrength = GCombo(widgetName:"gcombo_clkoutpin_driverstrength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sspin_charactristics = GCombo(widgetName:"gcombo_sspin_charactristics", options:["Push Pull","Open Drain"], value:"Push Pull", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_sspin_driverstrength = GCombo(widgetName:"gcombo_sspin_driverstrength", options:["Don't Care","Weak Driver","Medium Driver","Strong Driver Soft Edge","Strong Driver Slow Edge","Strong Driver Sharp Edge","Strong Driver Medium Edge"], value:"Don't Care", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_rxpincharacteristics = GCombo(widgetName:"gcombo_rxpincharacteristics", options:["Tristate","Pull Down","Pull Up","Continuous Sampling Mode","Inverted Tristate","Inverted Pull Down","Inverted Pull Up","Inverted Continuous Sampling Mode"], value:"Tristate", enabled:true, visible:true, isMandatoryValue:false)
+	 gcombo_hysteresis = GCombo(widgetName:"gcombo_hysteresis", options:["Standard","Large"], value:"Standard", enabled:true, visible:true, isMandatoryValue:false)
+	 gfloat_desired_bus_speed = GFloat(widgetName:"gfloat_desired_bus_speed", value:19.2, minValue:0.1, maxValue:60000, enabled:true, visible:true, isMandatoryValue:false)
+	 gfloat_actual_bus_speed = GFloat(widgetName:"gfloat_actual_bus_speed", value:19.2, minValue:0.1, maxValue:60000, enabled:true, visible:true, isMandatoryValue:false)
+	 gfloat_actual_leading_trailing_delay = GFloat(widgetName:"gfloat_actual_leading_trailing_delay", value:0.0, minValue:0.0, maxValue:Double.POSITIVE_INFINITY, enabled:false, visible:true, isMandatoryValue:false)
+	 gfloat_actual_interword_delay = GFloat(widgetName:"gfloat_actual_interword_delay", value:0.0, minValue:0.0, maxValue:Double.POSITIVE_INFINITY, enabled:false, visible:true, isMandatoryValue:false)
+	 gstring_tx_callback = GString(widgetName:"gstring_tx_callback", value:"", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_rx_callback = GString(widgetName:"gstring_rx_callback", value:"", enabled:true, visible:true, isMandatoryValue:false)
+	 gstring_parity_error_callback = GString(widgetName:"gstring_parity_error_callback", value:"", enabled:true, visible:true, isMandatoryValue:false)
+	 gcheck_selo_polarity = GCheck(widgetName:"gcheck_selo_polarity", value:true, enabled:true, visible:true)
+	 gcheck_frame_end_mode = GCheck(widgetName:"gcheck_frame_end_mode", value:true, enabled:true, visible:true)
+	 gcheck_enabletxfifo = GCheck(widgetName:"gcheck_enabletxfifo", value:true, enabled:true, visible:true)
+	 gcheck_enablerxfifo = GCheck(widgetName:"gcheck_enablerxfifo", value:true, enabled:true, visible:true)
+	 gcheck_end_transmission = GCheck(widgetName:"gcheck_end_transmission", value:false, enabled:true, visible:true)
+	 gcheck_end_reception = GCheck(widgetName:"gcheck_end_reception", value:false, enabled:true, visible:true)
+	 gcheck_parity_error = GCheck(widgetName:"gcheck_parity_error", value:false, enabled:true, visible:true)
+	 gcheck_enablepinconfig = GCheck(widgetName:"gcheck_enablepinconfig", value:false, enabled:true, visible:true)
+	 glabel_parity = GLabel(widgetName:"glabel_parity", text:"Parity selection:", enabled:true, visible:true)
+	 glabel_transmit_mode = GLabel(widgetName:"glabel_transmit_mode", text:"Transmit mode:", enabled:true, visible:true)
+	 glabel_receive_mode = GLabel(widgetName:"glabel_receive_mode", text:"Receive mode:", enabled:true, visible:true)
+	 glabel_clock_settings = GLabel(widgetName:"glabel_clock_settings", text:"Clock settings:", enabled:true, visible:true)
+	 glabel_txfifosize = GLabel(widgetName:"glabel_txfifosize", text:"Size:", enabled:true, visible:true)
+	 glabel_rxfifosize = GLabel(widgetName:"glabel_rxfifosize", text:"Size:", enabled:true, visible:true)
+	 glabel_txpincharactristics = GLabel(widgetName:"glabel_txpincharactristics", text:"Mode:", enabled:true, visible:true)
+	 glabel_txpin_driverstrength = GLabel(widgetName:"glabel_txpin_driverstrength", text:"Driver strength:", enabled:true, visible:true)
+	 glabel_clkoutpin_charactristics = GLabel(widgetName:"glabel_clkoutpin_charactristics", text:"Mode:", enabled:true, visible:true)
+	 glabel_clkoutpin_driverstrength = GLabel(widgetName:"glabel_clkoutpin_driverstrength", text:"Driver strength:", enabled:true, visible:true)
+	 glabel_sspin_charactristics = GLabel(widgetName:"glabel_sspin_charactristics", text:"Mode:", enabled:true, visible:true)
+	 glabel_sspin_driverstrength = GLabel(widgetName:"glabel_sspin_driverstrength", text:"Driver strength:", enabled:true, visible:true)
+	 glabel_rxpincharacteristics = GLabel(widgetName:"glabel_rxpincharacteristics", text:"Mode:", enabled:true, visible:true)
+	 glabel_hysteresis = GLabel(widgetName:"glabel_hysteresis", text:"Hysteresis:", enabled:true, visible:true)
+	 glabel_tx_callback = GLabel(widgetName:"glabel_tx_callback", text:"tx callback", enabled:true, visible:true)
+	 glabel_rx_callback = GLabel(widgetName:"glabel_rx_callback", text:"rx callback", enabled:true, visible:true)
+	 glabel_parity_error_callback = GLabel(widgetName:"glabel_parity_error_callback", text:"parity callback", enabled:true, visible:true)
+	 ggroup_protocol_handling = GGroup(widgetName:"ggroup_protocol_handling", text:"Protocol Handling", enabled:true, visible:true)
+	 ggroup_fifo_settings = GGroup(widgetName:"ggroup_fifo_settings", text:"FIFO Settings", enabled:true, visible:true)
+	 ggroup_transmit_interrupt = GGroup(widgetName:"ggroup_transmit_interrupt", text:"Transmit", enabled:true, visible:true)
+	 ggroup_receive_interrupt = GGroup(widgetName:"ggroup_receive_interrupt", text:"Receive/Transfer", enabled:true, visible:true)
+	 ggroup_error_handling = GGroup(widgetName:"ggroup_error_handling", text:"Error Handling", enabled:true, visible:true)
+	 ggroup_txpinconfig = GGroup(widgetName:"ggroup_txpinconfig", text:"MOSI", enabled:true, visible:true)
+	 ggroup_clkoutpinconfig = GGroup(widgetName:"ggroup_clkoutpinconfig", text:"SCLK", enabled:true, visible:true)
+	 ggroup_sspinconfig = GGroup(widgetName:"ggroup_sspinconfig", text:"Slave Select", enabled:true, visible:true)
+	 ggroup_rxpinconfig = GGroup(widgetName:"ggroup_rxpinconfig", text:"MISO", enabled:true, visible:true)
+	 ginterruptprio_tx = GInterruptPrio(widgetName:"ginterruptprio_tx", priorityValue:63, minPriority:0, maxPriority:63, subPriorityValue:0, minSubPriority:0, maxSubPriority:63, subPriorityVisible:true, enabled:true, visible:true)
+	 ginterruptprio_rx = GInterruptPrio(widgetName:"ginterruptprio_rx", priorityValue:62, minPriority:0, maxPriority:63, subPriorityValue:0, minSubPriority:0, maxSubPriority:63, subPriorityVisible:true, enabled:true, visible:true)
+	 ginterruptprio_error = GInterruptPrio(widgetName:"ginterruptprio_error", priorityValue:63, minPriority:0, maxPriority:63, subPriorityValue:0, minSubPriority:0, maxSubPriority:0, subPriorityVisible:true, enabled:true, visible:true)
+	 gmessage_protocol_handling = GMessage(widgetName:"gmessage_protocol_handling", text:"Mode combination not valid", isError:false, visible:true)
+	 gmessage_tx_callback_empty = GMessage(widgetName:"gmessage_tx_callback_empty", text:"Invalid function name for-\"End of transmit callback\".", isError:false, visible:true)
+	 gmessage_rx_callback_empty = GMessage(widgetName:"gmessage_rx_callback_empty", text:"Invalid function name for- \"End of receive/transfer callback\".", isError:false, visible:true)
+	 gmessage_receive_priority_info = GMessage(widgetName:"gmessage_receive_priority_info", text:"In order to avoid receive FIFO data overwriting, it is recommended to configure higher preemption priority for the receive interrupt.", isError:false, visible:true)
+	 gmessage_parity_error_callback_empty = GMessage(widgetName:"gmessage_parity_error_callback_empty", text:"Invalid function name for-\"Parity error callback\".", isError:false, visible:true)
+
+
+	 }
+	/* End : UI variable section */
+}

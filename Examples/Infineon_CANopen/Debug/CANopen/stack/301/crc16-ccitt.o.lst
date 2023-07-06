@@ -1,0 +1,557 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "crc16-ccitt.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .rodata.crc16_ccitt_table,"a",%progbits
+  20              	 .align 2
+  23              	crc16_ccitt_table:
+  24 0000 0000     	 .short 0
+  25 0002 2110     	 .short 4129
+  26 0004 4220     	 .short 8258
+  27 0006 6330     	 .short 12387
+  28 0008 8440     	 .short 16516
+  29 000a A550     	 .short 20645
+  30 000c C660     	 .short 24774
+  31 000e E770     	 .short 28903
+  32 0010 0881     	 .short -32504
+  33 0012 2991     	 .short -28375
+  34 0014 4AA1     	 .short -24246
+  35 0016 6BB1     	 .short -20117
+  36 0018 8CC1     	 .short -15988
+  37 001a ADD1     	 .short -11859
+  38 001c CEE1     	 .short -7730
+  39 001e EFF1     	 .short -3601
+  40 0020 3112     	 .short 4657
+  41 0022 1002     	 .short 528
+  42 0024 7332     	 .short 12915
+  43 0026 5222     	 .short 8786
+  44 0028 B552     	 .short 21173
+  45 002a 9442     	 .short 17044
+  46 002c F772     	 .short 29431
+  47 002e D662     	 .short 25302
+  48 0030 3993     	 .short -27847
+  49 0032 1883     	 .short -31976
+  50 0034 7BB3     	 .short -19589
+  51 0036 5AA3     	 .short -23718
+  52 0038 BDD3     	 .short -11331
+  53 003a 9CC3     	 .short -15460
+  54 003c FFF3     	 .short -3073
+  55 003e DEE3     	 .short -7202
+  56 0040 6224     	 .short 9314
+  57 0042 4334     	 .short 13379
+  58 0044 2004     	 .short 1056
+  59 0046 0114     	 .short 5121
+  60 0048 E664     	 .short 25830
+  61 004a C774     	 .short 29895
+  62 004c A444     	 .short 17572
+  63 004e 8554     	 .short 21637
+  64 0050 6AA5     	 .short -23190
+  65 0052 4BB5     	 .short -19125
+  66 0054 2885     	 .short -31448
+  67 0056 0995     	 .short -27383
+  68 0058 EEE5     	 .short -6674
+  69 005a CFF5     	 .short -2609
+  70 005c ACC5     	 .short -14932
+  71 005e 8DD5     	 .short -10867
+  72 0060 5336     	 .short 13907
+  73 0062 7226     	 .short 9842
+  74 0064 1116     	 .short 5649
+  75 0066 3006     	 .short 1584
+  76 0068 D776     	 .short 30423
+  77 006a F666     	 .short 26358
+  78 006c 9556     	 .short 22165
+  79 006e B446     	 .short 18100
+  80 0070 5BB7     	 .short -18597
+  81 0072 7AA7     	 .short -22662
+  82 0074 1997     	 .short -26855
+  83 0076 3887     	 .short -30920
+  84 0078 DFF7     	 .short -2081
+  85 007a FEE7     	 .short -6146
+  86 007c 9DD7     	 .short -10339
+  87 007e BCC7     	 .short -14404
+  88 0080 C448     	 .short 18628
+  89 0082 E558     	 .short 22757
+  90 0084 8668     	 .short 26758
+  91 0086 A778     	 .short 30887
+  92 0088 4008     	 .short 2112
+  93 008a 6118     	 .short 6241
+  94 008c 0228     	 .short 10242
+  95 008e 2338     	 .short 14371
+  96 0090 CCC9     	 .short -13876
+  97 0092 EDD9     	 .short -9747
+  98 0094 8EE9     	 .short -5746
+  99 0096 AFF9     	 .short -1617
+ 100 0098 4889     	 .short -30392
+ 101 009a 6999     	 .short -26263
+ 102 009c 0AA9     	 .short -22262
+ 103 009e 2BB9     	 .short -18133
+ 104 00a0 F55A     	 .short 23285
+ 105 00a2 D44A     	 .short 19156
+ 106 00a4 B77A     	 .short 31415
+ 107 00a6 966A     	 .short 27286
+ 108 00a8 711A     	 .short 6769
+ 109 00aa 500A     	 .short 2640
+ 110 00ac 333A     	 .short 14899
+ 111 00ae 122A     	 .short 10770
+ 112 00b0 FDDB     	 .short -9219
+ 113 00b2 DCCB     	 .short -13348
+ 114 00b4 BFFB     	 .short -1089
+ 115 00b6 9EEB     	 .short -5218
+ 116 00b8 799B     	 .short -25735
+ 117 00ba 588B     	 .short -29864
+ 118 00bc 3BBB     	 .short -17605
+ 119 00be 1AAB     	 .short -21734
+ 120 00c0 A66C     	 .short 27814
+ 121 00c2 877C     	 .short 31879
+ 122 00c4 E44C     	 .short 19684
+ 123 00c6 C55C     	 .short 23749
+ 124 00c8 222C     	 .short 11298
+ 125 00ca 033C     	 .short 15363
+ 126 00cc 600C     	 .short 3168
+ 127 00ce 411C     	 .short 7233
+ 128 00d0 AEED     	 .short -4690
+ 129 00d2 8FFD     	 .short -625
+ 130 00d4 ECCD     	 .short -12820
+ 131 00d6 CDDD     	 .short -8755
+ 132 00d8 2AAD     	 .short -21206
+ 133 00da 0BBD     	 .short -17141
+ 134 00dc 688D     	 .short -29336
+ 135 00de 499D     	 .short -25271
+ 136 00e0 977E     	 .short 32407
+ 137 00e2 B66E     	 .short 28342
+ 138 00e4 D55E     	 .short 24277
+ 139 00e6 F44E     	 .short 20212
+ 140 00e8 133E     	 .short 15891
+ 141 00ea 322E     	 .short 11826
+ 142 00ec 511E     	 .short 7761
+ 143 00ee 700E     	 .short 3696
+ 144 00f0 9FFF     	 .short -97
+ 145 00f2 BEEF     	 .short -4162
+ 146 00f4 DDDF     	 .short -8227
+ 147 00f6 FCCF     	 .short -12292
+ 148 00f8 1BBF     	 .short -16613
+ 149 00fa 3AAF     	 .short -20678
+ 150 00fc 599F     	 .short -24743
+ 151 00fe 788F     	 .short -28808
+ 152 0100 8891     	 .short -28280
+ 153 0102 A981     	 .short -32343
+ 154 0104 CAB1     	 .short -20022
+ 155 0106 EBA1     	 .short -24085
+ 156 0108 0CD1     	 .short -12020
+ 157 010a 2DC1     	 .short -16083
+ 158 010c 4EF1     	 .short -3762
+ 159 010e 6FE1     	 .short -7825
+ 160 0110 8010     	 .short 4224
+ 161 0112 A100     	 .short 161
+ 162 0114 C230     	 .short 12482
+ 163 0116 E320     	 .short 8419
+ 164 0118 0450     	 .short 20484
+ 165 011a 2540     	 .short 16421
+ 166 011c 4670     	 .short 28742
+ 167 011e 6760     	 .short 24679
+ 168 0120 B983     	 .short -31815
+ 169 0122 9893     	 .short -27752
+ 170 0124 FBA3     	 .short -23557
+ 171 0126 DAB3     	 .short -19494
+ 172 0128 3DC3     	 .short -15555
+ 173 012a 1CD3     	 .short -11492
+ 174 012c 7FE3     	 .short -7297
+ 175 012e 5EF3     	 .short -3234
+ 176 0130 B102     	 .short 689
+ 177 0132 9012     	 .short 4752
+ 178 0134 F322     	 .short 8947
+ 179 0136 D232     	 .short 13010
+ 180 0138 3542     	 .short 16949
+ 181 013a 1452     	 .short 21012
+ 182 013c 7762     	 .short 25207
+ 183 013e 5672     	 .short 29270
+ 184 0140 EAB5     	 .short -18966
+ 185 0142 CBA5     	 .short -23093
+ 186 0144 A895     	 .short -27224
+ 187 0146 8985     	 .short -31351
+ 188 0148 6EF5     	 .short -2706
+ 189 014a 4FE5     	 .short -6833
+ 190 014c 2CD5     	 .short -10964
+ 191 014e 0DC5     	 .short -15091
+ 192 0150 E234     	 .short 13538
+ 193 0152 C324     	 .short 9411
+ 194 0154 A014     	 .short 5280
+ 195 0156 8104     	 .short 1153
+ 196 0158 6674     	 .short 29798
+ 197 015a 4764     	 .short 25671
+ 198 015c 2454     	 .short 21540
+ 199 015e 0544     	 .short 17413
+ 200 0160 DBA7     	 .short -22565
+ 201 0162 FAB7     	 .short -18438
+ 202 0164 9987     	 .short -30823
+ 203 0166 B897     	 .short -26696
+ 204 0168 5FE7     	 .short -6305
+ 205 016a 7EF7     	 .short -2178
+ 206 016c 1DC7     	 .short -14563
+ 207 016e 3CD7     	 .short -10436
+ 208 0170 D326     	 .short 9939
+ 209 0172 F236     	 .short 14066
+ 210 0174 9106     	 .short 1681
+ 211 0176 B016     	 .short 5808
+ 212 0178 5766     	 .short 26199
+ 213 017a 7676     	 .short 30326
+ 214 017c 1546     	 .short 17941
+ 215 017e 3456     	 .short 22068
+ 216 0180 4CD9     	 .short -9908
+ 217 0182 6DC9     	 .short -13971
+ 218 0184 0EF9     	 .short -1778
+ 219 0186 2FE9     	 .short -5841
+ 220 0188 C899     	 .short -26168
+ 221 018a E989     	 .short -30231
+ 222 018c 8AB9     	 .short -18038
+ 223 018e ABA9     	 .short -22101
+ 224 0190 4458     	 .short 22596
+ 225 0192 6548     	 .short 18533
+ 226 0194 0678     	 .short 30726
+ 227 0196 2768     	 .short 26663
+ 228 0198 C018     	 .short 6336
+ 229 019a E108     	 .short 2273
+ 230 019c 8238     	 .short 14466
+ 231 019e A328     	 .short 10403
+ 232 01a0 7DCB     	 .short -13443
+ 233 01a2 5CDB     	 .short -9380
+ 234 01a4 3FEB     	 .short -5313
+ 235 01a6 1EFB     	 .short -1250
+ 236 01a8 F98B     	 .short -29703
+ 237 01aa D89B     	 .short -25640
+ 238 01ac BBAB     	 .short -21573
+ 239 01ae 9ABB     	 .short -17510
+ 240 01b0 754A     	 .short 19061
+ 241 01b2 545A     	 .short 23124
+ 242 01b4 376A     	 .short 27191
+ 243 01b6 167A     	 .short 31254
+ 244 01b8 F10A     	 .short 2801
+ 245 01ba D01A     	 .short 6864
+ 246 01bc B32A     	 .short 10931
+ 247 01be 923A     	 .short 14994
+ 248 01c0 2EFD     	 .short -722
+ 249 01c2 0FED     	 .short -4849
+ 250 01c4 6CDD     	 .short -8852
+ 251 01c6 4DCD     	 .short -12979
+ 252 01c8 AABD     	 .short -16982
+ 253 01ca 8BAD     	 .short -21109
+ 254 01cc E89D     	 .short -25112
+ 255 01ce C98D     	 .short -29239
+ 256 01d0 267C     	 .short 31782
+ 257 01d2 076C     	 .short 27655
+ 258 01d4 645C     	 .short 23652
+ 259 01d6 454C     	 .short 19525
+ 260 01d8 A23C     	 .short 15522
+ 261 01da 832C     	 .short 11395
+ 262 01dc E01C     	 .short 7392
+ 263 01de C10C     	 .short 3265
+ 264 01e0 1FEF     	 .short -4321
+ 265 01e2 3EFF     	 .short -194
+ 266 01e4 5DCF     	 .short -12451
+ 267 01e6 7CDF     	 .short -8324
+ 268 01e8 9BAF     	 .short -20581
+ 269 01ea BABF     	 .short -16454
+ 270 01ec D98F     	 .short -28711
+ 271 01ee F89F     	 .short -24584
+ 272 01f0 176E     	 .short 28183
+ 273 01f2 367E     	 .short 32310
+ 274 01f4 554E     	 .short 20053
+ 275 01f6 745E     	 .short 24180
+ 276 01f8 932E     	 .short 11923
+ 277 01fa B23E     	 .short 16050
+ 278 01fc D10E     	 .short 3793
+ 279 01fe F01E     	 .short 7920
+ 280              	 .section .text.crc16_ccitt_single,"ax",%progbits
+ 281              	 .align 2
+ 282              	 .global crc16_ccitt_single
+ 283              	 .thumb
+ 284              	 .thumb_func
+ 286              	crc16_ccitt_single:
+ 287              	.LFB6:
+ 288              	 .file 1 "../CANopen/stack/301/crc16-ccitt.c"
+   1:../CANopen/stack/301/crc16-ccitt.c **** /*
+   2:../CANopen/stack/301/crc16-ccitt.c ****  * Calculation of CRC 16 CCITT polynomial, x^16 + x^12 + x^5 + 1.
+   3:../CANopen/stack/301/crc16-ccitt.c ****  *
+   4:../CANopen/stack/301/crc16-ccitt.c ****  * @file        crc16-ccitt.c
+   5:../CANopen/stack/301/crc16-ccitt.c ****  * @ingroup     crc16-ccitt
+   6:../CANopen/stack/301/crc16-ccitt.c ****  * @author      Janez Paternoster
+   7:../CANopen/stack/301/crc16-ccitt.c ****  * @copyright   2012 - 2020 Janez Paternoster
+   8:../CANopen/stack/301/crc16-ccitt.c ****  *
+   9:../CANopen/stack/301/crc16-ccitt.c ****  * This file is part of CANopenNode, an opensource CANopen Stack.
+  10:../CANopen/stack/301/crc16-ccitt.c ****  * Project home page is <https://github.com/CANopenNode/CANopenNode>.
+  11:../CANopen/stack/301/crc16-ccitt.c ****  * For more information on CANopen see <http://www.can-cia.org/>.
+  12:../CANopen/stack/301/crc16-ccitt.c ****  *
+  13:../CANopen/stack/301/crc16-ccitt.c ****  * Licensed under the Apache License, Version 2.0 (the "License");
+  14:../CANopen/stack/301/crc16-ccitt.c ****  * you may not use this file except in compliance with the License.
+  15:../CANopen/stack/301/crc16-ccitt.c ****  * You may obtain a copy of the License at
+  16:../CANopen/stack/301/crc16-ccitt.c ****  *
+  17:../CANopen/stack/301/crc16-ccitt.c ****  *     http://www.apache.org/licenses/LICENSE-2.0
+  18:../CANopen/stack/301/crc16-ccitt.c ****  *
+  19:../CANopen/stack/301/crc16-ccitt.c ****  * Unless required by applicable law or agreed to in writing, software
+  20:../CANopen/stack/301/crc16-ccitt.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  21:../CANopen/stack/301/crc16-ccitt.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../CANopen/stack/301/crc16-ccitt.c ****  * See the License for the specific language governing permissions and
+  23:../CANopen/stack/301/crc16-ccitt.c ****  * limitations under the License.
+  24:../CANopen/stack/301/crc16-ccitt.c ****  */
+  25:../CANopen/stack/301/crc16-ccitt.c **** 
+  26:../CANopen/stack/301/crc16-ccitt.c **** #include "301/crc16-ccitt.h"
+  27:../CANopen/stack/301/crc16-ccitt.c **** 
+  28:../CANopen/stack/301/crc16-ccitt.c **** #if (CO_CONFIG_CRC16) & CO_CONFIG_CRC16_ENABLE
+  29:../CANopen/stack/301/crc16-ccitt.c **** #if !((CO_CONFIG_CRC16) & CO_CONFIG_CRC16_EXTERNAL)
+  30:../CANopen/stack/301/crc16-ccitt.c **** 
+  31:../CANopen/stack/301/crc16-ccitt.c **** /*
+  32:../CANopen/stack/301/crc16-ccitt.c ****  * CRC table calculated by the following algorithm:
+  33:../CANopen/stack/301/crc16-ccitt.c ****  *
+  34:../CANopen/stack/301/crc16-ccitt.c ****  * void crc16_ccitt_table_init(void){
+  35:../CANopen/stack/301/crc16-ccitt.c ****  *     uint16_t i, j;
+  36:../CANopen/stack/301/crc16-ccitt.c ****  *     for(i=0; i<256; i++){
+  37:../CANopen/stack/301/crc16-ccitt.c ****  *         uint16_t crc = 0;
+  38:../CANopen/stack/301/crc16-ccitt.c ****  *         uint16_t c = i << 8;
+  39:../CANopen/stack/301/crc16-ccitt.c ****  *         for(j=0; j<8; j++){
+  40:../CANopen/stack/301/crc16-ccitt.c ****  *             if((crc ^ c) & 0x8000) crc = (crc << 1) ^ 0x1021;
+  41:../CANopen/stack/301/crc16-ccitt.c ****  *             else                   crc = crc << 1;
+  42:../CANopen/stack/301/crc16-ccitt.c ****  *             c = c << 1;
+  43:../CANopen/stack/301/crc16-ccitt.c ****  *         }
+  44:../CANopen/stack/301/crc16-ccitt.c ****  *         crc16_ccitt_table[i] = crc;
+  45:../CANopen/stack/301/crc16-ccitt.c ****  *     }
+  46:../CANopen/stack/301/crc16-ccitt.c ****  * }
+  47:../CANopen/stack/301/crc16-ccitt.c ****  */
+  48:../CANopen/stack/301/crc16-ccitt.c **** static const uint16_t crc16_ccitt_table[256] = {
+  49:../CANopen/stack/301/crc16-ccitt.c ****     0x0000U, 0x1021U, 0x2042U, 0x3063U, 0x4084U, 0x50A5U, 0x60C6U, 0x70E7U,
+  50:../CANopen/stack/301/crc16-ccitt.c ****     0x8108U, 0x9129U, 0xA14AU, 0xB16BU, 0xC18CU, 0xD1ADU, 0xE1CEU, 0xF1EFU,
+  51:../CANopen/stack/301/crc16-ccitt.c ****     0x1231U, 0x0210U, 0x3273U, 0x2252U, 0x52B5U, 0x4294U, 0x72F7U, 0x62D6U,
+  52:../CANopen/stack/301/crc16-ccitt.c ****     0x9339U, 0x8318U, 0xB37BU, 0xA35AU, 0xD3BDU, 0xC39CU, 0xF3FFU, 0xE3DEU,
+  53:../CANopen/stack/301/crc16-ccitt.c ****     0x2462U, 0x3443U, 0x0420U, 0x1401U, 0x64E6U, 0x74C7U, 0x44A4U, 0x5485U,
+  54:../CANopen/stack/301/crc16-ccitt.c ****     0xA56AU, 0xB54BU, 0x8528U, 0x9509U, 0xE5EEU, 0xF5CFU, 0xC5ACU, 0xD58DU,
+  55:../CANopen/stack/301/crc16-ccitt.c ****     0x3653U, 0x2672U, 0x1611U, 0x0630U, 0x76D7U, 0x66F6U, 0x5695U, 0x46B4U,
+  56:../CANopen/stack/301/crc16-ccitt.c ****     0xB75BU, 0xA77AU, 0x9719U, 0x8738U, 0xF7DFU, 0xE7FEU, 0xD79DU, 0xC7BCU,
+  57:../CANopen/stack/301/crc16-ccitt.c ****     0x48C4U, 0x58E5U, 0x6886U, 0x78A7U, 0x0840U, 0x1861U, 0x2802U, 0x3823U,
+  58:../CANopen/stack/301/crc16-ccitt.c ****     0xC9CCU, 0xD9EDU, 0xE98EU, 0xF9AFU, 0x8948U, 0x9969U, 0xA90AU, 0xB92BU,
+  59:../CANopen/stack/301/crc16-ccitt.c ****     0x5AF5U, 0x4AD4U, 0x7AB7U, 0x6A96U, 0x1A71U, 0x0A50U, 0x3A33U, 0x2A12U,
+  60:../CANopen/stack/301/crc16-ccitt.c ****     0xDBFDU, 0xCBDCU, 0xFBBFU, 0xEB9EU, 0x9B79U, 0x8B58U, 0xBB3BU, 0xAB1AU,
+  61:../CANopen/stack/301/crc16-ccitt.c ****     0x6CA6U, 0x7C87U, 0x4CE4U, 0x5CC5U, 0x2C22U, 0x3C03U, 0x0C60U, 0x1C41U,
+  62:../CANopen/stack/301/crc16-ccitt.c ****     0xEDAEU, 0xFD8FU, 0xCDECU, 0xDDCDU, 0xAD2AU, 0xBD0BU, 0x8D68U, 0x9D49U,
+  63:../CANopen/stack/301/crc16-ccitt.c ****     0x7E97U, 0x6EB6U, 0x5ED5U, 0x4EF4U, 0x3E13U, 0x2E32U, 0x1E51U, 0x0E70U,
+  64:../CANopen/stack/301/crc16-ccitt.c ****     0xFF9FU, 0xEFBEU, 0xDFDDU, 0xCFFCU, 0xBF1BU, 0xAF3AU, 0x9F59U, 0x8F78U,
+  65:../CANopen/stack/301/crc16-ccitt.c ****     0x9188U, 0x81A9U, 0xB1CAU, 0xA1EBU, 0xD10CU, 0xC12DU, 0xF14EU, 0xE16FU,
+  66:../CANopen/stack/301/crc16-ccitt.c ****     0x1080U, 0x00A1U, 0x30C2U, 0x20E3U, 0x5004U, 0x4025U, 0x7046U, 0x6067U,
+  67:../CANopen/stack/301/crc16-ccitt.c ****     0x83B9U, 0x9398U, 0xA3FBU, 0xB3DAU, 0xC33DU, 0xD31CU, 0xE37FU, 0xF35EU,
+  68:../CANopen/stack/301/crc16-ccitt.c ****     0x02B1U, 0x1290U, 0x22F3U, 0x32D2U, 0x4235U, 0x5214U, 0x6277U, 0x7256U,
+  69:../CANopen/stack/301/crc16-ccitt.c ****     0xB5EAU, 0xA5CBU, 0x95A8U, 0x8589U, 0xF56EU, 0xE54FU, 0xD52CU, 0xC50DU,
+  70:../CANopen/stack/301/crc16-ccitt.c ****     0x34E2U, 0x24C3U, 0x14A0U, 0x0481U, 0x7466U, 0x6447U, 0x5424U, 0x4405U,
+  71:../CANopen/stack/301/crc16-ccitt.c ****     0xA7DBU, 0xB7FAU, 0x8799U, 0x97B8U, 0xE75FU, 0xF77EU, 0xC71DU, 0xD73CU,
+  72:../CANopen/stack/301/crc16-ccitt.c ****     0x26D3U, 0x36F2U, 0x0691U, 0x16B0U, 0x6657U, 0x7676U, 0x4615U, 0x5634U,
+  73:../CANopen/stack/301/crc16-ccitt.c ****     0xD94CU, 0xC96DU, 0xF90EU, 0xE92FU, 0x99C8U, 0x89E9U, 0xB98AU, 0xA9ABU,
+  74:../CANopen/stack/301/crc16-ccitt.c ****     0x5844U, 0x4865U, 0x7806U, 0x6827U, 0x18C0U, 0x08E1U, 0x3882U, 0x28A3U,
+  75:../CANopen/stack/301/crc16-ccitt.c ****     0xCB7DU, 0xDB5CU, 0xEB3FU, 0xFB1EU, 0x8BF9U, 0x9BD8U, 0xABBBU, 0xBB9AU,
+  76:../CANopen/stack/301/crc16-ccitt.c ****     0x4A75U, 0x5A54U, 0x6A37U, 0x7A16U, 0x0AF1U, 0x1AD0U, 0x2AB3U, 0x3A92U,
+  77:../CANopen/stack/301/crc16-ccitt.c ****     0xFD2EU, 0xED0FU, 0xDD6CU, 0xCD4DU, 0xBDAAU, 0xAD8BU, 0x9DE8U, 0x8DC9U,
+  78:../CANopen/stack/301/crc16-ccitt.c ****     0x7C26U, 0x6C07U, 0x5C64U, 0x4C45U, 0x3CA2U, 0x2C83U, 0x1CE0U, 0x0CC1U,
+  79:../CANopen/stack/301/crc16-ccitt.c ****     0xEF1FU, 0xFF3EU, 0xCF5DU, 0xDF7CU, 0xAF9BU, 0xBFBAU, 0x8FD9U, 0x9FF8U,
+  80:../CANopen/stack/301/crc16-ccitt.c ****     0x6E17U, 0x7E36U, 0x4E55U, 0x5E74U, 0x2E93U, 0x3EB2U, 0x0ED1U, 0x1EF0U
+  81:../CANopen/stack/301/crc16-ccitt.c **** };
+  82:../CANopen/stack/301/crc16-ccitt.c **** 
+  83:../CANopen/stack/301/crc16-ccitt.c **** 
+  84:../CANopen/stack/301/crc16-ccitt.c **** /******************************************************************************/
+  85:../CANopen/stack/301/crc16-ccitt.c **** void crc16_ccitt_single(uint16_t *crc, const uint8_t chr) {
+ 289              	 .loc 1 85 0
+ 290              	 .cfi_startproc
+ 291              	 
+ 292              	 
+ 293              	 
+ 294 0000 80B4     	 push {r7}
+ 295              	.LCFI0:
+ 296              	 .cfi_def_cfa_offset 4
+ 297              	 .cfi_offset 7,-4
+ 298 0002 85B0     	 sub sp,sp,#20
+ 299              	.LCFI1:
+ 300              	 .cfi_def_cfa_offset 24
+ 301 0004 00AF     	 add r7,sp,#0
+ 302              	.LCFI2:
+ 303              	 .cfi_def_cfa_register 7
+ 304 0006 7860     	 str r0,[r7,#4]
+ 305 0008 0B46     	 mov r3,r1
+ 306 000a FB70     	 strb r3,[r7,#3]
+  86:../CANopen/stack/301/crc16-ccitt.c ****     uint8_t tmp = (uint8_t)(*crc >> 8U) ^ chr;
+ 307              	 .loc 1 86 0
+ 308 000c 7B68     	 ldr r3,[r7,#4]
+ 309 000e 1B88     	 ldrh r3,[r3]
+ 310 0010 1B0A     	 lsrs r3,r3,#8
+ 311 0012 9BB2     	 uxth r3,r3
+ 312 0014 DAB2     	 uxtb r2,r3
+ 313 0016 FB78     	 ldrb r3,[r7,#3]
+ 314 0018 5340     	 eors r3,r3,r2
+ 315 001a FB73     	 strb r3,[r7,#15]
+  87:../CANopen/stack/301/crc16-ccitt.c ****     *crc = (*crc << 8U) ^ crc16_ccitt_table[tmp];
+ 316              	 .loc 1 87 0
+ 317 001c 7B68     	 ldr r3,[r7,#4]
+ 318 001e 1B88     	 ldrh r3,[r3]
+ 319 0020 1B02     	 lsls r3,r3,#8
+ 320 0022 99B2     	 uxth r1,r3
+ 321 0024 FB7B     	 ldrb r3,[r7,#15]
+ 322 0026 074A     	 ldr r2,.L2
+ 323 0028 32F81330 	 ldrh r3,[r2,r3,lsl#1]
+ 324 002c 9BB2     	 uxth r3,r3
+ 325 002e 0A46     	 mov r2,r1
+ 326 0030 5340     	 eors r3,r3,r2
+ 327 0032 9BB2     	 uxth r3,r3
+ 328 0034 9AB2     	 uxth r2,r3
+ 329 0036 7B68     	 ldr r3,[r7,#4]
+ 330 0038 1A80     	 strh r2,[r3]
+  88:../CANopen/stack/301/crc16-ccitt.c **** }
+ 331              	 .loc 1 88 0
+ 332 003a 1437     	 adds r7,r7,#20
+ 333              	.LCFI3:
+ 334              	 .cfi_def_cfa_offset 4
+ 335 003c BD46     	 mov sp,r7
+ 336              	.LCFI4:
+ 337              	 .cfi_def_cfa_register 13
+ 338              	 
+ 339 003e 5DF8047B 	 ldr r7,[sp],#4
+ 340              	.LCFI5:
+ 341              	 .cfi_restore 7
+ 342              	 .cfi_def_cfa_offset 0
+ 343 0042 7047     	 bx lr
+ 344              	.L3:
+ 345              	 .align 2
+ 346              	.L2:
+ 347 0044 00000000 	 .word crc16_ccitt_table
+ 348              	 .cfi_endproc
+ 349              	.LFE6:
+ 351              	 .section .text.crc16_ccitt,"ax",%progbits
+ 352              	 .align 2
+ 353              	 .global crc16_ccitt
+ 354              	 .thumb
+ 355              	 .thumb_func
+ 357              	crc16_ccitt:
+ 358              	.LFB7:
+  89:../CANopen/stack/301/crc16-ccitt.c **** 
+  90:../CANopen/stack/301/crc16-ccitt.c **** 
+  91:../CANopen/stack/301/crc16-ccitt.c **** /******************************************************************************/
+  92:../CANopen/stack/301/crc16-ccitt.c **** uint16_t crc16_ccitt(const uint8_t block[],
+  93:../CANopen/stack/301/crc16-ccitt.c ****                      size_t blockLength,
+  94:../CANopen/stack/301/crc16-ccitt.c ****                      uint16_t crc)
+  95:../CANopen/stack/301/crc16-ccitt.c **** {
+ 359              	 .loc 1 95 0
+ 360              	 .cfi_startproc
+ 361              	 
+ 362              	 
+ 363              	 
+ 364 0000 80B4     	 push {r7}
+ 365              	.LCFI6:
+ 366              	 .cfi_def_cfa_offset 4
+ 367              	 .cfi_offset 7,-4
+ 368 0002 87B0     	 sub sp,sp,#28
+ 369              	.LCFI7:
+ 370              	 .cfi_def_cfa_offset 32
+ 371 0004 00AF     	 add r7,sp,#0
+ 372              	.LCFI8:
+ 373              	 .cfi_def_cfa_register 7
+ 374 0006 F860     	 str r0,[r7,#12]
+ 375 0008 B960     	 str r1,[r7,#8]
+ 376 000a 1346     	 mov r3,r2
+ 377 000c FB80     	 strh r3,[r7,#6]
+  96:../CANopen/stack/301/crc16-ccitt.c ****     size_t i;
+  97:../CANopen/stack/301/crc16-ccitt.c **** 
+  98:../CANopen/stack/301/crc16-ccitt.c ****     for (i = 0U; i < blockLength; i++) {
+ 378              	 .loc 1 98 0
+ 379 000e 0023     	 movs r3,#0
+ 380 0010 7B61     	 str r3,[r7,#20]
+ 381 0012 18E0     	 b .L5
+ 382              	.L6:
+ 383              	.LBB2:
+  99:../CANopen/stack/301/crc16-ccitt.c ****         uint8_t tmp = (uint8_t)(crc >> 8U) ^ block[i];
+ 384              	 .loc 1 99 0 discriminator 3
+ 385 0014 FB88     	 ldrh r3,[r7,#6]
+ 386 0016 1B0A     	 lsrs r3,r3,#8
+ 387 0018 9BB2     	 uxth r3,r3
+ 388 001a DAB2     	 uxtb r2,r3
+ 389 001c F968     	 ldr r1,[r7,#12]
+ 390 001e 7B69     	 ldr r3,[r7,#20]
+ 391 0020 0B44     	 add r3,r3,r1
+ 392 0022 1B78     	 ldrb r3,[r3]
+ 393 0024 5340     	 eors r3,r3,r2
+ 394 0026 FB74     	 strb r3,[r7,#19]
+ 100:../CANopen/stack/301/crc16-ccitt.c ****         crc = (crc << 8U) ^ crc16_ccitt_table[tmp];
+ 395              	 .loc 1 100 0 discriminator 3
+ 396 0028 FB88     	 ldrh r3,[r7,#6]
+ 397 002a 1B02     	 lsls r3,r3,#8
+ 398 002c 99B2     	 uxth r1,r3
+ 399 002e FB7C     	 ldrb r3,[r7,#19]
+ 400 0030 0A4A     	 ldr r2,.L8
+ 401 0032 32F81330 	 ldrh r3,[r2,r3,lsl#1]
+ 402 0036 9BB2     	 uxth r3,r3
+ 403 0038 0A46     	 mov r2,r1
+ 404 003a 5340     	 eors r3,r3,r2
+ 405 003c 9BB2     	 uxth r3,r3
+ 406 003e FB80     	 strh r3,[r7,#6]
+ 407              	.LBE2:
+  98:../CANopen/stack/301/crc16-ccitt.c ****         uint8_t tmp = (uint8_t)(crc >> 8U) ^ block[i];
+ 408              	 .loc 1 98 0 discriminator 3
+ 409 0040 7B69     	 ldr r3,[r7,#20]
+ 410 0042 0133     	 adds r3,r3,#1
+ 411 0044 7B61     	 str r3,[r7,#20]
+ 412              	.L5:
+  98:../CANopen/stack/301/crc16-ccitt.c ****         uint8_t tmp = (uint8_t)(crc >> 8U) ^ block[i];
+ 413              	 .loc 1 98 0 is_stmt 0 discriminator 1
+ 414 0046 7A69     	 ldr r2,[r7,#20]
+ 415 0048 BB68     	 ldr r3,[r7,#8]
+ 416 004a 9A42     	 cmp r2,r3
+ 417 004c E2D3     	 bcc .L6
+ 101:../CANopen/stack/301/crc16-ccitt.c ****     }
+ 102:../CANopen/stack/301/crc16-ccitt.c ****     return crc;
+ 418              	 .loc 1 102 0 is_stmt 1
+ 419 004e FB88     	 ldrh r3,[r7,#6]
+ 103:../CANopen/stack/301/crc16-ccitt.c **** }
+ 420              	 .loc 1 103 0
+ 421 0050 1846     	 mov r0,r3
+ 422 0052 1C37     	 adds r7,r7,#28
+ 423              	.LCFI9:
+ 424              	 .cfi_def_cfa_offset 4
+ 425 0054 BD46     	 mov sp,r7
+ 426              	.LCFI10:
+ 427              	 .cfi_def_cfa_register 13
+ 428              	 
+ 429 0056 5DF8047B 	 ldr r7,[sp],#4
+ 430              	.LCFI11:
+ 431              	 .cfi_restore 7
+ 432              	 .cfi_def_cfa_offset 0
+ 433 005a 7047     	 bx lr
+ 434              	.L9:
+ 435              	 .align 2
+ 436              	.L8:
+ 437 005c 00000000 	 .word crc16_ccitt_table
+ 438              	 .cfi_endproc
+ 439              	.LFE7:
+ 441              	 .text
+ 442              	.Letext0:
+ 443              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\lib\\gcc\\arm-none-eabi\\4.9.3\\include\\stddef.h"
+ 444              	 .file 3 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 445              	 .file 4 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 crc16-ccitt.c
+    {standard input}:20     .rodata.crc16_ccitt_table:00000000 $d
+    {standard input}:23     .rodata.crc16_ccitt_table:00000000 crc16_ccitt_table
+    {standard input}:281    .text.crc16_ccitt_single:00000000 $t
+    {standard input}:286    .text.crc16_ccitt_single:00000000 crc16_ccitt_single
+    {standard input}:347    .text.crc16_ccitt_single:00000044 $d
+    {standard input}:352    .text.crc16_ccitt:00000000 $t
+    {standard input}:357    .text.crc16_ccitt:00000000 crc16_ccitt
+    {standard input}:437    .text.crc16_ccitt:0000005c $d
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

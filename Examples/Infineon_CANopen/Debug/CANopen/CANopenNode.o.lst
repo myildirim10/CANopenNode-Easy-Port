@@ -1,0 +1,1090 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "CANopenNode.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .rodata.CO_LSS_bitTimingTableLookup,"a",%progbits
+  20              	 .align 2
+  23              	CO_LSS_bitTimingTableLookup:
+  24 0000 E803     	 .short 1000
+  25 0002 2003     	 .short 800
+  26 0004 F401     	 .short 500
+  27 0006 FA00     	 .short 250
+  28 0008 7D00     	 .short 125
+  29 000a 0000     	 .short 0
+  30 000c 3200     	 .short 50
+  31 000e 1400     	 .short 20
+  32 0010 0A00     	 .short 10
+  33 0012 0000     	 .short 0
+  34              	 .section .bss.CO,"aw",%nobits
+  35              	 .align 2
+  38              	CO:
+  39 0000 00000000 	 .space 4
+  40              	 .section .bss.reset,"aw",%nobits
+  43              	reset:
+  44 0000 00       	 .space 1
+  45              	 .comm storage,56,4
+  46              	 .global storageEntries
+  47              	 .section .data.storageEntries,"aw",%progbits
+  48              	 .align 2
+  51              	storageEntries:
+  52 0000 00000000 	 .word OD_RAM
+  53 0004 A8020000 	 .word 680
+  54 0008 02       	 .byte 2
+  55 0009 05       	 .byte 5
+  56 000a 00000000 	 .space 30
+  56      00000000 
+  56      00000000 
+  56      00000000 
+  56      00000000 
+  57              	 .section .bss.mlStorage,"aw",%nobits
+  58              	 .align 2
+  61              	mlStorage:
+  62 0000 00000000 	 .space 4
+  63              	 .section .text.xCANopenNodeInit,"ax",%progbits
+  64              	 .align 2
+  65              	 .global xCANopenNodeInit
+  66              	 .thumb
+  67              	 .thumb_func
+  69              	xCANopenNodeInit:
+  70              	.LFB41:
+  71              	 .file 1 "../CANopen/CANopenNode.c"
+   1:../CANopen/CANopenNode.c **** /**
+   2:../CANopen/CANopenNode.c ****   ******************************************************************************
+   3:../CANopen/CANopenNode.c ****   * @file           : CANopenNode.c
+   4:../CANopen/CANopenNode.c ****   * @author         : Muhammed YILDIRIM
+   5:../CANopen/CANopenNode.c ****   * @brief          : CANopenNode driver file
+   6:../CANopen/CANopenNode.c ****   ******************************************************************************
+   7:../CANopen/CANopenNode.c ****   */
+   8:../CANopen/CANopenNode.c ****   
+   9:../CANopen/CANopenNode.c **** /* Includes ------------------------------------------------------------------*/
+  10:../CANopen/CANopenNode.c **** #include "CANopenNode.h"
+  11:../CANopen/CANopenNode.c **** #include "CANopen.h"
+  12:../CANopen/CANopenNode.c **** #include "OD.h"
+  13:../CANopen/CANopenNode.c **** #include "storage/CO_storageEeprom.h"
+  14:../CANopen/CANopenNode.c **** #include "CANopenHardware.h"
+  15:../CANopen/CANopenNode.c **** #include "log.h"
+  16:../CANopen/CANopenNode.c **** 
+  17:../CANopen/CANopenNode.c **** 
+  18:../CANopen/CANopenNode.c **** /* Defines -------------------------------------------------------------------*/
+  19:../CANopen/CANopenNode.c **** #define AUTO_STORAGE_ENABLE		 ( 0 )
+  20:../CANopen/CANopenNode.c **** 
+  21:../CANopen/CANopenNode.c **** /* default values for CO_CANopenInit() */
+  22:../CANopen/CANopenNode.c **** #define NMT_CONTROL \
+  23:../CANopen/CANopenNode.c ****             CO_NMT_STARTUP_TO_OPERATIONAL \
+  24:../CANopen/CANopenNode.c ****           | CO_NMT_ERR_ON_ERR_REG \
+  25:../CANopen/CANopenNode.c ****           | CO_ERR_REG_GENERIC_ERR \
+  26:../CANopen/CANopenNode.c ****           | CO_ERR_REG_COMMUNICATION
+  27:../CANopen/CANopenNode.c **** #define FIRST_HB_TIME             500
+  28:../CANopen/CANopenNode.c **** #define SDO_SRV_TIMEOUT_TIME      1000
+  29:../CANopen/CANopenNode.c **** #define SDO_CLI_TIMEOUT_TIME      500
+  30:../CANopen/CANopenNode.c **** #define SDO_CLI_BLOCK             false
+  31:../CANopen/CANopenNode.c **** #define OD_STATUS_BITS            NULL
+  32:../CANopen/CANopenNode.c **** 
+  33:../CANopen/CANopenNode.c **** 
+  34:../CANopen/CANopenNode.c **** /* Enum definitions ----------------------------------------------------------*/
+  35:../CANopen/CANopenNode.c **** 
+  36:../CANopen/CANopenNode.c **** /* Structure definitions -----------------------------------------------------*/
+  37:../CANopen/CANopenNode.c **** 
+  38:../CANopen/CANopenNode.c **** /* External variables --------------------------------------------------------*/
+  39:../CANopen/CANopenNode.c **** 
+  40:../CANopen/CANopenNode.c **** /* Private variables ---------------------------------------------------------*/
+  41:../CANopen/CANopenNode.c **** static CO_t *CO = NULL;         /* CANopen object */
+  42:../CANopen/CANopenNode.c **** static CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
+  43:../CANopen/CANopenNode.c **** 
+  44:../CANopen/CANopenNode.c **** #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+  45:../CANopen/CANopenNode.c **** CO_storage_t storage;
+  46:../CANopen/CANopenNode.c **** 
+  47:../CANopen/CANopenNode.c **** CO_storage_entry_t storageEntries[] = {
+  48:../CANopen/CANopenNode.c ****     {
+  49:../CANopen/CANopenNode.c ****         .addr = &OD_RAM,
+  50:../CANopen/CANopenNode.c ****         .len = sizeof(OD_RAM),
+  51:../CANopen/CANopenNode.c ****         .subIndexOD = 2,
+  52:../CANopen/CANopenNode.c ****         .attr = CO_storage_cmd | CO_storage_restore
+  53:../CANopen/CANopenNode.c ****     },
+  54:../CANopen/CANopenNode.c **** };
+  55:../CANopen/CANopenNode.c **** 
+  56:../CANopen/CANopenNode.c **** /* Data block for mainline data, which can be stored to non-volatile memory */
+  57:../CANopen/CANopenNode.c **** typedef struct {
+  58:../CANopen/CANopenNode.c ****     /* Pending CAN bit rate, can be set by switch or LSS slave. */
+  59:../CANopen/CANopenNode.c ****     uint16_t pendingBitRate;
+  60:../CANopen/CANopenNode.c ****     /* Pending CANopen NodeId, can be set by switch or LSS slave. */
+  61:../CANopen/CANopenNode.c ****     uint8_t pendingNodeId;
+  62:../CANopen/CANopenNode.c **** } mainlineStorage_t;
+  63:../CANopen/CANopenNode.c **** 
+  64:../CANopen/CANopenNode.c **** static mainlineStorage_t mlStorage = {0};
+  65:../CANopen/CANopenNode.c **** #endif
+  66:../CANopen/CANopenNode.c **** 
+  67:../CANopen/CANopenNode.c **** 
+  68:../CANopen/CANopenNode.c **** /* Private function prototypes -----------------------------------------------*/
+  69:../CANopen/CANopenNode.c **** 
+  70:../CANopen/CANopenNode.c **** /* Functions -----------------------------------------------------------------*/
+  71:../CANopen/CANopenNode.c **** /**
+  72:../CANopen/CANopenNode.c ****  * @brief CAN Open stack initialize
+  73:../CANopen/CANopenNode.c ****  * 
+  74:../CANopen/CANopenNode.c ****  * @return CANopenNode_StatusTypeDef 
+  75:../CANopen/CANopenNode.c ****  */
+  76:../CANopen/CANopenNode.c **** CANopenNodeStatusTypeDef_t xCANopenNodeInit (void)
+  77:../CANopen/CANopenNode.c **** {
+  72              	 .loc 1 77 0
+  73              	 .cfi_startproc
+  74              	 
+  75              	 
+  76 0000 90B5     	 push {r4,r7,lr}
+  77              	.LCFI0:
+  78              	 .cfi_def_cfa_offset 12
+  79              	 .cfi_offset 4,-12
+  80              	 .cfi_offset 7,-8
+  81              	 .cfi_offset 14,-4
+  82 0002 95B0     	 sub sp,sp,#84
+  83              	.LCFI1:
+  84              	 .cfi_def_cfa_offset 96
+  85 0004 08AF     	 add r7,sp,#32
+  86              	.LCFI2:
+  87              	 .cfi_def_cfa 7,64
+  78:../CANopen/CANopenNode.c ****     CO_ReturnError_t err;
+  79:../CANopen/CANopenNode.c ****     uint32_t heapMemoryUsed;
+  80:../CANopen/CANopenNode.c ****     void *CANptr = NULL;                                    /* CAN module address */
+  88              	 .loc 1 80 0
+  89 0006 0023     	 movs r3,#0
+  90 0008 FB61     	 str r3,[r7,#28]
+  81:../CANopen/CANopenNode.c ****     uint8_t activeNodeId;                                   /* Copied from CO_pendingNodeId in the 
+  82:../CANopen/CANopenNode.c ****     uint8_t pendingNodeId = CAN_OPEN_NODE_ID;               /* read from dip switches or nonvolatil
+  91              	 .loc 1 82 0
+  92 000a 0123     	 movs r3,#1
+  93 000c FB76     	 strb r3,[r7,#27]
+  83:../CANopen/CANopenNode.c ****     uint16_t pendingBitRate = CAN_OPEN_NODE_BAUDRATE;       /* read from dip switches or nonvolatil
+  94              	 .loc 1 83 0
+  95 000e 4FF47A73 	 mov r3,#1000
+  96 0012 3B83     	 strh r3,[r7,#24]
+  84:../CANopen/CANopenNode.c **** 
+  85:../CANopen/CANopenNode.c **** 
+  86:../CANopen/CANopenNode.c **** #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+  87:../CANopen/CANopenNode.c ****     uint8_t storageEntriesCount = sizeof(storageEntries) / sizeof(storageEntries[0]);
+  97              	 .loc 1 87 0
+  98 0014 0123     	 movs r3,#1
+  99 0016 87F82F30 	 strb r3,[r7,#47]
+  88:../CANopen/CANopenNode.c ****     uint32_t storageInitError = 0;
+ 100              	 .loc 1 88 0
+ 101 001a 0023     	 movs r3,#0
+ 102 001c 7B61     	 str r3,[r7,#20]
+  89:../CANopen/CANopenNode.c **** #endif
+  90:../CANopen/CANopenNode.c **** 
+  91:../CANopen/CANopenNode.c ****     /* Configure CAN hardware */
+  92:../CANopen/CANopenNode.c ****     if (xCANopenHardwareInit() == CAN_OPEN_HARDWARE_ERROR)
+ 103              	 .loc 1 92 0
+ 104 001e FFF7FEFF 	 bl xCANopenHardwareInit
+ 105 0022 0346     	 mov r3,r0
+ 106 0024 012B     	 cmp r3,#1
+ 107 0026 01D1     	 bne .L2
+  93:../CANopen/CANopenNode.c ****     {
+  94:../CANopen/CANopenNode.c ****       LOG_INFO("Failed: CANopen hardware initialize\n");
+  95:../CANopen/CANopenNode.c ****       return CAN_OPEN_NODE_ERROR;
+ 108              	 .loc 1 95 0
+ 109 0028 0123     	 movs r3,#1
+ 110 002a EFE0     	 b .L14
+ 111              	.L2:
+  96:../CANopen/CANopenNode.c ****     }
+  97:../CANopen/CANopenNode.c **** 
+  98:../CANopen/CANopenNode.c **** 
+  99:../CANopen/CANopenNode.c ****     /* Allocate memory */
+ 100:../CANopen/CANopenNode.c ****     CO_config_t *config_ptr = NULL;
+ 112              	 .loc 1 100 0
+ 113 002c 0023     	 movs r3,#0
+ 114 002e BB62     	 str r3,[r7,#40]
+ 101:../CANopen/CANopenNode.c **** #ifdef CO_MULTIPLE_OD
+ 102:../CANopen/CANopenNode.c ****     /* example usage of CO_MULTIPLE_OD (but still single OD here) */
+ 103:../CANopen/CANopenNode.c ****     CO_config_t co_config = {0};
+ 104:../CANopen/CANopenNode.c ****     OD_INIT_CONFIG(co_config); /* helper macro from OD.h */
+ 105:../CANopen/CANopenNode.c ****     co_config.CNT_LEDS = 1;
+ 106:../CANopen/CANopenNode.c ****     co_config.CNT_LSS_SLV = 1;
+ 107:../CANopen/CANopenNode.c ****     config_ptr = &co_config;
+ 108:../CANopen/CANopenNode.c **** #endif /* CO_MULTIPLE_OD */
+ 109:../CANopen/CANopenNode.c ****     CO = CO_new(config_ptr, &heapMemoryUsed);
+ 115              	 .loc 1 109 0
+ 116 0030 07F12003 	 add r3,r7,#32
+ 117 0034 B86A     	 ldr r0,[r7,#40]
+ 118 0036 1946     	 mov r1,r3
+ 119 0038 FFF7FEFF 	 bl CO_new
+ 120 003c 0246     	 mov r2,r0
+ 121 003e 754B     	 ldr r3,.L15
+ 122 0040 1A60     	 str r2,[r3]
+ 110:../CANopen/CANopenNode.c ****     if (CO == NULL) 
+ 123              	 .loc 1 110 0
+ 124 0042 744B     	 ldr r3,.L15
+ 125 0044 1B68     	 ldr r3,[r3]
+ 126 0046 002B     	 cmp r3,#0
+ 127 0048 01D1     	 bne .L4
+ 111:../CANopen/CANopenNode.c ****     {
+ 112:../CANopen/CANopenNode.c ****         LOG_INFO("Error: Can't allocate memory\n");
+ 113:../CANopen/CANopenNode.c ****         return CAN_OPEN_NODE_ERROR;
+ 128              	 .loc 1 113 0
+ 129 004a 0123     	 movs r3,#1
+ 130 004c DEE0     	 b .L14
+ 131              	.L4:
+ 114:../CANopen/CANopenNode.c ****     }
+ 115:../CANopen/CANopenNode.c ****     else 
+ 116:../CANopen/CANopenNode.c ****     {
+ 117:../CANopen/CANopenNode.c ****         LOG_INFO("Allocated %u bytes for CANopen objects\n", heapMemoryUsed);
+ 118:../CANopen/CANopenNode.c ****     }
+ 119:../CANopen/CANopenNode.c **** 
+ 120:../CANopen/CANopenNode.c **** 
+ 121:../CANopen/CANopenNode.c **** #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+ 122:../CANopen/CANopenNode.c ****     err = CO_storageEeprom_init(&storage,
+ 123:../CANopen/CANopenNode.c ****                                CO->CANmodule,
+ 132              	 .loc 1 123 0
+ 133 004e 714B     	 ldr r3,.L15
+ 134 0050 1B68     	 ldr r3,[r3]
+ 122:../CANopen/CANopenNode.c ****                                CO->CANmodule,
+ 135              	 .loc 1 122 0
+ 136 0052 5A68     	 ldr r2,[r3,#4]
+ 124:../CANopen/CANopenNode.c **** 							   NULL,
+ 125:../CANopen/CANopenNode.c ****                                OD_ENTRY_H1010_storeParameters,
+ 137              	 .loc 1 125 0
+ 138 0054 704B     	 ldr r3,.L15+4
+ 139 0056 1B68     	 ldr r3,[r3]
+ 140 0058 5B68     	 ldr r3,[r3,#4]
+ 122:../CANopen/CANopenNode.c ****                                CO->CANmodule,
+ 141              	 .loc 1 122 0
+ 142 005a 03F18404 	 add r4,r3,#132
+ 126:../CANopen/CANopenNode.c ****                                OD_ENTRY_H1011_restoreParameters,
+ 143              	 .loc 1 126 0
+ 144 005e 6E4B     	 ldr r3,.L15+4
+ 145 0060 1B68     	 ldr r3,[r3]
+ 146 0062 5B68     	 ldr r3,[r3,#4]
+ 122:../CANopen/CANopenNode.c ****                                CO->CANmodule,
+ 147              	 .loc 1 122 0
+ 148 0064 9033     	 adds r3,r3,#144
+ 149 0066 0093     	 str r3,[sp]
+ 150 0068 6C4B     	 ldr r3,.L15+8
+ 151 006a 0193     	 str r3,[sp,#4]
+ 152 006c 97F82F30 	 ldrb r3,[r7,#47]
+ 153 0070 0293     	 str r3,[sp,#8]
+ 154 0072 07F11403 	 add r3,r7,#20
+ 155 0076 0393     	 str r3,[sp,#12]
+ 156 0078 6948     	 ldr r0,.L15+12
+ 157 007a 1146     	 mov r1,r2
+ 158 007c 0022     	 movs r2,#0
+ 159 007e 2346     	 mov r3,r4
+ 160 0080 FFF7FEFF 	 bl CO_storageEeprom_init
+ 161 0084 0346     	 mov r3,r0
+ 162 0086 87F82730 	 strb r3,[r7,#39]
+ 127:../CANopen/CANopenNode.c ****                                storageEntries,
+ 128:../CANopen/CANopenNode.c ****                                storageEntriesCount,
+ 129:../CANopen/CANopenNode.c ****                                &storageInitError);
+ 130:../CANopen/CANopenNode.c **** 
+ 131:../CANopen/CANopenNode.c ****     if (err != CO_ERROR_NO && err != CO_ERROR_DATA_CORRUPT) {
+ 163              	 .loc 1 131 0
+ 164 008a 97F92730 	 ldrsb r3,[r7,#39]
+ 165 008e 002B     	 cmp r3,#0
+ 166 0090 06D0     	 beq .L5
+ 167              	 .loc 1 131 0 is_stmt 0 discriminator 1
+ 168 0092 97F92730 	 ldrsb r3,[r7,#39]
+ 169 0096 13F10D0F 	 cmn r3,#13
+ 170 009a 01D0     	 beq .L5
+ 132:../CANopen/CANopenNode.c ****     	LOG_INFO("Error: Storage %d\n", storageInitError);
+ 133:../CANopen/CANopenNode.c ****         return 0;
+ 171              	 .loc 1 133 0 is_stmt 1
+ 172 009c 0023     	 movs r3,#0
+ 173 009e B5E0     	 b .L14
+ 174              	.L5:
+ 134:../CANopen/CANopenNode.c ****     }
+ 135:../CANopen/CANopenNode.c **** #endif
+ 136:../CANopen/CANopenNode.c **** 
+ 137:../CANopen/CANopenNode.c ****     /* CANopen communication reset - initialize CANopen objects */
+ 138:../CANopen/CANopenNode.c ****     if(reset != CO_RESET_APP) {
+ 175              	 .loc 1 138 0
+ 176 00a0 604B     	 ldr r3,.L15+16
+ 177 00a2 1B78     	 ldrb r3,[r3]
+ 178 00a4 022B     	 cmp r3,#2
+ 179 00a6 00F0AD80 	 beq .L6
+ 180              	.LBB2:
+ 139:../CANopen/CANopenNode.c **** 
+ 140:../CANopen/CANopenNode.c ****         LOG_INFO("CANopenNode - Reset communication\n");
+ 141:../CANopen/CANopenNode.c **** 
+ 142:../CANopen/CANopenNode.c ****         /* Wait rt_thread. */
+ 143:../CANopen/CANopenNode.c ****         CO->CANmodule->CANnormal = false;
+ 181              	 .loc 1 143 0
+ 182 00aa 5A4B     	 ldr r3,.L15
+ 183 00ac 1B68     	 ldr r3,[r3]
+ 184 00ae 5B68     	 ldr r3,[r3,#4]
+ 185 00b0 0022     	 movs r2,#0
+ 186 00b2 5A61     	 str r2,[r3,#20]
+ 144:../CANopen/CANopenNode.c **** 
+ 145:../CANopen/CANopenNode.c ****         /* Enter CAN configuration. */
+ 146:../CANopen/CANopenNode.c ****         CO_CANsetConfigurationMode((void *)&CANptr);
+ 187              	 .loc 1 146 0
+ 188 00b4 07F11C03 	 add r3,r7,#28
+ 189 00b8 1846     	 mov r0,r3
+ 190 00ba FFF7FEFF 	 bl CO_CANsetConfigurationMode
+ 147:../CANopen/CANopenNode.c ****         CO_CANmodule_disable(CO->CANmodule);
+ 191              	 .loc 1 147 0
+ 192 00be 554B     	 ldr r3,.L15
+ 193 00c0 1B68     	 ldr r3,[r3]
+ 194 00c2 5B68     	 ldr r3,[r3,#4]
+ 195 00c4 1846     	 mov r0,r3
+ 196 00c6 FFF7FEFF 	 bl CO_CANmodule_disable
+ 148:../CANopen/CANopenNode.c **** 
+ 149:../CANopen/CANopenNode.c ****         /* initialize CANopen */
+ 150:../CANopen/CANopenNode.c ****         err = CO_CANinit(CO, CANptr, pendingBitRate);
+ 197              	 .loc 1 150 0
+ 198 00ca 524B     	 ldr r3,.L15
+ 199 00cc 1968     	 ldr r1,[r3]
+ 200 00ce FA69     	 ldr r2,[r7,#28]
+ 201 00d0 3B8B     	 ldrh r3,[r7,#24]
+ 202 00d2 0846     	 mov r0,r1
+ 203 00d4 1146     	 mov r1,r2
+ 204 00d6 1A46     	 mov r2,r3
+ 205 00d8 FFF7FEFF 	 bl CO_CANinit
+ 206 00dc 0346     	 mov r3,r0
+ 207 00de 87F82730 	 strb r3,[r7,#39]
+ 151:../CANopen/CANopenNode.c ****         if (err != CO_ERROR_NO) {
+ 208              	 .loc 1 151 0
+ 209 00e2 97F92730 	 ldrsb r3,[r7,#39]
+ 210 00e6 002B     	 cmp r3,#0
+ 211 00e8 01D0     	 beq .L7
+ 152:../CANopen/CANopenNode.c ****             LOG_INFO("Error: CAN initialization failed: %d\n", err);
+ 153:../CANopen/CANopenNode.c ****             return CAN_OPEN_NODE_ERROR;
+ 212              	 .loc 1 153 0
+ 213 00ea 0123     	 movs r3,#1
+ 214 00ec 8EE0     	 b .L14
+ 215              	.L7:
+ 154:../CANopen/CANopenNode.c ****         }
+ 155:../CANopen/CANopenNode.c **** 
+ 156:../CANopen/CANopenNode.c ****         CO_LSS_address_t lssAddress = {.identity = {
+ 216              	 .loc 1 156 0
+ 217 00ee 3B1D     	 adds r3,r7,#4
+ 218 00f0 0022     	 movs r2,#0
+ 219 00f2 1A60     	 str r2,[r3]
+ 220 00f4 0433     	 adds r3,r3,#4
+ 221 00f6 0022     	 movs r2,#0
+ 222 00f8 1A60     	 str r2,[r3]
+ 223 00fa 0433     	 adds r3,r3,#4
+ 224 00fc 0022     	 movs r2,#0
+ 225 00fe 1A60     	 str r2,[r3]
+ 226 0100 0433     	 adds r3,r3,#4
+ 227 0102 0022     	 movs r2,#0
+ 228 0104 1A60     	 str r2,[r3]
+ 229 0106 0433     	 adds r3,r3,#4
+ 157:../CANopen/CANopenNode.c ****             .vendorID = OD_RAM.x1018_identityObject.vendorID,
+ 230              	 .loc 1 157 0
+ 231 0108 474B     	 ldr r3,.L15+20
+ 232 010a 5B6F     	 ldr r3,[r3,#116]
+ 156:../CANopen/CANopenNode.c ****             .vendorID = OD_RAM.x1018_identityObject.vendorID,
+ 233              	 .loc 1 156 0
+ 234 010c 7B60     	 str r3,[r7,#4]
+ 158:../CANopen/CANopenNode.c ****             .productCode = OD_RAM.x1018_identityObject.productCode,
+ 235              	 .loc 1 158 0
+ 236 010e 464B     	 ldr r3,.L15+20
+ 237 0110 9B6F     	 ldr r3,[r3,#120]
+ 156:../CANopen/CANopenNode.c ****             .vendorID = OD_RAM.x1018_identityObject.vendorID,
+ 238              	 .loc 1 156 0
+ 239 0112 BB60     	 str r3,[r7,#8]
+ 159:../CANopen/CANopenNode.c ****             .revisionNumber = OD_RAM.x1018_identityObject.revisionNumber
+ 240              	 .loc 1 159 0
+ 241 0114 444B     	 ldr r3,.L15+20
+ 242 0116 DB6F     	 ldr r3,[r3,#124]
+ 156:../CANopen/CANopenNode.c ****             .vendorID = OD_RAM.x1018_identityObject.vendorID,
+ 243              	 .loc 1 156 0
+ 244 0118 FB60     	 str r3,[r7,#12]
+ 160:../CANopen/CANopenNode.c ****         }};
+ 161:../CANopen/CANopenNode.c **** 
+ 162:../CANopen/CANopenNode.c ****         err = CO_LSSinit(CO, &lssAddress, &pendingNodeId, &pendingBitRate);
+ 245              	 .loc 1 162 0
+ 246 011a 3E4B     	 ldr r3,.L15
+ 247 011c 1868     	 ldr r0,[r3]
+ 248 011e 391D     	 adds r1,r7,#4
+ 249 0120 07F11B02 	 add r2,r7,#27
+ 250 0124 07F11803 	 add r3,r7,#24
+ 251 0128 FFF7FEFF 	 bl CO_LSSinit
+ 252 012c 0346     	 mov r3,r0
+ 253 012e 87F82730 	 strb r3,[r7,#39]
+ 163:../CANopen/CANopenNode.c ****         if(err != CO_ERROR_NO) {
+ 254              	 .loc 1 163 0
+ 255 0132 97F92730 	 ldrsb r3,[r7,#39]
+ 256 0136 002B     	 cmp r3,#0
+ 257 0138 01D0     	 beq .L9
+ 164:../CANopen/CANopenNode.c ****             LOG_INFO("Error: LSS slave initialization failed: %d\n", err);
+ 165:../CANopen/CANopenNode.c ****             return CAN_OPEN_NODE_ERROR;
+ 258              	 .loc 1 165 0
+ 259 013a 0123     	 movs r3,#1
+ 260 013c 66E0     	 b .L14
+ 261              	.L9:
+ 166:../CANopen/CANopenNode.c ****         }
+ 167:../CANopen/CANopenNode.c **** 
+ 168:../CANopen/CANopenNode.c ****         activeNodeId = pendingNodeId;
+ 262              	 .loc 1 168 0
+ 263 013e FB7E     	 ldrb r3,[r7,#27]
+ 264 0140 87F82630 	 strb r3,[r7,#38]
+ 169:../CANopen/CANopenNode.c ****         uint32_t errInfo = 0;
+ 265              	 .loc 1 169 0
+ 266 0144 0023     	 movs r3,#0
+ 267 0146 3B60     	 str r3,[r7]
+ 170:../CANopen/CANopenNode.c **** 
+ 171:../CANopen/CANopenNode.c ****         err = CO_CANopenInit(CO,                    /* CANopen object */
+ 268              	 .loc 1 171 0
+ 269 0148 324B     	 ldr r3,.L15
+ 270 014a 1A68     	 ldr r2,[r3]
+ 271 014c 324B     	 ldr r3,.L15+4
+ 272 014e 1C68     	 ldr r4,[r3]
+ 273 0150 0023     	 movs r3,#0
+ 274 0152 0093     	 str r3,[sp]
+ 275 0154 42F21113 	 movw r3,#8465
+ 276 0158 0193     	 str r3,[sp,#4]
+ 277 015a 4FF4FA73 	 mov r3,#500
+ 278 015e 0293     	 str r3,[sp,#8]
+ 279 0160 4FF47A73 	 mov r3,#1000
+ 280 0164 0393     	 str r3,[sp,#12]
+ 281 0166 4FF4FA73 	 mov r3,#500
+ 282 016a 0493     	 str r3,[sp,#16]
+ 283 016c 0023     	 movs r3,#0
+ 284 016e 0593     	 str r3,[sp,#20]
+ 285 0170 97F82630 	 ldrb r3,[r7,#38]
+ 286 0174 0693     	 str r3,[sp,#24]
+ 287 0176 3B46     	 mov r3,r7
+ 288 0178 0793     	 str r3,[sp,#28]
+ 289 017a 1046     	 mov r0,r2
+ 290 017c 0021     	 movs r1,#0
+ 291 017e 0022     	 movs r2,#0
+ 292 0180 2346     	 mov r3,r4
+ 293 0182 FFF7FEFF 	 bl CO_CANopenInit
+ 294 0186 0346     	 mov r3,r0
+ 295 0188 87F82730 	 strb r3,[r7,#39]
+ 172:../CANopen/CANopenNode.c ****                              NULL,                  /* alternate NMT */
+ 173:../CANopen/CANopenNode.c ****                              NULL,                  /* alternate em */
+ 174:../CANopen/CANopenNode.c ****                              OD,                    /* Object dictionary */
+ 175:../CANopen/CANopenNode.c ****                              OD_STATUS_BITS,        /* Optional OD_statusBits */
+ 176:../CANopen/CANopenNode.c ****                              NMT_CONTROL,           /* CO_NMT_control_t */
+ 177:../CANopen/CANopenNode.c ****                              FIRST_HB_TIME,         /* firstHBTime_ms */
+ 178:../CANopen/CANopenNode.c ****                              SDO_SRV_TIMEOUT_TIME,  /* SDOserverTimeoutTime_ms */
+ 179:../CANopen/CANopenNode.c ****                              SDO_CLI_TIMEOUT_TIME,  /* SDOclientTimeoutTime_ms */
+ 180:../CANopen/CANopenNode.c ****                              SDO_CLI_BLOCK,         /* SDOclientBlockTransfer */
+ 181:../CANopen/CANopenNode.c ****                              activeNodeId,
+ 182:../CANopen/CANopenNode.c ****                              &errInfo);
+ 183:../CANopen/CANopenNode.c **** 
+ 184:../CANopen/CANopenNode.c ****         if(err != CO_ERROR_NO && err != CO_ERROR_NODE_ID_UNCONFIGURED_LSS) {
+ 296              	 .loc 1 184 0
+ 297 018c 97F92730 	 ldrsb r3,[r7,#39]
+ 298 0190 002B     	 cmp r3,#0
+ 299 0192 06D0     	 beq .L10
+ 300              	 .loc 1 184 0 is_stmt 0 discriminator 1
+ 301 0194 97F92730 	 ldrsb r3,[r7,#39]
+ 302 0198 13F1130F 	 cmn r3,#19
+ 303 019c 01D0     	 beq .L10
+ 185:../CANopen/CANopenNode.c **** 
+ 186:../CANopen/CANopenNode.c ****             if (err == CO_ERROR_OD_PARAMETERS) {
+ 187:../CANopen/CANopenNode.c ****                 LOG_INFO("Error: Object Dictionary entry 0x%X\n", errInfo);
+ 188:../CANopen/CANopenNode.c ****             }
+ 189:../CANopen/CANopenNode.c ****             else {
+ 190:../CANopen/CANopenNode.c ****                 LOG_INFO("Error: CANopen initialization failed: %d\n", err);
+ 191:../CANopen/CANopenNode.c ****             }
+ 192:../CANopen/CANopenNode.c **** 
+ 193:../CANopen/CANopenNode.c ****             return CAN_OPEN_NODE_ERROR;
+ 304              	 .loc 1 193 0 is_stmt 1
+ 305 019e 0123     	 movs r3,#1
+ 306 01a0 34E0     	 b .L14
+ 307              	.L10:
+ 194:../CANopen/CANopenNode.c ****         }
+ 195:../CANopen/CANopenNode.c **** 
+ 196:../CANopen/CANopenNode.c ****         err = CO_CANopenInitPDO(CO, CO->em, OD, activeNodeId, &errInfo);
+ 308              	 .loc 1 196 0
+ 309 01a2 1C4B     	 ldr r3,.L15
+ 310 01a4 1868     	 ldr r0,[r3]
+ 311 01a6 1B4B     	 ldr r3,.L15
+ 312 01a8 1B68     	 ldr r3,[r3]
+ 313 01aa D969     	 ldr r1,[r3,#28]
+ 314 01ac 1A4B     	 ldr r3,.L15+4
+ 315 01ae 1A68     	 ldr r2,[r3]
+ 316 01b0 97F82640 	 ldrb r4,[r7,#38]
+ 317 01b4 3B46     	 mov r3,r7
+ 318 01b6 0093     	 str r3,[sp]
+ 319 01b8 2346     	 mov r3,r4
+ 320 01ba FFF7FEFF 	 bl CO_CANopenInitPDO
+ 321 01be 0346     	 mov r3,r0
+ 322 01c0 87F82730 	 strb r3,[r7,#39]
+ 197:../CANopen/CANopenNode.c ****         if(err != CO_ERROR_NO) {
+ 323              	 .loc 1 197 0
+ 324 01c4 97F92730 	 ldrsb r3,[r7,#39]
+ 325 01c8 002B     	 cmp r3,#0
+ 326 01ca 01D0     	 beq .L11
+ 198:../CANopen/CANopenNode.c ****             if (err == CO_ERROR_OD_PARAMETERS) {
+ 199:../CANopen/CANopenNode.c ****                 LOG_INFO("Error: Object Dictionary entry 0x%X\n", errInfo);
+ 200:../CANopen/CANopenNode.c ****             }
+ 201:../CANopen/CANopenNode.c ****             else {
+ 202:../CANopen/CANopenNode.c ****                 LOG_INFO("Error: PDO initialization failed: %d\n", err);
+ 203:../CANopen/CANopenNode.c ****             }
+ 204:../CANopen/CANopenNode.c ****             return CAN_OPEN_NODE_ERROR;
+ 327              	 .loc 1 204 0
+ 328 01cc 0123     	 movs r3,#1
+ 329 01ce 1DE0     	 b .L14
+ 330              	.L11:
+ 205:../CANopen/CANopenNode.c ****         }
+ 206:../CANopen/CANopenNode.c **** 
+ 207:../CANopen/CANopenNode.c ****         /* Configure CANopen callbacks, etc */
+ 208:../CANopen/CANopenNode.c ****         if(!CO->nodeIdUnconfigured) 
+ 331              	 .loc 1 208 0
+ 332 01d0 104B     	 ldr r3,.L15
+ 333 01d2 1B68     	 ldr r3,[r3]
+ 334 01d4 1B68     	 ldr r3,[r3]
+ 335 01d6 002B     	 cmp r3,#0
+ 336 01d8 0ED1     	 bne .L12
+ 209:../CANopen/CANopenNode.c ****         {
+ 210:../CANopen/CANopenNode.c **** 
+ 211:../CANopen/CANopenNode.c **** #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+ 212:../CANopen/CANopenNode.c ****             if(storageInitError != 0) {
+ 337              	 .loc 1 212 0
+ 338 01da 7B69     	 ldr r3,[r7,#20]
+ 339 01dc 002B     	 cmp r3,#0
+ 340 01de 0BD0     	 beq .L12
+ 213:../CANopen/CANopenNode.c ****                 CO_errorReport(CO->em, CO_EM_NON_VOLATILE_MEMORY,
+ 341              	 .loc 1 213 0
+ 342 01e0 0C4B     	 ldr r3,.L15
+ 343 01e2 1B68     	 ldr r3,[r3]
+ 344 01e4 DA69     	 ldr r2,[r3,#28]
+ 345 01e6 7B69     	 ldr r3,[r7,#20]
+ 346 01e8 0093     	 str r3,[sp]
+ 347 01ea 1046     	 mov r0,r2
+ 348 01ec 0121     	 movs r1,#1
+ 349 01ee 2F22     	 movs r2,#47
+ 350 01f0 4FF4A043 	 mov r3,#20480
+ 351 01f4 FFF7FEFF 	 bl CO_error
+ 352              	.L12:
+ 214:../CANopen/CANopenNode.c ****                                CO_EMC_HARDWARE, storageInitError);
+ 215:../CANopen/CANopenNode.c ****             }
+ 216:../CANopen/CANopenNode.c **** #endif
+ 217:../CANopen/CANopenNode.c ****         }
+ 218:../CANopen/CANopenNode.c ****         else 
+ 219:../CANopen/CANopenNode.c ****         {
+ 220:../CANopen/CANopenNode.c ****             LOG_INFO("CANopenNode - Node-id not initialized\n");
+ 221:../CANopen/CANopenNode.c ****         }
+ 222:../CANopen/CANopenNode.c **** 
+ 223:../CANopen/CANopenNode.c ****       /* start CAN */
+ 224:../CANopen/CANopenNode.c ****       CO_CANsetNormalMode(CO->CANmodule);
+ 353              	 .loc 1 224 0 discriminator 1
+ 354 01f8 064B     	 ldr r3,.L15
+ 355 01fa 1B68     	 ldr r3,[r3]
+ 356 01fc 5B68     	 ldr r3,[r3,#4]
+ 357 01fe 1846     	 mov r0,r3
+ 358 0200 FFF7FEFF 	 bl CO_CANsetNormalMode
+ 359              	.L6:
+ 360              	.LBE2:
+ 225:../CANopen/CANopenNode.c **** 
+ 226:../CANopen/CANopenNode.c ****       LOG_INFO("CANopenNode - Running\n");
+ 227:../CANopen/CANopenNode.c ****     }
+ 228:../CANopen/CANopenNode.c **** 
+ 229:../CANopen/CANopenNode.c ****     reset = CO_RESET_NOT;
+ 361              	 .loc 1 229 0
+ 362 0204 074B     	 ldr r3,.L15+16
+ 363 0206 0022     	 movs r2,#0
+ 364 0208 1A70     	 strb r2,[r3]
+ 230:../CANopen/CANopenNode.c **** 
+ 231:../CANopen/CANopenNode.c ****     return CAN_OPEN_NODE_OK;
+ 365              	 .loc 1 231 0
+ 366 020a 0023     	 movs r3,#0
+ 367              	.L14:
+ 232:../CANopen/CANopenNode.c **** }
+ 368              	 .loc 1 232 0 discriminator 2
+ 369 020c 1846     	 mov r0,r3
+ 370 020e 3437     	 adds r7,r7,#52
+ 371              	.LCFI3:
+ 372              	 .cfi_def_cfa_offset 12
+ 373 0210 BD46     	 mov sp,r7
+ 374              	.LCFI4:
+ 375              	 .cfi_def_cfa_register 13
+ 376              	 
+ 377 0212 90BD     	 pop {r4,r7,pc}
+ 378              	.L16:
+ 379              	 .align 2
+ 380              	.L15:
+ 381 0214 00000000 	 .word CO
+ 382 0218 00000000 	 .word OD
+ 383 021c 00000000 	 .word storageEntries
+ 384 0220 00000000 	 .word storage
+ 385 0224 00000000 	 .word reset
+ 386 0228 00000000 	 .word OD_RAM
+ 387              	 .cfi_endproc
+ 388              	.LFE41:
+ 390              	 .section .text.vCANopenNodeProcess,"ax",%progbits
+ 391              	 .align 2
+ 392              	 .global vCANopenNodeProcess
+ 393              	 .thumb
+ 394              	 .thumb_func
+ 396              	vCANopenNodeProcess:
+ 397              	.LFB42:
+ 233:../CANopen/CANopenNode.c **** 
+ 234:../CANopen/CANopenNode.c **** 
+ 235:../CANopen/CANopenNode.c **** /**
+ 236:../CANopen/CANopenNode.c ****  * @brief CANopen Node pediodic function
+ 237:../CANopen/CANopenNode.c ****  *        This function must be call periodically
+ 238:../CANopen/CANopenNode.c ****  */
+ 239:../CANopen/CANopenNode.c **** void vCANopenNodeProcess (void)
+ 240:../CANopen/CANopenNode.c **** {
+ 398              	 .loc 1 240 0
+ 399              	 .cfi_startproc
+ 400              	 
+ 401              	 
+ 402 0000 80B5     	 push {r7,lr}
+ 403              	.LCFI5:
+ 404              	 .cfi_def_cfa_offset 8
+ 405              	 .cfi_offset 7,-8
+ 406              	 .cfi_offset 14,-4
+ 407 0002 82B0     	 sub sp,sp,#8
+ 408              	.LCFI6:
+ 409              	 .cfi_def_cfa_offset 16
+ 410 0004 00AF     	 add r7,sp,#0
+ 411              	.LCFI7:
+ 412              	 .cfi_def_cfa_register 7
+ 241:../CANopen/CANopenNode.c **** 
+ 242:../CANopen/CANopenNode.c ****     if (reset == CO_RESET_NOT)
+ 413              	 .loc 1 242 0
+ 414 0006 104B     	 ldr r3,.L21
+ 415 0008 1B78     	 ldrb r3,[r3]
+ 416 000a 002B     	 cmp r3,#0
+ 417 000c 0FD1     	 bne .L18
+ 418              	.LBB3:
+ 243:../CANopen/CANopenNode.c ****     {
+ 244:../CANopen/CANopenNode.c ****         /* get time difference since last function call */
+ 245:../CANopen/CANopenNode.c ****         uint32_t timeDifference_us = 1000;
+ 419              	 .loc 1 245 0
+ 420 000e 4FF47A73 	 mov r3,#1000
+ 421 0012 7B60     	 str r3,[r7,#4]
+ 246:../CANopen/CANopenNode.c **** 
+ 247:../CANopen/CANopenNode.c ****         /* CANopen process */
+ 248:../CANopen/CANopenNode.c ****         reset = CO_process(CO, false, timeDifference_us, NULL);
+ 422              	 .loc 1 248 0
+ 423 0014 0D4B     	 ldr r3,.L21+4
+ 424 0016 1B68     	 ldr r3,[r3]
+ 425 0018 1846     	 mov r0,r3
+ 426 001a 0021     	 movs r1,#0
+ 427 001c 7A68     	 ldr r2,[r7,#4]
+ 428 001e 0023     	 movs r3,#0
+ 429 0020 FFF7FEFF 	 bl CO_process
+ 430 0024 0346     	 mov r3,r0
+ 431 0026 1A46     	 mov r2,r3
+ 432 0028 074B     	 ldr r3,.L21
+ 433 002a 1A70     	 strb r2,[r3]
+ 434              	.LBE3:
+ 435 002c 09E0     	 b .L17
+ 436              	.L18:
+ 249:../CANopen/CANopenNode.c **** 
+ 250:../CANopen/CANopenNode.c ****         /* LED_red = CO_LED_RED(CO->LEDs, CO_LED_CANopen);     */
+ 251:../CANopen/CANopenNode.c ****         /* LED_green = CO_LED_GREEN(CO->LEDs, CO_LED_CANopen); */
+ 252:../CANopen/CANopenNode.c **** 
+ 253:../CANopen/CANopenNode.c ****         /* optional sleep for short time */
+ 254:../CANopen/CANopenNode.c **** #if (CO_CONFIG_STORAGE) & CO_CONFIG_STORAGE_ENABLE
+ 255:../CANopen/CANopenNode.c **** #if AUTO_STORAGE_ENABLE
+ 256:../CANopen/CANopenNode.c ****       CO_storageEeprom_auto_process(&storage, false);
+ 257:../CANopen/CANopenNode.c **** #endif
+ 258:../CANopen/CANopenNode.c **** #endif
+ 259:../CANopen/CANopenNode.c ****     }
+ 260:../CANopen/CANopenNode.c **** 
+ 261:../CANopen/CANopenNode.c ****     else if (reset == CO_RESET_APP || reset == CO_RESET_COMM)
+ 437              	 .loc 1 261 0
+ 438 002e 064B     	 ldr r3,.L21
+ 439 0030 1B78     	 ldrb r3,[r3]
+ 440 0032 022B     	 cmp r3,#2
+ 441 0034 03D0     	 beq .L20
+ 442              	 .loc 1 261 0 is_stmt 0 discriminator 1
+ 443 0036 044B     	 ldr r3,.L21
+ 444 0038 1B78     	 ldrb r3,[r3]
+ 445 003a 012B     	 cmp r3,#1
+ 446 003c 01D1     	 bne .L17
+ 447              	.L20:
+ 262:../CANopen/CANopenNode.c ****     {
+ 263:../CANopen/CANopenNode.c ****     	//CO_storageEeprom_auto_process(&storage, true);
+ 264:../CANopen/CANopenNode.c ****         vResetModule();
+ 448              	 .loc 1 264 0 is_stmt 1
+ 449 003e FFF7FEFF 	 bl vResetModule
+ 450              	.L17:
+ 265:../CANopen/CANopenNode.c ****     }
+ 266:../CANopen/CANopenNode.c **** }
+ 451              	 .loc 1 266 0
+ 452 0042 0837     	 adds r7,r7,#8
+ 453              	.LCFI8:
+ 454              	 .cfi_def_cfa_offset 8
+ 455 0044 BD46     	 mov sp,r7
+ 456              	.LCFI9:
+ 457              	 .cfi_def_cfa_register 13
+ 458              	 
+ 459 0046 80BD     	 pop {r7,pc}
+ 460              	.L22:
+ 461              	 .align 2
+ 462              	.L21:
+ 463 0048 00000000 	 .word reset
+ 464 004c 00000000 	 .word CO
+ 465              	 .cfi_endproc
+ 466              	.LFE42:
+ 468              	 .section .text.vCANopenNodeTimerInterrupt,"ax",%progbits
+ 469              	 .align 2
+ 470              	 .global vCANopenNodeTimerInterrupt
+ 471              	 .thumb
+ 472              	 .thumb_func
+ 474              	vCANopenNodeTimerInterrupt:
+ 475              	.LFB43:
+ 267:../CANopen/CANopenNode.c **** 
+ 268:../CANopen/CANopenNode.c **** 
+ 269:../CANopen/CANopenNode.c **** /**
+ 270:../CANopen/CANopenNode.c ****  * @brief CANopen function in timer
+ 271:../CANopen/CANopenNode.c ****  *        This function must be call in 1 ms Timer Interrupt
+ 272:../CANopen/CANopenNode.c ****  */
+ 273:../CANopen/CANopenNode.c **** void vCANopenNodeTimerInterrupt (void)
+ 274:../CANopen/CANopenNode.c **** {
+ 476              	 .loc 1 274 0
+ 477              	 .cfi_startproc
+ 478              	 
+ 479              	 
+ 480 0000 80B5     	 push {r7,lr}
+ 481              	.LCFI10:
+ 482              	 .cfi_def_cfa_offset 8
+ 483              	 .cfi_offset 7,-8
+ 484              	 .cfi_offset 14,-4
+ 485 0002 82B0     	 sub sp,sp,#8
+ 486              	.LCFI11:
+ 487              	 .cfi_def_cfa_offset 16
+ 488 0004 00AF     	 add r7,sp,#0
+ 489              	.LCFI12:
+ 490              	 .cfi_def_cfa_register 7
+ 275:../CANopen/CANopenNode.c **** 
+ 276:../CANopen/CANopenNode.c ****     CO_LOCK_OD(CO->CANmodule);
+ 277:../CANopen/CANopenNode.c **** 
+ 278:../CANopen/CANopenNode.c ****     if (!CO->nodeIdUnconfigured && CO->CANmodule->CANnormal) 
+ 491              	 .loc 1 278 0
+ 492 0006 154B     	 ldr r3,.L25
+ 493 0008 1B68     	 ldr r3,[r3]
+ 494 000a 1B68     	 ldr r3,[r3]
+ 495 000c 002B     	 cmp r3,#0
+ 496 000e 22D1     	 bne .L23
+ 497              	 .loc 1 278 0 is_stmt 0 discriminator 1
+ 498 0010 124B     	 ldr r3,.L25
+ 499 0012 1B68     	 ldr r3,[r3]
+ 500 0014 5B68     	 ldr r3,[r3,#4]
+ 501 0016 5B69     	 ldr r3,[r3,#20]
+ 502 0018 002B     	 cmp r3,#0
+ 503 001a 1CD0     	 beq .L23
+ 504              	.LBB4:
+ 279:../CANopen/CANopenNode.c ****     {
+ 280:../CANopen/CANopenNode.c ****         bool_t syncWas = false;
+ 505              	 .loc 1 280 0 is_stmt 1
+ 506 001c 0023     	 movs r3,#0
+ 507 001e 7B60     	 str r3,[r7,#4]
+ 281:../CANopen/CANopenNode.c ****         /* get time difference since last function call */
+ 282:../CANopen/CANopenNode.c ****         uint32_t timeDifference_us = 1000;
+ 508              	 .loc 1 282 0
+ 509 0020 4FF47A73 	 mov r3,#1000
+ 510 0024 3B60     	 str r3,[r7]
+ 283:../CANopen/CANopenNode.c **** 
+ 284:../CANopen/CANopenNode.c **** #if (CO_CONFIG_SYNC) & CO_CONFIG_SYNC_ENABLE
+ 285:../CANopen/CANopenNode.c ****         syncWas = CO_process_SYNC(CO, timeDifference_us, NULL);
+ 511              	 .loc 1 285 0
+ 512 0026 0D4B     	 ldr r3,.L25
+ 513 0028 1B68     	 ldr r3,[r3]
+ 514 002a 1846     	 mov r0,r3
+ 515 002c 3968     	 ldr r1,[r7]
+ 516 002e 0022     	 movs r2,#0
+ 517 0030 FFF7FEFF 	 bl CO_process_SYNC
+ 518 0034 7860     	 str r0,[r7,#4]
+ 286:../CANopen/CANopenNode.c **** #endif
+ 287:../CANopen/CANopenNode.c **** #if (CO_CONFIG_PDO) & CO_CONFIG_RPDO_ENABLE
+ 288:../CANopen/CANopenNode.c ****         CO_process_RPDO(CO, syncWas, timeDifference_us, NULL);
+ 519              	 .loc 1 288 0
+ 520 0036 094B     	 ldr r3,.L25
+ 521 0038 1B68     	 ldr r3,[r3]
+ 522 003a 1846     	 mov r0,r3
+ 523 003c 7968     	 ldr r1,[r7,#4]
+ 524 003e 3A68     	 ldr r2,[r7]
+ 525 0040 0023     	 movs r3,#0
+ 526 0042 FFF7FEFF 	 bl CO_process_RPDO
+ 289:../CANopen/CANopenNode.c **** #endif
+ 290:../CANopen/CANopenNode.c **** #if (CO_CONFIG_PDO) & CO_CONFIG_TPDO_ENABLE
+ 291:../CANopen/CANopenNode.c ****         CO_process_TPDO(CO, syncWas, timeDifference_us, NULL);
+ 527              	 .loc 1 291 0
+ 528 0046 054B     	 ldr r3,.L25
+ 529 0048 1B68     	 ldr r3,[r3]
+ 530 004a 1846     	 mov r0,r3
+ 531 004c 7968     	 ldr r1,[r7,#4]
+ 532 004e 3A68     	 ldr r2,[r7]
+ 533 0050 0023     	 movs r3,#0
+ 534 0052 FFF7FEFF 	 bl CO_process_TPDO
+ 535              	.L23:
+ 536              	.LBE4:
+ 292:../CANopen/CANopenNode.c **** #endif
+ 293:../CANopen/CANopenNode.c **** 
+ 294:../CANopen/CANopenNode.c ****     }
+ 295:../CANopen/CANopenNode.c ****     
+ 296:../CANopen/CANopenNode.c ****     CO_UNLOCK_OD(CO->CANmodule);
+ 297:../CANopen/CANopenNode.c **** }
+ 537              	 .loc 1 297 0
+ 538 0056 0837     	 adds r7,r7,#8
+ 539              	.LCFI13:
+ 540              	 .cfi_def_cfa_offset 8
+ 541 0058 BD46     	 mov sp,r7
+ 542              	.LCFI14:
+ 543              	 .cfi_def_cfa_register 13
+ 544              	 
+ 545 005a 80BD     	 pop {r7,pc}
+ 546              	.L26:
+ 547              	 .align 2
+ 548              	.L25:
+ 549 005c 00000000 	 .word CO
+ 550              	 .cfi_endproc
+ 551              	.LFE43:
+ 553              	 .section .text.vCANopenNodeReceiveInterrupt,"ax",%progbits
+ 554              	 .align 2
+ 555              	 .global vCANopenNodeReceiveInterrupt
+ 556              	 .thumb
+ 557              	 .thumb_func
+ 559              	vCANopenNodeReceiveInterrupt:
+ 560              	.LFB44:
+ 298:../CANopen/CANopenNode.c **** 
+ 299:../CANopen/CANopenNode.c **** /**
+ 300:../CANopen/CANopenNode.c ****  * @brief CANopen receive interrupt function
+ 301:../CANopen/CANopenNode.c ****  */
+ 302:../CANopen/CANopenNode.c **** void vCANopenNodeReceiveInterrupt (void)
+ 303:../CANopen/CANopenNode.c **** {
+ 561              	 .loc 1 303 0
+ 562              	 .cfi_startproc
+ 563              	 
+ 564              	 
+ 565 0000 80B5     	 push {r7,lr}
+ 566              	.LCFI15:
+ 567              	 .cfi_def_cfa_offset 8
+ 568              	 .cfi_offset 7,-8
+ 569              	 .cfi_offset 14,-4
+ 570 0002 00AF     	 add r7,sp,#0
+ 571              	.LCFI16:
+ 572              	 .cfi_def_cfa_register 7
+ 304:../CANopen/CANopenNode.c ****     CO_CANinterrupt(CO->CANmodule);
+ 573              	 .loc 1 304 0
+ 574 0004 034B     	 ldr r3,.L28
+ 575 0006 1B68     	 ldr r3,[r3]
+ 576 0008 5B68     	 ldr r3,[r3,#4]
+ 577 000a 1846     	 mov r0,r3
+ 578 000c FFF7FEFF 	 bl CO_CANinterrupt
+ 305:../CANopen/CANopenNode.c **** }
+ 579              	 .loc 1 305 0
+ 580 0010 80BD     	 pop {r7,pc}
+ 581              	.L29:
+ 582 0012 00BF     	 .align 2
+ 583              	.L28:
+ 584 0014 00000000 	 .word CO
+ 585              	 .cfi_endproc
+ 586              	.LFE44:
+ 588              	 .section .text.xCANopenNodeGetNMTState,"ax",%progbits
+ 589              	 .align 2
+ 590              	 .global xCANopenNodeGetNMTState
+ 591              	 .thumb
+ 592              	 .thumb_func
+ 594              	xCANopenNodeGetNMTState:
+ 595              	.LFB45:
+ 306:../CANopen/CANopenNode.c **** 
+ 307:../CANopen/CANopenNode.c **** 
+ 308:../CANopen/CANopenNode.c **** /**
+ 309:../CANopen/CANopenNode.c ****  * @brief  CANopen get NMT State
+ 310:../CANopen/CANopenNode.c ****  * @return State
+ 311:../CANopen/CANopenNode.c ****  */
+ 312:../CANopen/CANopenNode.c **** CANopenNodeNMTStatusTypeDef_t xCANopenNodeGetNMTState ( void )
+ 313:../CANopen/CANopenNode.c **** {
+ 596              	 .loc 1 313 0
+ 597              	 .cfi_startproc
+ 598              	 
+ 599              	 
+ 600              	 
+ 601 0000 80B4     	 push {r7}
+ 602              	.LCFI17:
+ 603              	 .cfi_def_cfa_offset 4
+ 604              	 .cfi_offset 7,-4
+ 605 0002 00AF     	 add r7,sp,#0
+ 606              	.LCFI18:
+ 607              	 .cfi_def_cfa_register 7
+ 314:../CANopen/CANopenNode.c ****     return CO->NMT->operatingState;
+ 608              	 .loc 1 314 0
+ 609 0004 044B     	 ldr r3,.L32
+ 610 0006 1B68     	 ldr r3,[r3]
+ 611 0008 1B69     	 ldr r3,[r3,#16]
+ 612 000a 1B78     	 ldrb r3,[r3]
+ 613 000c 5BB2     	 sxtb r3,r3
+ 315:../CANopen/CANopenNode.c **** }
+ 614              	 .loc 1 315 0
+ 615 000e 1846     	 mov r0,r3
+ 616 0010 BD46     	 mov sp,r7
+ 617              	.LCFI19:
+ 618              	 .cfi_def_cfa_register 13
+ 619              	 
+ 620 0012 5DF8047B 	 ldr r7,[sp],#4
+ 621              	.LCFI20:
+ 622              	 .cfi_restore 7
+ 623              	 .cfi_def_cfa_offset 0
+ 624 0016 7047     	 bx lr
+ 625              	.L33:
+ 626              	 .align 2
+ 627              	.L32:
+ 628 0018 00000000 	 .word CO
+ 629              	 .cfi_endproc
+ 630              	.LFE45:
+ 632              	 .section .text.vCANopenNodeSetNMTState,"ax",%progbits
+ 633              	 .align 2
+ 634              	 .global vCANopenNodeSetNMTState
+ 635              	 .thumb
+ 636              	 .thumb_func
+ 638              	vCANopenNodeSetNMTState:
+ 639              	.LFB46:
+ 316:../CANopen/CANopenNode.c **** 
+ 317:../CANopen/CANopenNode.c **** 
+ 318:../CANopen/CANopenNode.c **** /**
+ 319:../CANopen/CANopenNode.c ****  * @brief  CANopen set NMT State
+ 320:../CANopen/CANopenNode.c ****  * @return State
+ 321:../CANopen/CANopenNode.c ****  */
+ 322:../CANopen/CANopenNode.c **** void vCANopenNodeSetNMTState ( CANopenNodeNMTStatusTypeDef_t xState )
+ 323:../CANopen/CANopenNode.c **** {
+ 640              	 .loc 1 323 0
+ 641              	 .cfi_startproc
+ 642              	 
+ 643              	 
+ 644              	 
+ 645 0000 80B4     	 push {r7}
+ 646              	.LCFI21:
+ 647              	 .cfi_def_cfa_offset 4
+ 648              	 .cfi_offset 7,-4
+ 649 0002 83B0     	 sub sp,sp,#12
+ 650              	.LCFI22:
+ 651              	 .cfi_def_cfa_offset 16
+ 652 0004 00AF     	 add r7,sp,#0
+ 653              	.LCFI23:
+ 654              	 .cfi_def_cfa_register 7
+ 655 0006 0346     	 mov r3,r0
+ 656 0008 FB71     	 strb r3,[r7,#7]
+ 324:../CANopen/CANopenNode.c **** 	if ( ( xState == NMT_INITIALIZING ) || ( xState == NMT_PRE_OPERATIONAL ) || ( xState == NMT_OPERAT
+ 657              	 .loc 1 324 0
+ 658 000a 97F90730 	 ldrsb r3,[r7,#7]
+ 659 000e 002B     	 cmp r3,#0
+ 660 0010 0BD0     	 beq .L35
+ 661              	 .loc 1 324 0 is_stmt 0 discriminator 1
+ 662 0012 97F90730 	 ldrsb r3,[r7,#7]
+ 663 0016 7F2B     	 cmp r3,#127
+ 664 0018 07D0     	 beq .L35
+ 665              	 .loc 1 324 0 discriminator 2
+ 666 001a 97F90730 	 ldrsb r3,[r7,#7]
+ 667 001e 052B     	 cmp r3,#5
+ 668 0020 03D0     	 beq .L35
+ 669              	 .loc 1 324 0 discriminator 3
+ 670 0022 97F90730 	 ldrsb r3,[r7,#7]
+ 671 0026 042B     	 cmp r3,#4
+ 672 0028 04D1     	 bne .L34
+ 673              	.L35:
+ 325:../CANopen/CANopenNode.c **** 		CO->NMT->operatingState = xState;
+ 674              	 .loc 1 325 0 is_stmt 1
+ 675 002a 054B     	 ldr r3,.L37
+ 676 002c 1B68     	 ldr r3,[r3]
+ 677 002e 1B69     	 ldr r3,[r3,#16]
+ 678 0030 FA79     	 ldrb r2,[r7,#7]
+ 679 0032 1A70     	 strb r2,[r3]
+ 680              	.L34:
+ 326:../CANopen/CANopenNode.c **** }
+ 681              	 .loc 1 326 0
+ 682 0034 0C37     	 adds r7,r7,#12
+ 683              	.LCFI24:
+ 684              	 .cfi_def_cfa_offset 4
+ 685 0036 BD46     	 mov sp,r7
+ 686              	.LCFI25:
+ 687              	 .cfi_def_cfa_register 13
+ 688              	 
+ 689 0038 5DF8047B 	 ldr r7,[sp],#4
+ 690              	.LCFI26:
+ 691              	 .cfi_restore 7
+ 692              	 .cfi_def_cfa_offset 0
+ 693 003c 7047     	 bx lr
+ 694              	.L38:
+ 695 003e 00BF     	 .align 2
+ 696              	.L37:
+ 697 0040 00000000 	 .word CO
+ 698              	 .cfi_endproc
+ 699              	.LFE46:
+ 701              	 .text
+ 702              	.Letext0:
+ 703              	 .file 2 "../CANopen/CANopenNode.h"
+ 704              	 .file 3 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\lib\\gcc\\arm-none-eabi\\4.9.3\\include\\stddef.h"
+ 705              	 .file 4 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 706              	 .file 5 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 707              	 .file 6 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/driver/CO_driver_target.h"
+ 708              	 .file 7 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_driver.h"
+ 709              	 .file 8 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_ODinterface.h"
+ 710              	 .file 9 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_Emergency.h"
+ 711              	 .file 10 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_NMT_Heartbeat.h"
+ 712              	 .file 11 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_HBconsumer.h"
+ 713              	 .file 12 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_SDOserver.h"
+ 714              	 .file 13 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_SYNC.h"
+ 715              	 .file 14 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_PDO.h"
+ 716              	 .file 15 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_TIME.h"
+ 717              	 .file 16 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/303/CO_LEDs.h"
+ 718              	 .file 17 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/305/CO_LSS.h"
+ 719              	 .file 18 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/305/CO_LSSslave.h"
+ 720              	 .file 19 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/CANopen.h"
+ 721              	 .file 20 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/driver/OD.h"
+ 722              	 .file 21 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/storage/CO_storage.h"
+ 723              	 .file 22 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/hardware/CANopenHardware.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 CANopenNode.c
+    {standard input}:20     .rodata.CO_LSS_bitTimingTableLookup:00000000 $d
+    {standard input}:23     .rodata.CO_LSS_bitTimingTableLookup:00000000 CO_LSS_bitTimingTableLookup
+    {standard input}:35     .bss.CO:00000000 $d
+    {standard input}:38     .bss.CO:00000000 CO
+    {standard input}:43     .bss.reset:00000000 reset
+    {standard input}:44     .bss.reset:00000000 $d
+                            *COM*:00000038 storage
+    {standard input}:51     .data.storageEntries:00000000 storageEntries
+    {standard input}:48     .data.storageEntries:00000000 $d
+    {standard input}:58     .bss.mlStorage:00000000 $d
+    {standard input}:61     .bss.mlStorage:00000000 mlStorage
+    {standard input}:64     .text.xCANopenNodeInit:00000000 $t
+    {standard input}:69     .text.xCANopenNodeInit:00000000 xCANopenNodeInit
+    {standard input}:381    .text.xCANopenNodeInit:00000214 $d
+    {standard input}:391    .text.vCANopenNodeProcess:00000000 $t
+    {standard input}:396    .text.vCANopenNodeProcess:00000000 vCANopenNodeProcess
+    {standard input}:463    .text.vCANopenNodeProcess:00000048 $d
+    {standard input}:469    .text.vCANopenNodeTimerInterrupt:00000000 $t
+    {standard input}:474    .text.vCANopenNodeTimerInterrupt:00000000 vCANopenNodeTimerInterrupt
+    {standard input}:549    .text.vCANopenNodeTimerInterrupt:0000005c $d
+    {standard input}:554    .text.vCANopenNodeReceiveInterrupt:00000000 $t
+    {standard input}:559    .text.vCANopenNodeReceiveInterrupt:00000000 vCANopenNodeReceiveInterrupt
+    {standard input}:584    .text.vCANopenNodeReceiveInterrupt:00000014 $d
+    {standard input}:589    .text.xCANopenNodeGetNMTState:00000000 $t
+    {standard input}:594    .text.xCANopenNodeGetNMTState:00000000 xCANopenNodeGetNMTState
+    {standard input}:628    .text.xCANopenNodeGetNMTState:00000018 $d
+    {standard input}:633    .text.vCANopenNodeSetNMTState:00000000 $t
+    {standard input}:638    .text.vCANopenNodeSetNMTState:00000000 vCANopenNodeSetNMTState
+    {standard input}:697    .text.vCANopenNodeSetNMTState:00000040 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+OD_RAM
+xCANopenHardwareInit
+CO_new
+CO_storageEeprom_init
+CO_CANsetConfigurationMode
+CO_CANmodule_disable
+CO_CANinit
+CO_LSSinit
+CO_CANopenInit
+CO_CANopenInitPDO
+CO_error
+CO_CANsetNormalMode
+OD
+CO_process
+vResetModule
+CO_process_SYNC
+CO_process_RPDO
+CO_process_TPDO
+CO_CANinterrupt

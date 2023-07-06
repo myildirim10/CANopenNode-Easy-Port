@@ -1,0 +1,472 @@
+<p1:Tab  xmlns="http://www.eclipse.org/xwt/presentation" xmlns:x="http://www.eclipse.org/xwt" xmlns:p1="clr-namespace:com.ifx.davex.ui.controls.app" x:Class="e" widgetName="composite1" layout="{x:Null}">
+	<p1:TabFolder bounds="5, 5, 545, 659">
+		<p1:GTab text="General Settings" enabled="true" visible="true" widgetName="gtab_general_settings">
+			<p1:GTab.control>
+				<p1:Tab widgetName="tab1_composite1" >
+					<p1:Tab.layout>
+						<GridLayout horizontalSpacing="10" verticalSpacing="10" numColumns="2"/>
+					</p1:Tab.layout>
+					<p1:GLabel text="Operation mode:" widgetName="glabel_oprmode"/>
+					<p1:GCombo description="Choose the desired operation mode for the data transmission &amp; reception.&#13;&#10;&#13;&#10;Mode of operation of the SPI master peripheral. The USIC channel will be configured to use  port pins based on the operation mode selected. &lt;br&gt;&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;&lt;b&gt;Full Duplex:&lt;/b&gt; 2 pins are used to establish full duplex communication. One pin for reception(MOSI) and another pin for transmission(MISO). Parallel transmission and reception are possible in this mode.&lt;br&gt;&#13;&#10;SPI_MASTER_Transmit(), SPI_MASTER_Receive(), SPI_MASTER_Transfer() APIs can be used in this operation mode.&#13;&#10;&lt;li&gt;&lt;b&gt;Half Duplex:&lt;/b&gt; Single pin is used for communicating data in half duplex mode. Data can either be transmitted or received at any point of time. Only MISO pin will be available for manual pin selection. By default the pin is configured in open drain mode.&lt;br&gt;&#13;&#10;SPI_MASTER_Transmit(), SPI_MASTER_Receive() APIs can be used in this operation mode.&#13;&#10;&lt;li&gt;&lt;b&gt;Dual SPI:&lt;/b&gt; 2 pins are used to establish half duplex communication. 2 bits of data is either transmitted or received for each period of shift clock(SCLK). A word of 8bits will be transmitted or received using 4 clock cycles.&lt;br&gt;&#13;&#10;SPI_MASTER_Transmit(), SPI_MASTER_Receive() APIs can be used in this operation mode.&#13;&#10;&lt;li&gt;&lt;b&gt;Quad SPI:&lt;/b&gt; 4 pins are used to establish half duplex communication. For each period of serial clock(SCLK) 4 bits of data is transmitted or received.&lt;br&gt;&#13;&#10;SPI_MASTER_Transmit(), SPI_MASTER_Receive() APIs can be used in this operation mode.&#13;&#10;&lt;/ul&gt;" manifestObj="true" options="Full Duplex&#13;&#10;Half Duplex&#13;&#10;Dual SPI&#13;&#10;Quad SPI" toolTipText="" value="Full Duplex" widgetName="gcombo_oprmode">
+						<p1:GCombo.layoutData>
+							<GridData grabExcessHorizontalSpace="true" widthHint="115"/>
+						</p1:GCombo.layoutData>
+					</p1:GCombo>
+					<p1:GLabel text="Desired bus speed [KHz]:  " widgetName="glabel_desired_bus_speed">
+						<p1:GLabel.layoutData>
+							<GridData widthHint="131"/>
+						</p1:GLabel.layoutData>
+					</p1:GLabel>
+					<p1:GFloat description="" format="*,2" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="60000" minValue="0.1" toolTipText="" value="19.2" widgetName="gfloat_desired_bus_speed" x:Style="BORDER">
+						<p1:GFloat.layoutData>
+							<GridData grabExcessHorizontalSpace="true" widthHint="106"/>
+						</p1:GFloat.layoutData>
+					</p1:GFloat>
+					<p1:GLabel text="Actual bus speed [KHz]:" widgetName="glabel_actual_bus_speed"/>
+					<p1:GFloat description="Actual Baud Rate acheived after calculations based on the desired value." format="*,2" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="60000" minValue="0.1" toolTipText="" value="19.2" widgetName="gfloat_actual_bus_speed" x:Style="BORDER">
+						<p1:GFloat.layoutData>
+							<GridData grabExcessHorizontalSpace="true" widthHint="106"/>
+						</p1:GFloat.layoutData>
+					</p1:GFloat>
+					<p1:GLabel manifestObj="true" text="Parity selection:" widgetName="glabel_parity"/>
+					<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="None&#13;&#10;Even&#13;&#10;Odd&#13;&#10;" value="None" widgetName="gcombo_parity" description="Select the Parity type.&#13;&#10;&#13;&#10;&#13;&#10;Parity configuration for the SPI master channel. The configuration should match the configuration of SPI slave channel. When parity is selected, an extra bit will be added at the end of each frame. Parity configuration is possible only when the frame length is configured to a value less than 64.&lt;br&gt;&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;None: No parity bit will be added at the end of frame.&#13;&#10;&lt;li&gt;Even: An extra parity bit is added at the end of data frame.&#13;&#10;&lt;li&gt;Odd: An extra parity bit is added at the end of data frame. &#13;&#10;&lt;/ul&gt;&lt;br&gt;&#13;&#10;A callback can be registered in the &apos;Interrupt Settings&apos; tab to notify if the parity bit mismatched.">
+						<p1:GCombo.layoutData>
+							<GridData grabExcessHorizontalSpace="true" widthHint="115"/>
+						</p1:GCombo.layoutData>
+					</p1:GCombo>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Advanced Settings" visible="true" enabled="true" manifestObj="true" widgetName="gtab_advanced_settings" toolTipText="" description="Select number of slaves required.">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite21">
+					<p1:Tab.layout>
+						<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+					</p1:Tab.layout>
+					<p1:GGroup text="Protocol Handling" manifestObj="true" widgetName="ggroup_protocol_handling">
+						<p1:GGroup.layout>
+							<GridLayout horizontalSpacing="10" verticalSpacing="10" numColumns="2"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalSpan="2" horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GLabel text="Transmit mode:" visible="true" manifestObj="true" widgetName="glabel_transmit_mode" description="Mode that transmit events are being handled." toolTipText="Mode that transmit events are being handled.">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="85"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_transmit_mode" options="Interrupt&#13;&#10;DMA&#13;&#10;Direct&#13;&#10;" value="Interrupt" toolTipText="Mode that transmit events are being handled." description="Data transmission can be accomplished using 3 different mechanisms,&lt;br&gt;&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;&lt;b&gt;Interrupt:&lt;/b&gt; - A dedicated NVIC node will be used to transmit data. Reduces CPU load by using CPU only when transmit buffer is ready to accept new data. This mechanism has better CPU utilization compared to Direct(Polling) mechanism. &lt;br&gt;&#13;&#10;SPI_MASTER_Transmit(), SPI_MASTER_StartTransmitIRQ() APIs can be used to trigger the transmission of data.&#13;&#10;&lt;li&gt;&lt;b&gt;DMA:&lt;/b&gt; - A DMA channel is dedicated for data transmission. Ideal mechanism for offloading the CPU. CPU will be used only to configure the buffer address and size.&lt;br&gt;&#13;&#10;SPI_MASTER_Transmit(), SPI_MASTER_StartTransmitDMA() APIs can be used to trigger data transmission.&lt;br&gt;&#13;&#10;Note: DMA is not available for XMC1 family of microcontrollers.&#13;&#10;&lt;li&gt;&lt;b&gt;Direct:&lt;/b&gt; - This mechanism allows custom implementation of the software for data transaction. Signals related to SPI channel events will be available for connection with external APPs. Additionally, APIs implemented using polling mechanism will be available. But the APIs are CPU blocking implementations.&lt;br&gt;&#13;&#10;SPI_MASTER_Transmit() API implements blocking mechanism for transmission of data.&#13;&#10;&lt;/ul&gt;&lt;br&gt;&#13;&#10;In &apos;Interrupt&apos; and &apos;DMA&apos; mechanisms, a callback function can be registered in the &apos;Interrupt Settings&apos; tab. This callback function will be executed when the transmission of requested count is finished.&lt;br&gt;&#13;&#10;Additionally SPI_MASTER_Transfer() API can be used in &apos;Full Duplex&apos; operation mode to transmit and receive data at the same time.">
+							<p1:GCombo.layoutData>
+								<GridData grabExcessHorizontalSpace="true" widthHint="90"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="Receive mode:" visible="true" manifestObj="true" widgetName="glabel_receive_mode" description="Mode that receive events are being handled." toolTipText="Mode that receive events are being handled.">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="85"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Interrupt&#13;&#10;DMA&#13;&#10;Direct&#13;&#10;" value="Interrupt" widgetName="gcombo_receive_mode" toolTipText="Mode that receive events are being handled." description="Data reception can be accomplished using 3 different mechanisms,&lt;br&gt;&#13;&#10;&lt;ul&gt;&#13;&#10;&lt;li&gt;&lt;b&gt;Interrupt:&lt;/b&gt; - A dedicated NVIC node will be used to receive data. Reduces CPU load by using CPU only when receive buffer has new data. This mechanism has better CPU utilization compared to Direct(Polling) mechanism. &lt;br&gt;&#13;&#10;SPI_MASTER_Receive(), SPI_MASTER_StartReceiveIRQ() APIs can be used to start the reception of data.&#13;&#10;&lt;li&gt;&lt;b&gt;DMA:&lt;/b&gt; - A DMA channel will be dedicated for data reception. Ideal mechanism for offloading the CPU. CPU will be used only to configure the buffer address and size.&lt;br&gt;&#13;&#10;SPI_MASTER_Receive(), SPI_MASTER_StartReceiveDMA() APIs can be used to start data reception.&lt;br&gt;&#13;&#10;Note: DMA is not available for XMC1 family of microcontrollers.&#13;&#10;&lt;li&gt;&lt;b&gt;Direct:&lt;/b&gt; - This mechanism allows custom implementation of the software for data transaction. Signals related to SPI channel receive events will be available for connection with external APPs. Additionally, APIs implemented using polling mechanism will be available. But the APIs are CPU blocking implementations.&lt;br&gt;&#13;&#10;SPI_MASTER_Receive() API implements blocking mechanism for reception of data.&#13;&#10;&lt;/ul&gt;&lt;br&gt;&#13;&#10;In &apos;Interrupt&apos; and &apos;DMA&apos; mechanisms, a callback function can be registered in the &apos;Interrupt Settings&apos; tab. This callback function will be executed when data of requested count is received.&lt;br&gt;&#13;&#10;In &apos;Full Duplex&apos; mode, SPI_MASTER_Transfer() API can be used to transmit and receive data at the same time. The end of receive callback function, configured in the &apos;Interrupt Settings&apos; tab, will be executed after completion of the transfer.&#13;&#10;">
+							<p1:GCombo.layoutData>
+								<GridData grabExcessHorizontalSpace="true" widthHint="90"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GMessage text="Mode combination not valid" visible="true" manifestObj="true" widgetName="gmessage_protocol_handling">
+							<p1:GMessage.layoutData>
+								<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL" horizontalSpan="2"/>
+							</p1:GMessage.layoutData>
+						</p1:GMessage>
+					</p1:GGroup>
+					<p1:GLabel text="   Number of slave select lines:" visible="true" widgetName="glabel_slave_select_lines">
+						<p1:GLabel.layoutData>
+							<GridData widthHint="160"/>
+						</p1:GLabel.layoutData>
+					</p1:GLabel>
+					<p1:GInteger x:Style="NONE" minValue="0" maxValue="8" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" manifestObj="true" widgetName="gint_slave_select_lines" value="1" description="Select the number of slaves to be connected.">
+						<p1:GInteger.layoutData>
+							<GridData widthHint="30"/>
+						</p1:GInteger.layoutData>
+					</p1:GInteger>
+					<p1:GCheck text="Invert the signal polarity of SELOx signals" manifestObj="true" widgetName="gcheck_selo_polarity" value="true" description="Selection inverts the signal polarity of SELOx output signals." toolTipText="Selection inverts the signal polarity of SELOx output signals."/>
+					<Label/>
+					<p1:GGroup text="Frame and Word Length" widgetName="ggroup_frame_word_length">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL" grabExcessHorizontalSpace="true" horizontalSpan="2"/>
+						</p1:GGroup.layoutData>
+						<p1:GCheck text="Enable frame end mode" manifestObj="true" widgetName="gcheck_frame_end_mode" value="true" description="The MSLS signal is kept active also while no new data is available and no other end of frame condition is reached." toolTipText="MSLS signal is kept active after finishing the current frame.">
+							<p1:GCheck.layoutData>
+								<GridData widthHint="145" horizontalSpan="2"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GLabel text="Word length:" visible="true" widgetName="glabel_word_length" description="Word lenth for communication.">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="72"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GInteger x:Style="NONE" minValue="1" maxValue="16" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" manifestObj="true" widgetName="gint_word_length" value="8" description="Number of bits to be transmitted or received in each transaction as one word. This value will be considered as the count of bits to be either received or transmitted in the bit order selected. Data from the user buffer will be indexed based on the value provided in this field. If the value is less than or equal to 8, user buffer will be accessed one byte(8bits) at a time. This means that any data should be accessed in array of bytes(uint8_t). If the value is greater than 8, then the user buffer will be indexed with 2 bytes(16bits). User buffer should be created as an array of 16bit data type(uint16_t). Each word data should be accessed in each index of the 16bit type(uint16_t) array. APIs implemented in the APP are capable of indexing the user buffer based on the word length provided in this field.">
+							<p1:GInteger.layoutData>
+								<GridData widthHint="30"/>
+							</p1:GInteger.layoutData>
+						</p1:GInteger>
+						<p1:GLabel text="Frame length:  " widgetName="glabel_frame_length">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="72"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GInteger description="Frame length for communication.&#13;&#10;If FLE &lt; 64 then a CS signal is generated automatically by the first data bit and deactivated at the end of the last bit including delay Tld.&#13;&#10;If FLE = 64 then the user should give the start/end information of a data frame to create the desired length of the CS signal by using TCSR.SOF/EOF bits." format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="64" minValue="1" toolTipText="" value="64" widgetName="gint_frame_length">
+							<p1:GInteger.layoutData>
+								<GridData widthHint="30"/>
+							</p1:GInteger.layoutData>
+						</p1:GInteger>
+					</p1:GGroup>
+					<p1:GGroup text="Delay Settings" widgetName="ggroup_delay_settings">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" verticalSpacing="10" horizontalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL" grabExcessHorizontalSpace="true" horizontalSpan="2"/>
+						</p1:GGroup.layoutData>
+						<p1:GLabel text="Leading/Trailing delay [SCLK cycles]:" widgetName="glabel_desired_leading_trailing_delay:" toolTipText="Adds specified number of clock cycles delay after and before each frame." description="The first shift clock edge of SCLK is generated after the leading delay. Trailing delay starts at the end of the last SCLK cycle of a data frame. At the end point of the trailing delay the MSLS becomes inactive.">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="202"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GInteger description="Select the delay of desired number of clock cycles duration." format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="32" minValue="1" value="2" widgetName="gint_desired_leading_trailing_delay" toolTipText="">
+							<p1:GInteger.layoutData>
+								<GridData widthHint="65"/>
+							</p1:GInteger.layoutData>
+						</p1:GInteger>
+						<p1:GLabel description="The first shift clock edge of SCLK is generated after the leading delay. Trailing delay starts at the end of the last SCLK cycle of a data frame. At the end point of the trailing delay the MSLS becomes inactive." text="Actual Leading/Trailing delay [usec]:" toolTipText="Adds specified number of clock cycles delay after and before each frame." widgetName="glabel_actual_leading_trailing_delay:">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="202"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GFloat description="Displays the actual leading/trailing delay configured, based on the entered desired value." format="*,2" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" maxValue="POSITIVE_INFINITY" minValue="0.0" widgetName="gfloat_actual_leading_trailing_delay" x:Style="BORDER" enabled="false">
+							<p1:GFloat.layoutData>
+								<GridData grabExcessHorizontalSpace="true" widthHint="53"/>
+							</p1:GFloat.layoutData>
+						</p1:GFloat>
+						<p1:GLabel text="Desired inter-word delay [SCLK cycles]:" visible="true" widgetName="glabel_desired_interword_delay:">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="210"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GInteger x:Style="NONE" minValue="0" maxValue="32" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="(com.ifx.davex.ui.controls.util.AppUiConstants).DEC" manifestObj="true" widgetName="gint_desired_interword_delay" value="0" description="Select the delay of desired number of clock cycles duration.">
+							<p1:GInteger.layoutData>
+								<GridData widthHint="65"/>
+							</p1:GInteger.layoutData>
+						</p1:GInteger>
+						<p1:GLabel text="Actual inter-word delay [usec]:" widgetName="glabel_actual_interword_delay:">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="190"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GFloat x:Style="BORDER" minValue="0.0" maxValue="POSITIVE_INFINITY" mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" format="*,2" manifestObj="true" widgetName="gfloat_actual_interword_delay" description="Displays the actual inter word delay being configured, based on the entered desired value." enabled="false">
+							<p1:GFloat.layoutData>
+								<GridData widthHint="53"/>
+							</p1:GFloat.layoutData>
+						</p1:GFloat>
+					</p1:GGroup>
+					<p1:GGroup text="Control" widgetName="ggroup_control">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL" grabExcessHorizontalSpace="true" horizontalSpan="2"/>
+						</p1:GGroup.layoutData>
+						<p1:GLabel text="Bit order:" visible="true" widgetName="glabel_bit_order"/>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_bit_order" options="Transmit/receive MSB first&#13;&#10;Transmit/receive LSB first" value="Transmit/receive MSB first" toolTipText="" description="Order of bits transmitted or received depends on this configuration. Data can be shifted in MSB first order or LSB first order. Order configured here should match with the order configured in the SPI master device. Otherwise the data received may have inverted bit order. The order is applicable for each frame.">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="423"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="Clock settings:" visible="true" manifestObj="true" widgetName="glabel_clock_settings"/>
+						<p1:GCombo description="Define the clock passive level settings and edge for which data transfer has to happen." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Low if inactive, transmit on rising clock edge, receive on falling clock edge&#13;&#10;Low if inactive, transmit on falling clock edge, receive on rising clock edge&#13;&#10;High if inactive, transmit on rising clock edge, receive on falling clock edge&#13;&#10;High if inactive, transmit on falling clock edge, receive on rising clock edge" toolTipText="" value="Low if inactive, transmit on rising clock edge, receive on falling clock edge" widgetName="gcombo_clock_settings">
+							<p1:GCombo.layoutData>
+								<GridData grabExcessHorizontalSpace="true" widthHint="423"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="FIFO Settings" widgetName="ggroup_fifo_settings">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="3" verticalSpacing="10" horizontalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL" grabExcessHorizontalSpace="true" horizontalSpan="2"/>
+						</p1:GGroup.layoutData>
+						<p1:GCheck description="Enables usage of FIFO for transmission of data. By enabling FIFO, the CPU can put data in the FIFO when the SPI channel is busy in transmitting data. Data from the FIFO will be transmitting one after the other. CPU gets enough time to execute other functions till the FIFO gets empty. " manifestObj="true" text="Enable transmit FIFO" widgetName="gcheck_enabletxfifo" value="true">
+							<p1:GCheck.layoutData>
+								<GridData widthHint="140"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GLabel manifestObj="true" text="Size:" widgetName="glabel_txfifosize">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="22"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="Number of words in FIFO to be used for data transmission for this USIC channel.&#13;&#10;If any one of the channel is using complete FIFO i.e 64 stage, while enabling&#13;&#10;this option leads to the solver error. " manifestObj="true" options="2&#13;&#10;4&#13;&#10;8&#13;&#10;16&#13;&#10;32" toolTipText="" value="16" widgetName="gcombo_txfifosize">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="35"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GCheck description="Enables usage of FIFO for reception of data. The FIFO is configured to generate FIFO full event when the receive FIFO is filled to the configured size. CPU can execute other functions till the receive FIFO is full. " manifestObj="true" text="Enable receive FIFO" widgetName="gcheck_enablerxfifo" value="true">
+							<p1:GCheck.layoutData>
+								<GridData widthHint="140"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GLabel manifestObj="true" text="Size:" widgetName="glabel_rxfifosize">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="22"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="Number of words in FIFO to be used for data reception for this USIC channel.&#13;&#10;If any one of the channel is using complete FIFO i.e 64 stage, while enabling&#13;&#10;this option leads to the solver error. " manifestObj="true" options="2&#13;&#10;4&#13;&#10;8&#13;&#10;16&#13;&#10;32" toolTipText="" value="16" widgetName="gcombo_rxfifosize">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="35"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="A total of 64 FIFO entries are available to be configured as transmit and receive buffers. &#13;&#10;These 64 entries are additionally shared between the two channels of a USIC module." widgetName="label499">
+							<p1:GLabel.layoutData>
+								<GridData horizontalSpan="3" widthHint="513"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+					</p1:GGroup>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Interrupt Settings" enabled="true" visible="true" widgetName="gtab_interrupt_settings" manifestObj="true">
+			<p1:GTab.control>
+				<p1:Tab widgetName="tab2_composite1" >
+					<p1:Tab.layout>
+						<GridLayout/>
+					</p1:Tab.layout>
+					<p1:GGroup manifestObj="true" text="Transmit" widgetName="ggroup_transmit_interrupt">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" verticalSpacing="10" horizontalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData widthHint="388" grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GInterruptPrio manifestObj="true" maxPriority="63" maxSubPriority="63" minPriority="0" minSubPriority="0" priorityValue="63" subPriorityValue="0" text="Interrupt Priority" widgetName="ginterruptprio_tx" description="The interrupt priority can be changed by the user to provide explicit preference for time critical events. Maximum value of pre-emption priority and sub-priority depend on the number of bits configured for priority group in the CPU_CTRL_XMC4 APP in XMC4000 devices.">
+							<p1:GInterruptPrio.layoutData>
+								<GridData horizontalSpan="2" grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+							</p1:GInterruptPrio.layoutData>
+						</p1:GInterruptPrio>
+						<p1:GCheck manifestObj="true" text="End of transmit callback:" widgetName="gcheck_end_transmission" toolTipText="Enable a callback function execution after&#13;&#10;putting all the data provided in the transmit&#13;&#10;request to transmit buffer." description="If the checkbox is enabled, the function name provided in the text box is executed on completion of transmit request.&#13;&#10;Note: End of transmit does not mean completion of data transfer. It means that all the data in the user buffer has been put to transmit buffer. User should explicitly check for end of transmission using appropriate flags">
+							<p1:GCheck.layoutData>
+								<GridData widthHint="186"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GString mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Enter a function name of type &#13;&#10;void function(void)&#13;&#10;Function must be defined by the user&#13;&#10;in the application code." value="" widgetName="gstring_tx_callback" x:Style="BORDER" description="This field takes the name of function, which should be called on completion of data transfer. This function will be executed when all the data in the user&apos;s buffer is put to transmit buffer.&#13;&#10;Function type: void function(void)">
+							<p1:GString.layoutData>
+								<GridData widthHint="150" horizontalAlignment="FILL"/>
+							</p1:GString.layoutData>
+						</p1:GString>
+						<p1:GMessage isError="false" manifestObj="true" text="Invalid function name for-&quot;End of transmit callback&quot;." widgetName="gmessage_tx_callback_empty">
+							<p1:GMessage.layoutData>
+								<GridData horizontalSpan="2" widthHint="339" horizontalAlignment="FILL"/>
+							</p1:GMessage.layoutData>
+						</p1:GMessage>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="Receive/Transfer" widgetName="ggroup_receive_interrupt" description="The interrupt priority can be changed by the user to provide explicit preference for time critical events. Maximum value of pre-emption priority and sub-priority depend on the number of bits configured for priority group in the CPU_CTRL_XMC4 app in XMC4000 devices.">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL" grabExcessHorizontalSpace="true"/>
+						</p1:GGroup.layoutData>
+						<p1:GInterruptPrio manifestObj="true" maxPriority="63" maxSubPriority="63" minPriority="0" minSubPriority="0" priorityValue="62" subPriorityValue="0" text="Interrupt Priority" widgetName="ginterruptprio_rx" description="The interrupt priority can be changed by the user to provide explicit preference for time critical events. Maximum value of pre-emption priority and sub-priority depend on the number of bits configured for priority group in the CPU_CTRL_XMC4 app in XMC4000 devices.">
+							<p1:GInterruptPrio.layoutData>
+								<GridData horizontalSpan="2" horizontalAlignment="FILL"/>
+							</p1:GInterruptPrio.layoutData>
+						</p1:GInterruptPrio>
+						<p1:GCheck manifestObj="true" text="End of receive/transfer callback:" widgetName="gcheck_end_reception" toolTipText="Enable a callback function execution after&#13;&#10;receiving all the data requested in the receive&#13;&#10;or transfer request." description="If the checkbox is enabled, the function name provided in the text box is executed on completion of receive request. When the callback is executed, the user can be sure that all the requested number of data bytes are received.">
+							<p1:GCheck.layoutData>
+								<GridData widthHint="186"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GString mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Enter a function name of type &#13;&#10;void function(void)&#13;&#10;Function must be defined by the user&#13;&#10;in the application code." value="" widgetName="gstring_rx_callback" x:Style="BORDER" description="This field takes the name of function, which should be called on completion of data reception. This function will be executed when all the data requested by the user are received.&#13;&#10;Function type: void function(void)">
+							<p1:GString.layoutData>
+								<GridData widthHint="150" horizontalAlignment="FILL"/>
+							</p1:GString.layoutData>
+						</p1:GString>
+						<p1:GMessage isError="false" manifestObj="true" text="Invalid function name for- &quot;End of receive/transfer callback&quot;." widgetName="gmessage_rx_callback_empty">
+							<p1:GMessage.layoutData>
+								<GridData widthHint="339" horizontalAlignment="FILL" horizontalSpan="2"/>
+							</p1:GMessage.layoutData>
+						</p1:GMessage>
+						<p1:GMessage text="In order to avoid receive FIFO data overwriting, it is recommended to configure higher preemption priority for the receive interrupt." visible="true" manifestObj="true" isError="false" widgetName="gmessage_receive_priority_info">
+							<p1:GMessage.layoutData>
+								<GridData horizontalSpan="2" widthHint="512" horizontalAlignment="FILL"/>
+							</p1:GMessage.layoutData>
+						</p1:GMessage>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="Error Handling" widgetName="ggroup_error_handling" description="">
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GGroup.layoutData>
+							<GridData horizontalAlignment="FILL" widthHint="335"/>
+						</p1:GGroup.layoutData>
+						<p1:GInterruptPrio manifestObj="true" maxPriority="63" maxSubPriority="0" minPriority="0" minSubPriority="0" priorityValue="63" subPriorityValue="0" text="Interrupt Priority" widgetName="ginterruptprio_error" description="The interrupt priority can be changed by the user to provide explicit preference for time critical events. Maximum value of pre-emption priority and subpriority depend on the number of bits configured for priority group in the CPU_CTRL_XMC4 app in XMC4000 devices.">
+							<p1:GInterruptPrio.layoutData>
+								<GridData horizontalSpan="2" horizontalAlignment="FILL" grabExcessHorizontalSpace="true"/>
+							</p1:GInterruptPrio.layoutData>
+						</p1:GInterruptPrio>
+						<p1:GCheck manifestObj="true" text="Parity error callback:" widgetName="gcheck_parity_error" toolTipText="Enable a callback function execution if&#13;&#10;parity error event occurred." description="A parity error is detected when the data received is not proper. By enabling this check box a callback function is executed on detection of parity error.">
+							<p1:GCheck.layoutData>
+								<GridData widthHint="186"/>
+							</p1:GCheck.layoutData>
+						</p1:GCheck>
+						<p1:GString mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" toolTipText="Enter a function name of type &#13;&#10;void function(void)&#13;&#10;Function must be defined by the user&#13;&#10;in the application code." value="" widgetName="gstring_parity_error_callback" x:Style="BORDER" description="This field takes the name of function, which should be executed on parity error detection.&#13;&#10;Function type: void function(void)">
+							<p1:GString.layoutData>
+								<GridData widthHint="150" horizontalAlignment="FILL"/>
+							</p1:GString.layoutData>
+						</p1:GString>
+						<p1:GMessage isError="false" manifestObj="true" text="Invalid function name for-&quot;Parity error callback&quot;." widgetName="gmessage_parity_error_callback_empty">
+							<p1:GMessage.layoutData>
+								<GridData horizontalSpan="2" widthHint="339" horizontalAlignment="FILL"/>
+							</p1:GMessage.layoutData>
+						</p1:GMessage>
+					</p1:GGroup>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Pin Settings" visible="true" enabled="true" manifestObj="true" widgetName="gtab_pin_settings" description="By selecting this option, you can enable the transmit &amp; receive pin advanced configurations. ">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite14">
+					<p1:Tab.layout>
+						<GridLayout verticalSpacing="10" horizontalSpacing="10"/>
+					</p1:Tab.layout>
+					<p1:GCheck text="Enable advanced pin configurations" manifestObj="true" widgetName="gcheck_enablepinconfig" description="Select this option to enable advanced configurations for communication pins." toolTipText="Displays and allows configuration of&#13;&#10;advance pin characteristics">
+						<p1:GCheck.layoutData>
+							<GridData widthHint="208"/>
+						</p1:GCheck.layoutData>
+					</p1:GCheck>
+					<p1:GGroup text="MOSI" manifestObj="true" widgetName="ggroup_txpinconfig">
+						<p1:GGroup.layoutData>
+							<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" visible="true" manifestObj="true" widgetName="glabel_txpincharactristics">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_txpincharactristics" options="Push Pull&#13;&#10;Open Drain&#13;&#10;" toolTipText="Transmit pin output driver mode:&#13;&#10;(Push pull/ Open drain)" value="Push Pull" description="Push pull / open drain functionality can be selected for transmit (output) pin.">
+							<p1:GCombo.layoutData>
+								<GridData horizontalAlignment="FILL" widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel text="Driver strength:" visible="true" widgetName="glabel_txpin_driverstrength" manifestObj="true">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_txpin_driverstrength" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" value="Don&apos;t Care" description="Configures the output driver strength and the slew rate for transmit pin.&#13;&#10;Note that the pad driver mode registers are specific for each port.&#13;&#10;It is recommended to make this configuration before selecting the pins manually. The strength selected will be configured for MOSI pin in full duplex mode. In half duplex operation mode, the strength will be configured for the common MOSI/MISO pin. This selection will be configured for all the data pins in dual and quad operation modes." toolTipText="Select the output drive strength and the slew rate for transmit pin.">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="SCLK" widgetName="ggroup_clkoutpinconfig">
+						<p1:GGroup.layoutData>
+							<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel manifestObj="true" text="Mode:" widgetName="glabel_clkoutpin_charactristics">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="Push pull / open drain functionality can be selected for transmit (output) pin." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Push Pull&#13;&#10;Open Drain&#13;&#10;" toolTipText="Transmit pin output driver mode:&#13;&#10;(Push pull/ Open drain)" value="Push Pull" widgetName="gcombo_clkoutpin_charactristics">
+							<p1:GCombo.layoutData>
+								<GridData grabExcessHorizontalSpace="true" widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Driver strength:" visible="true" widgetName="glabel_clkoutpin_driverstrength">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="Configures the output driver strength and the slew rate for transmit pin.&#13;&#10;Note that the pad driver mode registers are specific for each port." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" toolTipText="Select the output drive strength and the slew rate for Shift clock pin." value="Don&apos;t Care" widgetName="gcombo_clkoutpin_driverstrength">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup manifestObj="true" text="Slave Select" widgetName="ggroup_sspinconfig">
+						<p1:GGroup.layoutData>
+							<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" horizontalSpacing="10" verticalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel manifestObj="true" text="Mode:" widgetName="glabel_sspin_charactristics">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="Push pull / open drain functionality can be selected for transmit (output) pin." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Push Pull&#13;&#10;Open Drain&#13;&#10;" toolTipText="Transmit pin output driver mode:&#13;&#10;(Push pull/ Open drain)" value="Push Pull" widgetName="gcombo_sspin_charactristics">
+							<p1:GCombo.layoutData>
+								<GridData grabExcessHorizontalSpace="true" widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Driver strength:" visible="true" widgetName="glabel_sspin_driverstrength">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo description="Configures the output driver strength and the slew rate for transmit pin.&#13;&#10;Note that the pad driver mode registers are specific for each port." mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Don&apos;t Care&#13;&#10;Weak Driver&#13;&#10;Medium Driver&#13;&#10;Strong Driver Soft Edge&#13;&#10;Strong Driver Slow Edge&#13;&#10;Strong Driver Sharp Edge&#13;&#10;Strong Driver Medium Edge" toolTipText="Select the output drive strength and the slew rate for slave select pin." value="Don&apos;t Care" widgetName="gcombo_sspin_driverstrength">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+					<p1:GGroup text="MISO" widgetName="ggroup_rxpinconfig" manifestObj="true">
+						<p1:GGroup.layoutData>
+							<GridData grabExcessHorizontalSpace="true" horizontalAlignment="FILL"/>
+						</p1:GGroup.layoutData>
+						<p1:GGroup.layout>
+							<GridLayout numColumns="2" verticalSpacing="10" horizontalSpacing="10"/>
+						</p1:GGroup.layout>
+						<p1:GLabel text="Mode:" visible="true" manifestObj="true" widgetName="glabel_rxpincharacteristics">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" widgetName="gcombo_rxpincharacteristics" options="Tristate&#13;&#10;Pull Down&#13;&#10;Pull Up&#13;&#10;Continuous Sampling Mode&#13;&#10;Inverted Tristate&#13;&#10;Inverted Pull Down&#13;&#10;Inverted Pull Up&#13;&#10;Inverted Continuous Sampling Mode&#13;&#10;" value="Tristate" description="Pull up / pull down characteristics can be selected for receive ( input ) pin. " toolTipText="Select the input pull characteristics">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+						<p1:GLabel manifestObj="true" text="Hysteresis:" visible="true" widgetName="glabel_hysteresis">
+							<p1:GLabel.layoutData>
+								<GridData widthHint="80"/>
+							</p1:GLabel.layoutData>
+						</p1:GLabel>
+						<p1:GCombo mandatory="(com.ifx.davex.ui.controls.util.AppUiConstants).FALSE" manifestObj="true" options="Standard&#13;&#10;Large" value="Standard" visible="true" widgetName="gcombo_hysteresis" toolTipText="Receive pin input hysteresis (Standard/Large)" description="XMC1000 family devices allow selection of input port pin hysteresis. User can change the receive pin hysteresis to large hysteresis from the default standard hysteresis.">
+							<p1:GCombo.layoutData>
+								<GridData widthHint="275"/>
+							</p1:GCombo.layoutData>
+						</p1:GCombo>
+					</p1:GGroup>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+		<p1:GTab text="Dummy Tab" visible="true" enabled="true" manifestObj="true" widgetName="gtab_dummy">
+			<p1:GTab.control>
+				<p1:Tab widgetName="composite_1">
+					<p1:GLabel text="tx callback" visible="true" manifestObj="true" widgetName="glabel_tx_callback" bounds="37, 42, 97, 29"/>
+					<p1:GLabel bounds="37, 77, 85, 25" manifestObj="true" text="rx callback" widgetName="glabel_rx_callback"/>
+					<p1:GLabel bounds="34, 110, 101, 23" manifestObj="true" text="parity callback" widgetName="glabel_parity_error_callback"/>
+				</p1:Tab>
+			</p1:GTab.control>
+		</p1:GTab>
+	</p1:TabFolder>
+</p1:Tab>

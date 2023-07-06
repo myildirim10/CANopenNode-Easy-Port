@@ -1,0 +1,168 @@
+package Model.APPS.SPI_MASTER.v4_3_30.Templates;
+
+import Model.APPS.SPI_MASTER.v4_3_30.SPI_MASTER
+
+out.print("""
+/**
+ * @cond
+ ***********************************************************************************************************************
+ *
+ * Copyright (c) 2015-2020, Infineon Technologies AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the
+ * following conditions are met:
+ *
+ *   Redistributions of source code must retain the above copyright notice, this list of conditions and the  following
+ *   disclaimer.
+ *
+ *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *   following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *   Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote
+ *   products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT  OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes
+ * with Infineon Technologies AG (dave@infineon.com).
+ ***********************************************************************************************************************
+ *
+ * Change History
+ * --------------
+ *
+ * 2015-02-16:
+ *     - Initial version<br>
+ *
+ * 2015-05-08:
+ *     - C++ guard is removed.<br>
+ *     - File is guard is changed according to the coding guidelines<br>
+ *
+ * 2015-06-20:
+ *     - Code generation for parity error is generated after selecting the parity type and enabling the callback in 
+ *        interrupt settings tab.<br>
+ *
+ * @endcond
+ *
+ */
+#ifndef SPI_MASTER_CONF_H
+#define SPI_MASTER_CONF_H
+
+/***********************************************************************************************************************
+ * HEADER FILES
+ **********************************************************************************************************************/
+
+/***********************************************************************************************************************
+ * MACROS
+ **********************************************************************************************************************/
+#define SPI_MASTER_MAJOR_VERSION (${SPI_MASTER.version.split("\\.")[0]}U)
+#define SPI_MASTER_MINOR_VERSION (${SPI_MASTER.version.split("\\.")[1]}U)
+#define SPI_MASTER_PATCH_VERSION (${SPI_MASTER.version.split("\\.")[2]}U)
+""")
+List MappedUri = null
+List TxInterrupt_Uri = null
+List RxInterrupt_Uri = null
+List ErrInterrupt_Uri = null
+String  spi_transmit_mode = null
+String Tx_node = null
+String Rx_node = null
+String Err_node = null
+Integer parity_error_enabled = 0
+Integer tx_direct_mode = 0
+Integer rx_direct_mode = 0
+Integer tx_dma_mode = 0
+Integer rx_dma_mode = 0
+Integer tx_interrupt_mode = 0
+Integer rx_interrupt_mode = 0
+for (SPI_MASTER spiInst : appInstancesList ) {
+	MappedUri = spiInst.hwres_usic_channel.getSolverUri()
+	
+	TxInterrupt_Uri = spiInst.hwres_cpu_nvic_interrupt_tx.getSolverUri();
+	RxInterrupt_Uri = spiInst.hwres_cpu_nvic_interrupt_rx.getSolverUri();
+	ErrInterrupt_Uri = spiInst.hwres_cpu_nvic_interrupt_error.getSolverUri();
+	
+  if (spiInst.gcombo_transmit_mode.value == "Interrupt")
+  {
+	Tx_node = TxInterrupt_Uri[-1]
+  }
+  if (spiInst.gcombo_receive_mode.value == "Interrupt")
+  {
+	Rx_node = RxInterrupt_Uri[-1]
+  }	
+    if((spiInst.gcheck_parity_error.value) && (spiInst.gcombo_parity.value != "None"))
+  {
+    Err_node = ErrInterrupt_Uri[-1]
+  }
+	  
+  if(spiInst.gcombo_transmit_mode.value == "Direct")
+  {
+    tx_direct_mode++;
+  }
+  else if(spiInst.gcombo_transmit_mode.value == "DMA")
+  {
+    tx_dma_mode++;
+  }
+  else
+  {
+	  tx_interrupt_mode++;
+	  out.print("""
+#define ${spiInst.getInstanceLabel()}_tx_handler     IRQ_Hdlr_${Tx_node}
+          """);
+  }
+
+  if(spiInst.gcombo_receive_mode.value == "Direct")
+  {
+    rx_direct_mode++;
+  }
+  else if(spiInst.gcombo_receive_mode.value == "DMA")
+  {
+	rx_dma_mode++;
+  } 
+  else
+  {
+	rx_interrupt_mode++;
+	  out.print("""
+#define ${spiInst.getInstanceLabel()}_rx_handler     IRQ_Hdlr_${Rx_node}
+          """);
+  }
+  
+if((spiInst.gcheck_parity_error.value) && (spiInst.gcombo_parity.value != "None"))
+  {
+	parity_error_enabled++;
+  out.print("""
+#define ${spiInst.getInstanceLabel()}_err_handler    IRQ_Hdlr_${Err_node}
+          """);
+  }
+}
+       out.print("""
+/* This is used to disable the code for Transmit handler */
+#define SPI_MASTER_DIRECT_TRANSMIT_MODE  ${if(tx_direct_mode > 0) "(1U)" else "(0U)"}
+
+/* This is used to disable the code for Receive handler */
+#define SPI_MASTER_DIRECT_RECEIVE_MODE   ${if(rx_direct_mode > 0) "(1U)" else "(0U)"}
+
+/* This is used to include the dma header file */
+#define SPI_MASTER_DMA_TRANSMIT_MODE     ${if(tx_dma_mode > 0) "(1U)" else "(0U)"}
+
+/* This is used to include the dma header file */
+#define SPI_MASTER_DMA_RECEIVE_MODE      ${if(rx_dma_mode > 0) "(1U)" else "(0U)"}
+
+/* This is used to include the dma header file */
+#define SPI_MASTER_INTERRUPT_TRANSMIT_MODE     ${if(tx_interrupt_mode > 0) "(1U)" else "(0U)"}
+
+/* This is used to include the dma header file */
+#define SPI_MASTER_INTERRUPT_RECEIVE_MODE      ${if(rx_interrupt_mode > 0) "(1U)" else "(0U)"}
+
+/* This is used to enable the code for parity error */
+#define SPI_MASTER_PARITY_ERROR          ${if(parity_error_enabled > 0) "(1U)" else "(0U)"}
+          """);
+	  
+out.print("""
+#endif /* End of SPI_MASTER_CONF_H */
+""");

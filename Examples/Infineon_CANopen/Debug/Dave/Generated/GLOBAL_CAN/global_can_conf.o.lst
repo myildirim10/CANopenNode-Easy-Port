@@ -1,0 +1,43 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "global_can_conf.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .global GLOBAL_CAN_0
+  20              	 .section .data.GLOBAL_CAN_0,"aw",%progbits
+  21              	 .align 2
+  24              	GLOBAL_CAN_0:
+  25 0000 00449508 	 .word 144000000
+  26 0004 00400148 	 .word 1208041472
+  27 0008 01       	 .byte 1
+  28 0009 000000   	 .space 3
+  29              	 .text
+  30              	.Letext0:
+  31              	 .file 1 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+  32              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+  33              	 .file 3 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/XMC4800.h"
+  34              	 .file 4 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc_can.h"
+  35              	 .file 5 "../Dave/Generated/GLOBAL_CAN/global_can.h"
+  36              	 .file 6 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/cmsis_gcc.h"
+  37              	 .file 7 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/core_cm4.h"
+  38              	 .file 8 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/system_XMC4800.h"
+  39              	 .file 9 "../Dave/Generated/GLOBAL_CAN/global_can_conf.c"
+DEFINED SYMBOLS
+                            *ABS*:00000000 global_can_conf.c
+    {standard input}:24     .data.GLOBAL_CAN_0:00000000 GLOBAL_CAN_0
+    {standard input}:21     .data.GLOBAL_CAN_0:00000000 $d
+
+NO UNDEFINED SYMBOLS

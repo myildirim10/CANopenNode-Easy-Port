@@ -1,0 +1,72 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "timer_conf.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .global TIMER_0_config
+  20              	 .section .data.TIMER_0_config,"aw",%progbits
+  21              	 .align 2
+  24              	TIMER_0_config:
+  25 0000 00       	 .byte 0
+  26 0001 00       	 .byte 0
+  27 0002 00       	 .byte 0
+  28 0003 00       	 .byte 0
+  29 0004 02       	 .byte 2
+  30 0005 00       	 .byte 0
+  31 0006 0000     	 .space 2
+  32              	 .global TIMER_0
+  33              	 .section .data.TIMER_0,"aw",%progbits
+  34              	 .align 2
+  37              	TIMER_0:
+  38 0000 A0860100 	 .word 100000
+  39 0004 3435E358 	 .word 1491285300
+  40 0008 0A000000 	 .word 10
+  41 000c 00500000 	 .word 20480
+  42 0010 00000000 	 .word GLOBAL_CCU4_0
+  43 0014 00440048 	 .word 1207976960
+  44 0018 03       	 .byte 3
+  45 0019 000000   	 .space 3
+  46 001c 00000000 	 .word TIMER_0_config
+  47 0020 01       	 .byte 1
+  48 0021 00       	 .byte 0
+  49 0022 9F8C     	 .short -29537
+  50 0024 01       	 .byte 1
+  51 0025 01       	 .byte 1
+  52 0026 00       	 .byte 0
+  53 0027 00       	 .space 1
+  54              	 .text
+  55              	.Letext0:
+  56              	 .file 1 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+  57              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+  58              	 .file 3 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/XMC4800.h"
+  59              	 .file 4 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc_ccu4.h"
+  60              	 .file 5 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/XMCLib/inc/xmc4_scu.h"
+  61              	 .file 6 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/GLOBAL_CCU4/global_ccu4.h"
+  62              	 .file 7 "../Dave/Generated/TIMER/timer.h"
+  63              	 .file 8 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/cmsis_gcc.h"
+  64              	 .file 9 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Include/core_cm4.h"
+  65              	 .file 10 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Libraries/CMSIS/Infineon/XMC4800_series/Include/system_XMC4800.h"
+  66              	 .file 11 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/Dave/Generated/GLOBAL_CCU4/global_ccu4_extern.h"
+  67              	 .file 12 "../Dave/Generated/TIMER/timer_conf.c"
+DEFINED SYMBOLS
+                            *ABS*:00000000 timer_conf.c
+    {standard input}:24     .data.TIMER_0_config:00000000 TIMER_0_config
+    {standard input}:21     .data.TIMER_0_config:00000000 $d
+    {standard input}:37     .data.TIMER_0:00000000 TIMER_0
+    {standard input}:34     .data.TIMER_0:00000000 $d
+
+UNDEFINED SYMBOLS
+GLOBAL_CCU4_0

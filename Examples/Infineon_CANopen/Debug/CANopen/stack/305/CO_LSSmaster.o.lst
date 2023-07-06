@@ -1,0 +1,42 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "CO_LSSmaster.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .rodata.CO_LSS_bitTimingTableLookup,"a",%progbits
+  20              	 .align 2
+  23              	CO_LSS_bitTimingTableLookup:
+  24 0000 E803     	 .short 1000
+  25 0002 2003     	 .short 800
+  26 0004 F401     	 .short 500
+  27 0006 FA00     	 .short 250
+  28 0008 7D00     	 .short 125
+  29 000a 0000     	 .short 0
+  30 000c 3200     	 .short 50
+  31 000e 1400     	 .short 20
+  32 0010 0A00     	 .short 10
+  33 0012 0000     	 .short 0
+  34              	 .text
+  35              	.Letext0:
+  36              	 .file 1 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+  37              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+  38              	 .file 3 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/305/CO_LSS.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 CO_LSSmaster.c
+    {standard input}:20     .rodata.CO_LSS_bitTimingTableLookup:00000000 $d
+    {standard input}:23     .rodata.CO_LSS_bitTimingTableLookup:00000000 CO_LSS_bitTimingTableLookup
+
+NO UNDEFINED SYMBOLS

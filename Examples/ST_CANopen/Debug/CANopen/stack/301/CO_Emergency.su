@@ -1,0 +1,12 @@
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_driver.h:740:23:CO_getUint8	24	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_driver.h:760:23:CO_setUint8	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_driver.h:768:23:CO_setUint32	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:439:24:OD_getIndex	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:588:21:OD_extension_init	16	static
+D:/Workspace/Development/my/ST_CanBus/CANopen/stack/301/CO_ODinterface.h:664:21:OD_get_u32	32	static
+../CANopen/stack/301/CO_Emergency.c:129:14:OD_read_1014_default	32	static
+../CANopen/stack/301/CO_Emergency.c:182:14:OD_read_1003	32	static
+../CANopen/stack/301/CO_Emergency.c:222:14:OD_write_1003	32	static
+../CANopen/stack/301/CO_Emergency.c:344:18:CO_EM_init	40	static
+../CANopen/stack/301/CO_Emergency.c:554:6:CO_EM_process	40	static
+../CANopen/stack/301/CO_Emergency.c:713:6:CO_error	48	static

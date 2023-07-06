@@ -1,0 +1,1726 @@
+   1              	 .syntax unified
+   2              	 .cpu cortex-m4
+   3              	 .eabi_attribute 27,3
+   4              	 .fpu fpv4-sp-d16
+   5              	 .eabi_attribute 20,1
+   6              	 .eabi_attribute 21,1
+   7              	 .eabi_attribute 23,3
+   8              	 .eabi_attribute 24,1
+   9              	 .eabi_attribute 25,1
+  10              	 .eabi_attribute 26,1
+  11              	 .eabi_attribute 30,6
+  12              	 .eabi_attribute 34,1
+  13              	 .eabi_attribute 18,4
+  14              	 .thumb
+  15              	 .file "CO_ODinterface.c"
+  16              	 .text
+  17              	.Ltext0:
+  18              	 .cfi_sections .debug_frame
+  19              	 .section .text.OD_readOriginal,"ax",%progbits
+  20              	 .align 2
+  21              	 .global OD_readOriginal
+  22              	 .thumb
+  23              	 .thumb_func
+  25              	OD_readOriginal:
+  26              	.LFB33:
+  27              	 .file 1 "../CANopen/stack/301/CO_ODinterface.c"
+   1:../CANopen/stack/301/CO_ODinterface.c **** /*
+   2:../CANopen/stack/301/CO_ODinterface.c ****  * CANopen Object Dictionary interface
+   3:../CANopen/stack/301/CO_ODinterface.c ****  *
+   4:../CANopen/stack/301/CO_ODinterface.c ****  * @file        CO_ODinterface.c
+   5:../CANopen/stack/301/CO_ODinterface.c ****  * @author      Janez Paternoster
+   6:../CANopen/stack/301/CO_ODinterface.c ****  * @copyright   2020 Janez Paternoster
+   7:../CANopen/stack/301/CO_ODinterface.c ****  *
+   8:../CANopen/stack/301/CO_ODinterface.c ****  * This file is part of CANopenNode, an opensource CANopen Stack.
+   9:../CANopen/stack/301/CO_ODinterface.c ****  * Project home page is <https://github.com/CANopenNode/CANopenNode>.
+  10:../CANopen/stack/301/CO_ODinterface.c ****  * For more information on CANopen see <http://www.can-cia.org/>.
+  11:../CANopen/stack/301/CO_ODinterface.c ****  *
+  12:../CANopen/stack/301/CO_ODinterface.c ****  * Licensed under the Apache License, Version 2.0 (the "License");
+  13:../CANopen/stack/301/CO_ODinterface.c ****  * you may not use this file except in compliance with the License.
+  14:../CANopen/stack/301/CO_ODinterface.c ****  * You may obtain a copy of the License at
+  15:../CANopen/stack/301/CO_ODinterface.c ****  *
+  16:../CANopen/stack/301/CO_ODinterface.c ****  *     http://www.apache.org/licenses/LICENSE-2.0
+  17:../CANopen/stack/301/CO_ODinterface.c ****  *
+  18:../CANopen/stack/301/CO_ODinterface.c ****  * Unless required by applicable law or agreed to in writing, software
+  19:../CANopen/stack/301/CO_ODinterface.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  20:../CANopen/stack/301/CO_ODinterface.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  21:../CANopen/stack/301/CO_ODinterface.c ****  * See the License for the specific language governing permissions and
+  22:../CANopen/stack/301/CO_ODinterface.c ****  * limitations under the License.
+  23:../CANopen/stack/301/CO_ODinterface.c ****  */
+  24:../CANopen/stack/301/CO_ODinterface.c **** 
+  25:../CANopen/stack/301/CO_ODinterface.c **** #include <string.h>
+  26:../CANopen/stack/301/CO_ODinterface.c **** #define OD_DEFINITION
+  27:../CANopen/stack/301/CO_ODinterface.c **** #include "301/CO_ODinterface.h"
+  28:../CANopen/stack/301/CO_ODinterface.c **** 
+  29:../CANopen/stack/301/CO_ODinterface.c **** 
+  30:../CANopen/stack/301/CO_ODinterface.c **** /******************************************************************************/
+  31:../CANopen/stack/301/CO_ODinterface.c **** ODR_t OD_readOriginal(OD_stream_t *stream, void *buf,
+  32:../CANopen/stack/301/CO_ODinterface.c ****                       OD_size_t count, OD_size_t *countRead)
+  33:../CANopen/stack/301/CO_ODinterface.c **** {
+  28              	 .loc 1 33 0
+  29              	 .cfi_startproc
+  30              	 
+  31              	 
+  32 0000 80B5     	 push {r7,lr}
+  33              	.LCFI0:
+  34              	 .cfi_def_cfa_offset 8
+  35              	 .cfi_offset 7,-8
+  36              	 .cfi_offset 14,-4
+  37 0002 88B0     	 sub sp,sp,#32
+  38              	.LCFI1:
+  39              	 .cfi_def_cfa_offset 40
+  40 0004 00AF     	 add r7,sp,#0
+  41              	.LCFI2:
+  42              	 .cfi_def_cfa_register 7
+  43 0006 F860     	 str r0,[r7,#12]
+  44 0008 B960     	 str r1,[r7,#8]
+  45 000a 7A60     	 str r2,[r7,#4]
+  46 000c 3B60     	 str r3,[r7]
+  34:../CANopen/stack/301/CO_ODinterface.c ****     if (stream == NULL || buf == NULL || countRead == NULL) {
+  47              	 .loc 1 34 0
+  48 000e FB68     	 ldr r3,[r7,#12]
+  49 0010 002B     	 cmp r3,#0
+  50 0012 05D0     	 beq .L2
+  51              	 .loc 1 34 0 is_stmt 0 discriminator 1
+  52 0014 BB68     	 ldr r3,[r7,#8]
+  53 0016 002B     	 cmp r3,#0
+  54 0018 02D0     	 beq .L2
+  55              	 .loc 1 34 0 discriminator 2
+  56 001a 3B68     	 ldr r3,[r7]
+  57 001c 002B     	 cmp r3,#0
+  58 001e 01D1     	 bne .L3
+  59              	.L2:
+  35:../CANopen/stack/301/CO_ODinterface.c ****         return ODR_DEV_INCOMPAT;
+  60              	 .loc 1 35 0 is_stmt 1
+  61 0020 0923     	 movs r3,#9
+  62 0022 40E0     	 b .L4
+  63              	.L3:
+  36:../CANopen/stack/301/CO_ODinterface.c ****     }
+  37:../CANopen/stack/301/CO_ODinterface.c **** 
+  38:../CANopen/stack/301/CO_ODinterface.c ****     OD_size_t dataLenToCopy = stream->dataLength; /* length of OD variable */
+  64              	 .loc 1 38 0
+  65 0024 FB68     	 ldr r3,[r7,#12]
+  66 0026 9B68     	 ldr r3,[r3,#8]
+  67 0028 FB61     	 str r3,[r7,#28]
+  39:../CANopen/stack/301/CO_ODinterface.c ****     const uint8_t *dataOrig = stream->dataOrig;
+  68              	 .loc 1 39 0
+  69 002a FB68     	 ldr r3,[r7,#12]
+  70 002c 1B68     	 ldr r3,[r3]
+  71 002e BB61     	 str r3,[r7,#24]
+  40:../CANopen/stack/301/CO_ODinterface.c **** 
+  41:../CANopen/stack/301/CO_ODinterface.c ****     if (dataOrig == NULL) {
+  72              	 .loc 1 41 0
+  73 0030 BB69     	 ldr r3,[r7,#24]
+  74 0032 002B     	 cmp r3,#0
+  75 0034 01D1     	 bne .L5
+  42:../CANopen/stack/301/CO_ODinterface.c ****         return ODR_SUB_NOT_EXIST;
+  76              	 .loc 1 42 0
+  77 0036 0E23     	 movs r3,#14
+  78 0038 35E0     	 b .L4
+  79              	.L5:
+  43:../CANopen/stack/301/CO_ODinterface.c ****     }
+  44:../CANopen/stack/301/CO_ODinterface.c **** 
+  45:../CANopen/stack/301/CO_ODinterface.c ****     ODR_t returnCode = ODR_OK;
+  80              	 .loc 1 45 0
+  81 003a 0023     	 movs r3,#0
+  82 003c FB75     	 strb r3,[r7,#23]
+  46:../CANopen/stack/301/CO_ODinterface.c **** 
+  47:../CANopen/stack/301/CO_ODinterface.c ****     /* If previous read was partial or OD variable length is larger than
+  48:../CANopen/stack/301/CO_ODinterface.c ****      * current buffer size, then data was (will be) read in several segments */
+  49:../CANopen/stack/301/CO_ODinterface.c ****     if (stream->dataOffset > 0 || dataLenToCopy > count) {
+  83              	 .loc 1 49 0
+  84 003e FB68     	 ldr r3,[r7,#12]
+  85 0040 DB68     	 ldr r3,[r3,#12]
+  86 0042 002B     	 cmp r3,#0
+  87 0044 03D1     	 bne .L6
+  88              	 .loc 1 49 0 is_stmt 0 discriminator 1
+  89 0046 FA69     	 ldr r2,[r7,#28]
+  90 0048 7B68     	 ldr r3,[r7,#4]
+  91 004a 9A42     	 cmp r2,r3
+  92 004c 22D9     	 bls .L7
+  93              	.L6:
+  50:../CANopen/stack/301/CO_ODinterface.c ****         if (stream->dataOffset >= dataLenToCopy) {
+  94              	 .loc 1 50 0 is_stmt 1
+  95 004e FB68     	 ldr r3,[r7,#12]
+  96 0050 DA68     	 ldr r2,[r3,#12]
+  97 0052 FB69     	 ldr r3,[r7,#28]
+  98 0054 9A42     	 cmp r2,r3
+  99 0056 01D3     	 bcc .L8
+  51:../CANopen/stack/301/CO_ODinterface.c ****             return ODR_DEV_INCOMPAT;
+ 100              	 .loc 1 51 0
+ 101 0058 0923     	 movs r3,#9
+ 102 005a 24E0     	 b .L4
+ 103              	.L8:
+  52:../CANopen/stack/301/CO_ODinterface.c ****         }
+  53:../CANopen/stack/301/CO_ODinterface.c ****         /* Reduce for already copied data */
+  54:../CANopen/stack/301/CO_ODinterface.c ****         dataLenToCopy -= stream->dataOffset;
+ 104              	 .loc 1 54 0
+ 105 005c FB68     	 ldr r3,[r7,#12]
+ 106 005e DB68     	 ldr r3,[r3,#12]
+ 107 0060 FA69     	 ldr r2,[r7,#28]
+ 108 0062 D31A     	 subs r3,r2,r3
+ 109 0064 FB61     	 str r3,[r7,#28]
+  55:../CANopen/stack/301/CO_ODinterface.c ****         dataOrig += stream->dataOffset;
+ 110              	 .loc 1 55 0
+ 111 0066 FB68     	 ldr r3,[r7,#12]
+ 112 0068 DB68     	 ldr r3,[r3,#12]
+ 113 006a BA69     	 ldr r2,[r7,#24]
+ 114 006c 1344     	 add r3,r3,r2
+ 115 006e BB61     	 str r3,[r7,#24]
+  56:../CANopen/stack/301/CO_ODinterface.c **** 
+  57:../CANopen/stack/301/CO_ODinterface.c ****         if (dataLenToCopy > count) {
+ 116              	 .loc 1 57 0
+ 117 0070 FA69     	 ldr r2,[r7,#28]
+ 118 0072 7B68     	 ldr r3,[r7,#4]
+ 119 0074 9A42     	 cmp r2,r3
+ 120 0076 0AD9     	 bls .L9
+  58:../CANopen/stack/301/CO_ODinterface.c ****             /* Not enough space in destination buffer */
+  59:../CANopen/stack/301/CO_ODinterface.c ****             dataLenToCopy = count;
+ 121              	 .loc 1 59 0
+ 122 0078 7B68     	 ldr r3,[r7,#4]
+ 123 007a FB61     	 str r3,[r7,#28]
+  60:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOffset += dataLenToCopy;
+ 124              	 .loc 1 60 0
+ 125 007c FB68     	 ldr r3,[r7,#12]
+ 126 007e DA68     	 ldr r2,[r3,#12]
+ 127 0080 FB69     	 ldr r3,[r7,#28]
+ 128 0082 1A44     	 add r2,r2,r3
+ 129 0084 FB68     	 ldr r3,[r7,#12]
+ 130 0086 DA60     	 str r2,[r3,#12]
+  61:../CANopen/stack/301/CO_ODinterface.c ****             returnCode = ODR_PARTIAL;
+ 131              	 .loc 1 61 0
+ 132 0088 FF23     	 movs r3,#255
+ 133 008a FB75     	 strb r3,[r7,#23]
+ 134 008c 02E0     	 b .L7
+ 135              	.L9:
+  62:../CANopen/stack/301/CO_ODinterface.c ****         }
+  63:../CANopen/stack/301/CO_ODinterface.c ****         else {
+  64:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOffset = 0; /* copy finished, reset offset */
+ 136              	 .loc 1 64 0
+ 137 008e FB68     	 ldr r3,[r7,#12]
+ 138 0090 0022     	 movs r2,#0
+ 139 0092 DA60     	 str r2,[r3,#12]
+ 140              	.L7:
+  65:../CANopen/stack/301/CO_ODinterface.c ****         }
+  66:../CANopen/stack/301/CO_ODinterface.c ****     }
+  67:../CANopen/stack/301/CO_ODinterface.c **** 
+  68:../CANopen/stack/301/CO_ODinterface.c **** #if (C2000_PORT != 0)
+  69:../CANopen/stack/301/CO_ODinterface.c ****     if((stream->attribute & ODA_STR) == 0) {
+  70:../CANopen/stack/301/CO_ODinterface.c ****         if(stream->dataLength <= 2) {
+  71:../CANopen/stack/301/CO_ODinterface.c ****             /* For C2000, length of uint8_t and uint16_t OD variable is 1 */
+  72:../CANopen/stack/301/CO_ODinterface.c ****             memcpy(buf, dataOrig, 1);
+  73:../CANopen/stack/301/CO_ODinterface.c ****         } else {
+  74:../CANopen/stack/301/CO_ODinterface.c ****             memcpy(buf, dataOrig, dataLenToCopy / 2);
+  75:../CANopen/stack/301/CO_ODinterface.c ****         }
+  76:../CANopen/stack/301/CO_ODinterface.c ****     } else {
+  77:../CANopen/stack/301/CO_ODinterface.c ****         /* As-is for string */
+  78:../CANopen/stack/301/CO_ODinterface.c ****         memcpy(buf, dataOrig, dataLenToCopy);
+  79:../CANopen/stack/301/CO_ODinterface.c ****     }
+  80:../CANopen/stack/301/CO_ODinterface.c **** #else
+  81:../CANopen/stack/301/CO_ODinterface.c ****     memcpy(buf, dataOrig, dataLenToCopy);
+ 141              	 .loc 1 81 0
+ 142 0094 B868     	 ldr r0,[r7,#8]
+ 143 0096 B969     	 ldr r1,[r7,#24]
+ 144 0098 FA69     	 ldr r2,[r7,#28]
+ 145 009a FFF7FEFF 	 bl memcpy
+  82:../CANopen/stack/301/CO_ODinterface.c **** #endif
+  83:../CANopen/stack/301/CO_ODinterface.c **** 
+  84:../CANopen/stack/301/CO_ODinterface.c ****     *countRead = dataLenToCopy;
+ 146              	 .loc 1 84 0
+ 147 009e 3B68     	 ldr r3,[r7]
+ 148 00a0 FA69     	 ldr r2,[r7,#28]
+ 149 00a2 1A60     	 str r2,[r3]
+  85:../CANopen/stack/301/CO_ODinterface.c ****     return returnCode;
+ 150              	 .loc 1 85 0
+ 151 00a4 FB7D     	 ldrb r3,[r7,#23]
+ 152              	.L4:
+ 153 00a6 5BB2     	 sxtb r3,r3
+  86:../CANopen/stack/301/CO_ODinterface.c **** }
+ 154              	 .loc 1 86 0
+ 155 00a8 1846     	 mov r0,r3
+ 156 00aa 2037     	 adds r7,r7,#32
+ 157              	.LCFI3:
+ 158              	 .cfi_def_cfa_offset 8
+ 159 00ac BD46     	 mov sp,r7
+ 160              	.LCFI4:
+ 161              	 .cfi_def_cfa_register 13
+ 162              	 
+ 163 00ae 80BD     	 pop {r7,pc}
+ 164              	 .cfi_endproc
+ 165              	.LFE33:
+ 167              	 .section .text.OD_writeOriginal,"ax",%progbits
+ 168              	 .align 2
+ 169              	 .global OD_writeOriginal
+ 170              	 .thumb
+ 171              	 .thumb_func
+ 173              	OD_writeOriginal:
+ 174              	.LFB34:
+  87:../CANopen/stack/301/CO_ODinterface.c **** 
+  88:../CANopen/stack/301/CO_ODinterface.c **** /******************************************************************************/
+  89:../CANopen/stack/301/CO_ODinterface.c **** ODR_t OD_writeOriginal(OD_stream_t *stream, const void *buf,
+  90:../CANopen/stack/301/CO_ODinterface.c ****                        OD_size_t count, OD_size_t *countWritten)
+  91:../CANopen/stack/301/CO_ODinterface.c **** {
+ 175              	 .loc 1 91 0
+ 176              	 .cfi_startproc
+ 177              	 
+ 178              	 
+ 179 0000 80B5     	 push {r7,lr}
+ 180              	.LCFI5:
+ 181              	 .cfi_def_cfa_offset 8
+ 182              	 .cfi_offset 7,-8
+ 183              	 .cfi_offset 14,-4
+ 184 0002 88B0     	 sub sp,sp,#32
+ 185              	.LCFI6:
+ 186              	 .cfi_def_cfa_offset 40
+ 187 0004 00AF     	 add r7,sp,#0
+ 188              	.LCFI7:
+ 189              	 .cfi_def_cfa_register 7
+ 190 0006 F860     	 str r0,[r7,#12]
+ 191 0008 B960     	 str r1,[r7,#8]
+ 192 000a 7A60     	 str r2,[r7,#4]
+ 193 000c 3B60     	 str r3,[r7]
+  92:../CANopen/stack/301/CO_ODinterface.c ****     if (stream == NULL || buf == NULL || countWritten == NULL) {
+ 194              	 .loc 1 92 0
+ 195 000e FB68     	 ldr r3,[r7,#12]
+ 196 0010 002B     	 cmp r3,#0
+ 197 0012 05D0     	 beq .L11
+ 198              	 .loc 1 92 0 is_stmt 0 discriminator 1
+ 199 0014 BB68     	 ldr r3,[r7,#8]
+ 200 0016 002B     	 cmp r3,#0
+ 201 0018 02D0     	 beq .L11
+ 202              	 .loc 1 92 0 discriminator 2
+ 203 001a 3B68     	 ldr r3,[r7]
+ 204 001c 002B     	 cmp r3,#0
+ 205 001e 01D1     	 bne .L12
+ 206              	.L11:
+  93:../CANopen/stack/301/CO_ODinterface.c ****         return ODR_DEV_INCOMPAT;
+ 207              	 .loc 1 93 0 is_stmt 1
+ 208 0020 0923     	 movs r3,#9
+ 209 0022 46E0     	 b .L13
+ 210              	.L12:
+  94:../CANopen/stack/301/CO_ODinterface.c ****     }
+  95:../CANopen/stack/301/CO_ODinterface.c **** 
+  96:../CANopen/stack/301/CO_ODinterface.c ****     OD_size_t dataLenToCopy = stream->dataLength; /* length of OD variable */
+ 211              	 .loc 1 96 0
+ 212 0024 FB68     	 ldr r3,[r7,#12]
+ 213 0026 9B68     	 ldr r3,[r3,#8]
+ 214 0028 FB61     	 str r3,[r7,#28]
+  97:../CANopen/stack/301/CO_ODinterface.c ****     uint8_t *dataOrig = stream->dataOrig;
+ 215              	 .loc 1 97 0
+ 216 002a FB68     	 ldr r3,[r7,#12]
+ 217 002c 1B68     	 ldr r3,[r3]
+ 218 002e BB61     	 str r3,[r7,#24]
+  98:../CANopen/stack/301/CO_ODinterface.c **** 
+  99:../CANopen/stack/301/CO_ODinterface.c ****     if (dataOrig == NULL) {
+ 219              	 .loc 1 99 0
+ 220 0030 BB69     	 ldr r3,[r7,#24]
+ 221 0032 002B     	 cmp r3,#0
+ 222 0034 01D1     	 bne .L14
+ 100:../CANopen/stack/301/CO_ODinterface.c ****         return ODR_SUB_NOT_EXIST;
+ 223              	 .loc 1 100 0
+ 224 0036 0E23     	 movs r3,#14
+ 225 0038 3BE0     	 b .L13
+ 226              	.L14:
+ 101:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 102:../CANopen/stack/301/CO_ODinterface.c **** 
+ 103:../CANopen/stack/301/CO_ODinterface.c ****     ODR_t returnCode = ODR_OK;
+ 227              	 .loc 1 103 0
+ 228 003a 0023     	 movs r3,#0
+ 229 003c FB75     	 strb r3,[r7,#23]
+ 104:../CANopen/stack/301/CO_ODinterface.c **** 
+ 105:../CANopen/stack/301/CO_ODinterface.c ****     /* If previous write was partial or OD variable length is larger than
+ 106:../CANopen/stack/301/CO_ODinterface.c ****      * current buffer size, then data was (will be) written in several
+ 107:../CANopen/stack/301/CO_ODinterface.c ****      * segments */
+ 108:../CANopen/stack/301/CO_ODinterface.c ****     if (stream->dataOffset > 0 || dataLenToCopy > count) {
+ 230              	 .loc 1 108 0
+ 231 003e FB68     	 ldr r3,[r7,#12]
+ 232 0040 DB68     	 ldr r3,[r3,#12]
+ 233 0042 002B     	 cmp r3,#0
+ 234 0044 03D1     	 bne .L15
+ 235              	 .loc 1 108 0 is_stmt 0 discriminator 1
+ 236 0046 FA69     	 ldr r2,[r7,#28]
+ 237 0048 7B68     	 ldr r3,[r7,#4]
+ 238 004a 9A42     	 cmp r2,r3
+ 239 004c 22D9     	 bls .L16
+ 240              	.L15:
+ 109:../CANopen/stack/301/CO_ODinterface.c ****         if (stream->dataOffset >= dataLenToCopy) {
+ 241              	 .loc 1 109 0 is_stmt 1
+ 242 004e FB68     	 ldr r3,[r7,#12]
+ 243 0050 DA68     	 ldr r2,[r3,#12]
+ 244 0052 FB69     	 ldr r3,[r7,#28]
+ 245 0054 9A42     	 cmp r2,r3
+ 246 0056 01D3     	 bcc .L17
+ 110:../CANopen/stack/301/CO_ODinterface.c ****             return ODR_DEV_INCOMPAT;
+ 247              	 .loc 1 110 0
+ 248 0058 0923     	 movs r3,#9
+ 249 005a 2AE0     	 b .L13
+ 250              	.L17:
+ 111:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 112:../CANopen/stack/301/CO_ODinterface.c ****         /* reduce for already copied data */
+ 113:../CANopen/stack/301/CO_ODinterface.c ****         dataLenToCopy -= stream->dataOffset;
+ 251              	 .loc 1 113 0
+ 252 005c FB68     	 ldr r3,[r7,#12]
+ 253 005e DB68     	 ldr r3,[r3,#12]
+ 254 0060 FA69     	 ldr r2,[r7,#28]
+ 255 0062 D31A     	 subs r3,r2,r3
+ 256 0064 FB61     	 str r3,[r7,#28]
+ 114:../CANopen/stack/301/CO_ODinterface.c ****         dataOrig += stream->dataOffset;
+ 257              	 .loc 1 114 0
+ 258 0066 FB68     	 ldr r3,[r7,#12]
+ 259 0068 DB68     	 ldr r3,[r3,#12]
+ 260 006a BA69     	 ldr r2,[r7,#24]
+ 261 006c 1344     	 add r3,r3,r2
+ 262 006e BB61     	 str r3,[r7,#24]
+ 115:../CANopen/stack/301/CO_ODinterface.c **** 
+ 116:../CANopen/stack/301/CO_ODinterface.c ****         if (dataLenToCopy > count) {
+ 263              	 .loc 1 116 0
+ 264 0070 FA69     	 ldr r2,[r7,#28]
+ 265 0072 7B68     	 ldr r3,[r7,#4]
+ 266 0074 9A42     	 cmp r2,r3
+ 267 0076 0AD9     	 bls .L18
+ 117:../CANopen/stack/301/CO_ODinterface.c ****             /* Remaining data space in OD variable is larger than current count
+ 118:../CANopen/stack/301/CO_ODinterface.c ****              * of data, so only current count of data will be copied */
+ 119:../CANopen/stack/301/CO_ODinterface.c ****             dataLenToCopy = count;
+ 268              	 .loc 1 119 0
+ 269 0078 7B68     	 ldr r3,[r7,#4]
+ 270 007a FB61     	 str r3,[r7,#28]
+ 120:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOffset += dataLenToCopy;
+ 271              	 .loc 1 120 0
+ 272 007c FB68     	 ldr r3,[r7,#12]
+ 273 007e DA68     	 ldr r2,[r3,#12]
+ 274 0080 FB69     	 ldr r3,[r7,#28]
+ 275 0082 1A44     	 add r2,r2,r3
+ 276 0084 FB68     	 ldr r3,[r7,#12]
+ 277 0086 DA60     	 str r2,[r3,#12]
+ 121:../CANopen/stack/301/CO_ODinterface.c ****             returnCode = ODR_PARTIAL;
+ 278              	 .loc 1 121 0
+ 279 0088 FF23     	 movs r3,#255
+ 280 008a FB75     	 strb r3,[r7,#23]
+ 281 008c 02E0     	 b .L16
+ 282              	.L18:
+ 122:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 123:../CANopen/stack/301/CO_ODinterface.c ****         else {
+ 124:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOffset = 0; /* copy finished, reset offset */
+ 283              	 .loc 1 124 0
+ 284 008e FB68     	 ldr r3,[r7,#12]
+ 285 0090 0022     	 movs r2,#0
+ 286 0092 DA60     	 str r2,[r3,#12]
+ 287              	.L16:
+ 125:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 126:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 127:../CANopen/stack/301/CO_ODinterface.c **** 
+ 128:../CANopen/stack/301/CO_ODinterface.c ****     if (dataLenToCopy < count) {
+ 288              	 .loc 1 128 0
+ 289 0094 FA69     	 ldr r2,[r7,#28]
+ 290 0096 7B68     	 ldr r3,[r7,#4]
+ 291 0098 9A42     	 cmp r2,r3
+ 292 009a 01D2     	 bcs .L19
+ 129:../CANopen/stack/301/CO_ODinterface.c ****         /* OD variable is smaller than current amount of data */
+ 130:../CANopen/stack/301/CO_ODinterface.c ****         return ODR_DATA_LONG;
+ 293              	 .loc 1 130 0
+ 294 009c 0C23     	 movs r3,#12
+ 295 009e 08E0     	 b .L13
+ 296              	.L19:
+ 131:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 132:../CANopen/stack/301/CO_ODinterface.c **** 
+ 133:../CANopen/stack/301/CO_ODinterface.c **** #if (C2000_PORT != 0)
+ 134:../CANopen/stack/301/CO_ODinterface.c ****     if((stream->attribute & ODA_STR) == 0) {
+ 135:../CANopen/stack/301/CO_ODinterface.c ****         if(stream->dataLength <= 2) {
+ 136:../CANopen/stack/301/CO_ODinterface.c ****             /* For C2000, length of uint8_t and uint16_t OD variable is 1 */
+ 137:../CANopen/stack/301/CO_ODinterface.c ****             memcpy(dataOrig, buf, 1);
+ 138:../CANopen/stack/301/CO_ODinterface.c ****         } else {
+ 139:../CANopen/stack/301/CO_ODinterface.c ****             memcpy(dataOrig, buf, dataLenToCopy / 2);
+ 140:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 141:../CANopen/stack/301/CO_ODinterface.c ****     } else {
+ 142:../CANopen/stack/301/CO_ODinterface.c ****         /* As-is for string */
+ 143:../CANopen/stack/301/CO_ODinterface.c ****         memcpy(dataOrig, buf, dataLenToCopy);
+ 144:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 145:../CANopen/stack/301/CO_ODinterface.c **** #else
+ 146:../CANopen/stack/301/CO_ODinterface.c ****     memcpy(dataOrig, buf, dataLenToCopy);
+ 297              	 .loc 1 146 0
+ 298 00a0 B869     	 ldr r0,[r7,#24]
+ 299 00a2 B968     	 ldr r1,[r7,#8]
+ 300 00a4 FA69     	 ldr r2,[r7,#28]
+ 301 00a6 FFF7FEFF 	 bl memcpy
+ 147:../CANopen/stack/301/CO_ODinterface.c **** #endif
+ 148:../CANopen/stack/301/CO_ODinterface.c **** 
+ 149:../CANopen/stack/301/CO_ODinterface.c ****     *countWritten = dataLenToCopy;
+ 302              	 .loc 1 149 0
+ 303 00aa 3B68     	 ldr r3,[r7]
+ 304 00ac FA69     	 ldr r2,[r7,#28]
+ 305 00ae 1A60     	 str r2,[r3]
+ 150:../CANopen/stack/301/CO_ODinterface.c ****     return returnCode;
+ 306              	 .loc 1 150 0
+ 307 00b0 FB7D     	 ldrb r3,[r7,#23]
+ 308              	.L13:
+ 309 00b2 5BB2     	 sxtb r3,r3
+ 151:../CANopen/stack/301/CO_ODinterface.c **** }
+ 310              	 .loc 1 151 0
+ 311 00b4 1846     	 mov r0,r3
+ 312 00b6 2037     	 adds r7,r7,#32
+ 313              	.LCFI8:
+ 314              	 .cfi_def_cfa_offset 8
+ 315 00b8 BD46     	 mov sp,r7
+ 316              	.LCFI9:
+ 317              	 .cfi_def_cfa_register 13
+ 318              	 
+ 319 00ba 80BD     	 pop {r7,pc}
+ 320              	 .cfi_endproc
+ 321              	.LFE34:
+ 323              	 .section .text.OD_readDisabled,"ax",%progbits
+ 324              	 .align 2
+ 325              	 .thumb
+ 326              	 .thumb_func
+ 328              	OD_readDisabled:
+ 329              	.LFB35:
+ 152:../CANopen/stack/301/CO_ODinterface.c **** 
+ 153:../CANopen/stack/301/CO_ODinterface.c **** /* Read value from variable from Object Dictionary disabled, see OD_IO_t*/
+ 154:../CANopen/stack/301/CO_ODinterface.c **** static ODR_t OD_readDisabled(OD_stream_t *stream, void *buf,
+ 155:../CANopen/stack/301/CO_ODinterface.c ****                              OD_size_t count, OD_size_t *countRead)
+ 156:../CANopen/stack/301/CO_ODinterface.c **** {
+ 330              	 .loc 1 156 0
+ 331              	 .cfi_startproc
+ 332              	 
+ 333              	 
+ 334              	 
+ 335 0000 80B4     	 push {r7}
+ 336              	.LCFI10:
+ 337              	 .cfi_def_cfa_offset 4
+ 338              	 .cfi_offset 7,-4
+ 339 0002 85B0     	 sub sp,sp,#20
+ 340              	.LCFI11:
+ 341              	 .cfi_def_cfa_offset 24
+ 342 0004 00AF     	 add r7,sp,#0
+ 343              	.LCFI12:
+ 344              	 .cfi_def_cfa_register 7
+ 345 0006 F860     	 str r0,[r7,#12]
+ 346 0008 B960     	 str r1,[r7,#8]
+ 347 000a 7A60     	 str r2,[r7,#4]
+ 348 000c 3B60     	 str r3,[r7]
+ 157:../CANopen/stack/301/CO_ODinterface.c ****     (void) stream; (void) buf; (void) count; (void) countRead;
+ 158:../CANopen/stack/301/CO_ODinterface.c ****     return ODR_UNSUPP_ACCESS;
+ 349              	 .loc 1 158 0
+ 350 000e 0223     	 movs r3,#2
+ 351 0010 5BB2     	 sxtb r3,r3
+ 159:../CANopen/stack/301/CO_ODinterface.c **** }
+ 352              	 .loc 1 159 0
+ 353 0012 1846     	 mov r0,r3
+ 354 0014 1437     	 adds r7,r7,#20
+ 355              	.LCFI13:
+ 356              	 .cfi_def_cfa_offset 4
+ 357 0016 BD46     	 mov sp,r7
+ 358              	.LCFI14:
+ 359              	 .cfi_def_cfa_register 13
+ 360              	 
+ 361 0018 5DF8047B 	 ldr r7,[sp],#4
+ 362              	.LCFI15:
+ 363              	 .cfi_restore 7
+ 364              	 .cfi_def_cfa_offset 0
+ 365 001c 7047     	 bx lr
+ 366              	 .cfi_endproc
+ 367              	.LFE35:
+ 369 001e 00BF     	 .section .text.OD_writeDisabled,"ax",%progbits
+ 370              	 .align 2
+ 371              	 .thumb
+ 372              	 .thumb_func
+ 374              	OD_writeDisabled:
+ 375              	.LFB36:
+ 160:../CANopen/stack/301/CO_ODinterface.c **** 
+ 161:../CANopen/stack/301/CO_ODinterface.c **** /* Write value to variable from Object Dictionary disabled, see OD_IO_t */
+ 162:../CANopen/stack/301/CO_ODinterface.c **** static ODR_t OD_writeDisabled(OD_stream_t *stream, const void *buf,
+ 163:../CANopen/stack/301/CO_ODinterface.c ****                               OD_size_t count, OD_size_t *countWritten)
+ 164:../CANopen/stack/301/CO_ODinterface.c **** {
+ 376              	 .loc 1 164 0
+ 377              	 .cfi_startproc
+ 378              	 
+ 379              	 
+ 380              	 
+ 381 0000 80B4     	 push {r7}
+ 382              	.LCFI16:
+ 383              	 .cfi_def_cfa_offset 4
+ 384              	 .cfi_offset 7,-4
+ 385 0002 85B0     	 sub sp,sp,#20
+ 386              	.LCFI17:
+ 387              	 .cfi_def_cfa_offset 24
+ 388 0004 00AF     	 add r7,sp,#0
+ 389              	.LCFI18:
+ 390              	 .cfi_def_cfa_register 7
+ 391 0006 F860     	 str r0,[r7,#12]
+ 392 0008 B960     	 str r1,[r7,#8]
+ 393 000a 7A60     	 str r2,[r7,#4]
+ 394 000c 3B60     	 str r3,[r7]
+ 165:../CANopen/stack/301/CO_ODinterface.c ****     (void) stream; (void) buf; (void) count; (void) countWritten;
+ 166:../CANopen/stack/301/CO_ODinterface.c ****     return ODR_UNSUPP_ACCESS;
+ 395              	 .loc 1 166 0
+ 396 000e 0223     	 movs r3,#2
+ 397 0010 5BB2     	 sxtb r3,r3
+ 167:../CANopen/stack/301/CO_ODinterface.c **** }
+ 398              	 .loc 1 167 0
+ 399 0012 1846     	 mov r0,r3
+ 400 0014 1437     	 adds r7,r7,#20
+ 401              	.LCFI19:
+ 402              	 .cfi_def_cfa_offset 4
+ 403 0016 BD46     	 mov sp,r7
+ 404              	.LCFI20:
+ 405              	 .cfi_def_cfa_register 13
+ 406              	 
+ 407 0018 5DF8047B 	 ldr r7,[sp],#4
+ 408              	.LCFI21:
+ 409              	 .cfi_restore 7
+ 410              	 .cfi_def_cfa_offset 0
+ 411 001c 7047     	 bx lr
+ 412              	 .cfi_endproc
+ 413              	.LFE36:
+ 415 001e 00BF     	 .section .text.OD_find,"ax",%progbits
+ 416              	 .align 2
+ 417              	 .global OD_find
+ 418              	 .thumb
+ 419              	 .thumb_func
+ 421              	OD_find:
+ 422              	.LFB37:
+ 168:../CANopen/stack/301/CO_ODinterface.c **** 
+ 169:../CANopen/stack/301/CO_ODinterface.c **** 
+ 170:../CANopen/stack/301/CO_ODinterface.c **** /******************************************************************************/
+ 171:../CANopen/stack/301/CO_ODinterface.c **** OD_entry_t *OD_find(OD_t *od, uint16_t index) {
+ 423              	 .loc 1 171 0
+ 424              	 .cfi_startproc
+ 425              	 
+ 426              	 
+ 427              	 
+ 428 0000 80B4     	 push {r7}
+ 429              	.LCFI22:
+ 430              	 .cfi_def_cfa_offset 4
+ 431              	 .cfi_offset 7,-4
+ 432 0002 87B0     	 sub sp,sp,#28
+ 433              	.LCFI23:
+ 434              	 .cfi_def_cfa_offset 32
+ 435 0004 00AF     	 add r7,sp,#0
+ 436              	.LCFI24:
+ 437              	 .cfi_def_cfa_register 7
+ 438 0006 7860     	 str r0,[r7,#4]
+ 439 0008 0B46     	 mov r3,r1
+ 440 000a 7B80     	 strh r3,[r7,#2]
+ 172:../CANopen/stack/301/CO_ODinterface.c ****     if (od == NULL || od->size == 0) {
+ 441              	 .loc 1 172 0
+ 442 000c 7B68     	 ldr r3,[r7,#4]
+ 443 000e 002B     	 cmp r3,#0
+ 444 0010 03D0     	 beq .L25
+ 445              	 .loc 1 172 0 is_stmt 0 discriminator 1
+ 446 0012 7B68     	 ldr r3,[r7,#4]
+ 447 0014 1B88     	 ldrh r3,[r3]
+ 448 0016 002B     	 cmp r3,#0
+ 449 0018 01D1     	 bne .L26
+ 450              	.L25:
+ 173:../CANopen/stack/301/CO_ODinterface.c ****         return NULL;
+ 451              	 .loc 1 173 0 is_stmt 1
+ 452 001a 0023     	 movs r3,#0
+ 453 001c 46E0     	 b .L27
+ 454              	.L26:
+ 174:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 175:../CANopen/stack/301/CO_ODinterface.c **** 
+ 176:../CANopen/stack/301/CO_ODinterface.c ****     uint16_t min = 0;
+ 455              	 .loc 1 176 0
+ 456 001e 0023     	 movs r3,#0
+ 457 0020 FB82     	 strh r3,[r7,#22]
+ 177:../CANopen/stack/301/CO_ODinterface.c ****     uint16_t max = od->size - 1;
+ 458              	 .loc 1 177 0
+ 459 0022 7B68     	 ldr r3,[r7,#4]
+ 460 0024 1B88     	 ldrh r3,[r3]
+ 461 0026 013B     	 subs r3,r3,#1
+ 462 0028 BB82     	 strh r3,[r7,#20]
+ 178:../CANopen/stack/301/CO_ODinterface.c **** 
+ 179:../CANopen/stack/301/CO_ODinterface.c ****     /* Fast search in ordered Object Dictionary. If indexes are mixed,
+ 180:../CANopen/stack/301/CO_ODinterface.c ****      * this won't work. If Object Dictionary has up to N entries, then the
+ 181:../CANopen/stack/301/CO_ODinterface.c ****      * max number of loop passes is log2(N) */
+ 182:../CANopen/stack/301/CO_ODinterface.c ****     while (min < max) {
+ 463              	 .loc 1 182 0
+ 464 002a 26E0     	 b .L28
+ 465              	.L33:
+ 466              	.LBB2:
+ 183:../CANopen/stack/301/CO_ODinterface.c ****         /* get entry between min and max */
+ 184:../CANopen/stack/301/CO_ODinterface.c ****         uint16_t cur = (min + max) >> 1;
+ 467              	 .loc 1 184 0
+ 468 002c FA8A     	 ldrh r2,[r7,#22]
+ 469 002e BB8A     	 ldrh r3,[r7,#20]
+ 470 0030 1344     	 add r3,r3,r2
+ 471 0032 5B10     	 asrs r3,r3,#1
+ 472 0034 7B82     	 strh r3,[r7,#18]
+ 185:../CANopen/stack/301/CO_ODinterface.c ****         OD_entry_t* entry = &od->list[cur];
+ 473              	 .loc 1 185 0
+ 474 0036 7B68     	 ldr r3,[r7,#4]
+ 475 0038 5968     	 ldr r1,[r3,#4]
+ 476 003a 7A8A     	 ldrh r2,[r7,#18]
+ 477 003c 1346     	 mov r3,r2
+ 478 003e 5B00     	 lsls r3,r3,#1
+ 479 0040 1344     	 add r3,r3,r2
+ 480 0042 9B00     	 lsls r3,r3,#2
+ 481 0044 0B44     	 add r3,r3,r1
+ 482 0046 FB60     	 str r3,[r7,#12]
+ 186:../CANopen/stack/301/CO_ODinterface.c **** 
+ 187:../CANopen/stack/301/CO_ODinterface.c ****         if (index == entry->index) {
+ 483              	 .loc 1 187 0
+ 484 0048 FB68     	 ldr r3,[r7,#12]
+ 485 004a 1B88     	 ldrh r3,[r3]
+ 486 004c 7A88     	 ldrh r2,[r7,#2]
+ 487 004e 9A42     	 cmp r2,r3
+ 488 0050 01D1     	 bne .L29
+ 188:../CANopen/stack/301/CO_ODinterface.c ****             return entry;
+ 489              	 .loc 1 188 0
+ 490 0052 FB68     	 ldr r3,[r7,#12]
+ 491 0054 2AE0     	 b .L27
+ 492              	.L29:
+ 189:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 190:../CANopen/stack/301/CO_ODinterface.c **** 
+ 191:../CANopen/stack/301/CO_ODinterface.c ****         if (index < entry->index) {
+ 493              	 .loc 1 191 0
+ 494 0056 FB68     	 ldr r3,[r7,#12]
+ 495 0058 1B88     	 ldrh r3,[r3]
+ 496 005a 7A88     	 ldrh r2,[r7,#2]
+ 497 005c 9A42     	 cmp r2,r3
+ 498 005e 09D2     	 bcs .L30
+ 192:../CANopen/stack/301/CO_ODinterface.c ****             max = (cur > 0) ? (cur - 1) : cur;
+ 499              	 .loc 1 192 0
+ 500 0060 7B8A     	 ldrh r3,[r7,#18]
+ 501 0062 002B     	 cmp r3,#0
+ 502 0064 03D0     	 beq .L31
+ 503              	 .loc 1 192 0 is_stmt 0 discriminator 1
+ 504 0066 7B8A     	 ldrh r3,[r7,#18]
+ 505 0068 013B     	 subs r3,r3,#1
+ 506 006a 9BB2     	 uxth r3,r3
+ 507 006c 00E0     	 b .L32
+ 508              	.L31:
+ 509              	 .loc 1 192 0 discriminator 2
+ 510 006e 7B8A     	 ldrh r3,[r7,#18]
+ 511              	.L32:
+ 512              	 .loc 1 192 0 discriminator 4
+ 513 0070 BB82     	 strh r3,[r7,#20]
+ 514 0072 02E0     	 b .L28
+ 515              	.L30:
+ 193:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 194:../CANopen/stack/301/CO_ODinterface.c ****         else {
+ 195:../CANopen/stack/301/CO_ODinterface.c ****             min = cur + 1;
+ 516              	 .loc 1 195 0 is_stmt 1
+ 517 0074 7B8A     	 ldrh r3,[r7,#18]
+ 518 0076 0133     	 adds r3,r3,#1
+ 519 0078 FB82     	 strh r3,[r7,#22]
+ 520              	.L28:
+ 521              	.LBE2:
+ 182:../CANopen/stack/301/CO_ODinterface.c ****         /* get entry between min and max */
+ 522              	 .loc 1 182 0
+ 523 007a FA8A     	 ldrh r2,[r7,#22]
+ 524 007c BB8A     	 ldrh r3,[r7,#20]
+ 525 007e 9A42     	 cmp r2,r3
+ 526 0080 D4D3     	 bcc .L33
+ 196:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 197:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 198:../CANopen/stack/301/CO_ODinterface.c **** 
+ 199:../CANopen/stack/301/CO_ODinterface.c ****     if (min == max) {
+ 527              	 .loc 1 199 0
+ 528 0082 FA8A     	 ldrh r2,[r7,#22]
+ 529 0084 BB8A     	 ldrh r3,[r7,#20]
+ 530 0086 9A42     	 cmp r2,r3
+ 531 0088 0FD1     	 bne .L34
+ 532              	.LBB3:
+ 200:../CANopen/stack/301/CO_ODinterface.c ****         OD_entry_t* entry = &od->list[min];
+ 533              	 .loc 1 200 0
+ 534 008a 7B68     	 ldr r3,[r7,#4]
+ 535 008c 5968     	 ldr r1,[r3,#4]
+ 536 008e FA8A     	 ldrh r2,[r7,#22]
+ 537 0090 1346     	 mov r3,r2
+ 538 0092 5B00     	 lsls r3,r3,#1
+ 539 0094 1344     	 add r3,r3,r2
+ 540 0096 9B00     	 lsls r3,r3,#2
+ 541 0098 0B44     	 add r3,r3,r1
+ 542 009a BB60     	 str r3,[r7,#8]
+ 201:../CANopen/stack/301/CO_ODinterface.c ****         if (index == entry->index) {
+ 543              	 .loc 1 201 0
+ 544 009c BB68     	 ldr r3,[r7,#8]
+ 545 009e 1B88     	 ldrh r3,[r3]
+ 546 00a0 7A88     	 ldrh r2,[r7,#2]
+ 547 00a2 9A42     	 cmp r2,r3
+ 548 00a4 01D1     	 bne .L34
+ 202:../CANopen/stack/301/CO_ODinterface.c ****             return entry;
+ 549              	 .loc 1 202 0
+ 550 00a6 BB68     	 ldr r3,[r7,#8]
+ 551 00a8 00E0     	 b .L27
+ 552              	.L34:
+ 553              	.LBE3:
+ 203:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 204:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 205:../CANopen/stack/301/CO_ODinterface.c **** 
+ 206:../CANopen/stack/301/CO_ODinterface.c ****     return NULL;  /* entry does not exist in OD */
+ 554              	 .loc 1 206 0
+ 555 00aa 0023     	 movs r3,#0
+ 556              	.L27:
+ 207:../CANopen/stack/301/CO_ODinterface.c **** }
+ 557              	 .loc 1 207 0
+ 558 00ac 1846     	 mov r0,r3
+ 559 00ae 1C37     	 adds r7,r7,#28
+ 560              	.LCFI25:
+ 561              	 .cfi_def_cfa_offset 4
+ 562 00b0 BD46     	 mov sp,r7
+ 563              	.LCFI26:
+ 564              	 .cfi_def_cfa_register 13
+ 565              	 
+ 566 00b2 5DF8047B 	 ldr r7,[sp],#4
+ 567              	.LCFI27:
+ 568              	 .cfi_restore 7
+ 569              	 .cfi_def_cfa_offset 0
+ 570 00b6 7047     	 bx lr
+ 571              	 .cfi_endproc
+ 572              	.LFE37:
+ 574              	 .section .text.OD_getSub,"ax",%progbits
+ 575              	 .align 2
+ 576              	 .global OD_getSub
+ 577              	 .thumb
+ 578              	 .thumb_func
+ 580              	OD_getSub:
+ 581              	.LFB38:
+ 208:../CANopen/stack/301/CO_ODinterface.c **** 
+ 209:../CANopen/stack/301/CO_ODinterface.c **** /******************************************************************************/
+ 210:../CANopen/stack/301/CO_ODinterface.c **** ODR_t OD_getSub(const OD_entry_t *entry, uint8_t subIndex,
+ 211:../CANopen/stack/301/CO_ODinterface.c ****                 OD_IO_t *io, bool_t odOrig)
+ 212:../CANopen/stack/301/CO_ODinterface.c **** {
+ 582              	 .loc 1 212 0
+ 583              	 .cfi_startproc
+ 584              	 
+ 585              	 
+ 586              	 
+ 587 0000 80B4     	 push {r7}
+ 588              	.LCFI28:
+ 589              	 .cfi_def_cfa_offset 4
+ 590              	 .cfi_offset 7,-4
+ 591 0002 8DB0     	 sub sp,sp,#52
+ 592              	.LCFI29:
+ 593              	 .cfi_def_cfa_offset 56
+ 594 0004 00AF     	 add r7,sp,#0
+ 595              	.LCFI30:
+ 596              	 .cfi_def_cfa_register 7
+ 597 0006 F860     	 str r0,[r7,#12]
+ 598 0008 7A60     	 str r2,[r7,#4]
+ 599 000a 3B60     	 str r3,[r7]
+ 600 000c 0B46     	 mov r3,r1
+ 601 000e FB72     	 strb r3,[r7,#11]
+ 213:../CANopen/stack/301/CO_ODinterface.c ****     if (entry == NULL || entry->odObject == NULL) return ODR_IDX_NOT_EXIST;
+ 602              	 .loc 1 213 0
+ 603 0010 FB68     	 ldr r3,[r7,#12]
+ 604 0012 002B     	 cmp r3,#0
+ 605 0014 03D0     	 beq .L36
+ 606              	 .loc 1 213 0 is_stmt 0 discriminator 2
+ 607 0016 FB68     	 ldr r3,[r7,#12]
+ 608 0018 5B68     	 ldr r3,[r3,#4]
+ 609 001a 002B     	 cmp r3,#0
+ 610 001c 01D1     	 bne .L37
+ 611              	.L36:
+ 612              	 .loc 1 213 0 discriminator 3
+ 613 001e 0523     	 movs r3,#5
+ 614 0020 CFE0     	 b .L38
+ 615              	.L37:
+ 214:../CANopen/stack/301/CO_ODinterface.c ****     if (io == NULL) return ODR_DEV_INCOMPAT;
+ 616              	 .loc 1 214 0 is_stmt 1
+ 617 0022 7B68     	 ldr r3,[r7,#4]
+ 618 0024 002B     	 cmp r3,#0
+ 619 0026 01D1     	 bne .L39
+ 620              	 .loc 1 214 0 is_stmt 0 discriminator 1
+ 621 0028 0923     	 movs r3,#9
+ 622 002a CAE0     	 b .L38
+ 623              	.L39:
+ 215:../CANopen/stack/301/CO_ODinterface.c **** 
+ 216:../CANopen/stack/301/CO_ODinterface.c ****     OD_stream_t *stream = &io->stream;
+ 624              	 .loc 1 216 0 is_stmt 1
+ 625 002c 7B68     	 ldr r3,[r7,#4]
+ 626 002e 7B62     	 str r3,[r7,#36]
+ 217:../CANopen/stack/301/CO_ODinterface.c **** 
+ 218:../CANopen/stack/301/CO_ODinterface.c ****     /* attribute, dataOrig and dataLength, depends on object type */
+ 219:../CANopen/stack/301/CO_ODinterface.c ****     switch (entry->odObjectType & ODT_TYPE_MASK) {
+ 627              	 .loc 1 219 0
+ 628 0030 FB68     	 ldr r3,[r7,#12]
+ 629 0032 DB78     	 ldrb r3,[r3,#3]
+ 630 0034 03F00F03 	 and r3,r3,#15
+ 631 0038 022B     	 cmp r3,#2
+ 632 003a 19D0     	 beq .L41
+ 633 003c 032B     	 cmp r3,#3
+ 634 003e 4BD0     	 beq .L42
+ 635 0040 012B     	 cmp r3,#1
+ 636 0042 40F08780 	 bne .L63
+ 637              	.LBB4:
+ 220:../CANopen/stack/301/CO_ODinterface.c ****     case ODT_VAR: {
+ 221:../CANopen/stack/301/CO_ODinterface.c ****         if (subIndex > 0) return ODR_SUB_NOT_EXIST;
+ 638              	 .loc 1 221 0
+ 639 0046 FB7A     	 ldrb r3,[r7,#11]
+ 640 0048 002B     	 cmp r3,#0
+ 641 004a 01D0     	 beq .L44
+ 642              	 .loc 1 221 0 is_stmt 0 discriminator 1
+ 643 004c 0E23     	 movs r3,#14
+ 644 004e B8E0     	 b .L38
+ 645              	.L44:
+ 222:../CANopen/stack/301/CO_ODinterface.c ****         CO_PROGMEM OD_obj_var_t *odo = entry->odObject;
+ 646              	 .loc 1 222 0 is_stmt 1
+ 647 0050 FB68     	 ldr r3,[r7,#12]
+ 648 0052 5B68     	 ldr r3,[r3,#4]
+ 649 0054 3B62     	 str r3,[r7,#32]
+ 223:../CANopen/stack/301/CO_ODinterface.c **** 
+ 224:../CANopen/stack/301/CO_ODinterface.c **** 
+ 225:../CANopen/stack/301/CO_ODinterface.c ****         stream->attribute = odo->attribute;
+ 650              	 .loc 1 225 0
+ 651 0056 3B6A     	 ldr r3,[r7,#32]
+ 652 0058 1A79     	 ldrb r2,[r3,#4]
+ 653 005a 7B6A     	 ldr r3,[r7,#36]
+ 654 005c 1A74     	 strb r2,[r3,#16]
+ 226:../CANopen/stack/301/CO_ODinterface.c ****         stream->dataOrig = odo->dataOrig;
+ 655              	 .loc 1 226 0
+ 656 005e 3B6A     	 ldr r3,[r7,#32]
+ 657 0060 1A68     	 ldr r2,[r3]
+ 658 0062 7B6A     	 ldr r3,[r7,#36]
+ 659 0064 1A60     	 str r2,[r3]
+ 227:../CANopen/stack/301/CO_ODinterface.c ****         stream->dataLength = odo->dataLength;
+ 660              	 .loc 1 227 0
+ 661 0066 3B6A     	 ldr r3,[r7,#32]
+ 662 0068 9A68     	 ldr r2,[r3,#8]
+ 663 006a 7B6A     	 ldr r3,[r7,#36]
+ 664 006c 9A60     	 str r2,[r3,#8]
+ 228:../CANopen/stack/301/CO_ODinterface.c ****         break;
+ 665              	 .loc 1 228 0
+ 666 006e 73E0     	 b .L45
+ 667              	.L41:
+ 668              	.LBE4:
+ 669              	.LBB5:
+ 229:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 230:../CANopen/stack/301/CO_ODinterface.c ****     case ODT_ARR: {
+ 231:../CANopen/stack/301/CO_ODinterface.c ****         if (subIndex >= entry->subEntriesCount) return ODR_SUB_NOT_EXIST;
+ 670              	 .loc 1 231 0
+ 671 0070 FB68     	 ldr r3,[r7,#12]
+ 672 0072 9B78     	 ldrb r3,[r3,#2]
+ 673 0074 FA7A     	 ldrb r2,[r7,#11]
+ 674 0076 9A42     	 cmp r2,r3
+ 675 0078 01D3     	 bcc .L46
+ 676              	 .loc 1 231 0 is_stmt 0 discriminator 1
+ 677 007a 0E23     	 movs r3,#14
+ 678 007c A1E0     	 b .L38
+ 679              	.L46:
+ 232:../CANopen/stack/301/CO_ODinterface.c ****         CO_PROGMEM OD_obj_array_t *odo = entry->odObject;
+ 680              	 .loc 1 232 0 is_stmt 1
+ 681 007e FB68     	 ldr r3,[r7,#12]
+ 682 0080 5B68     	 ldr r3,[r3,#4]
+ 683 0082 FB61     	 str r3,[r7,#28]
+ 233:../CANopen/stack/301/CO_ODinterface.c **** 
+ 234:../CANopen/stack/301/CO_ODinterface.c ****         if (subIndex == 0) {
+ 684              	 .loc 1 234 0
+ 685 0084 FB7A     	 ldrb r3,[r7,#11]
+ 686 0086 002B     	 cmp r3,#0
+ 687 0088 0BD1     	 bne .L47
+ 235:../CANopen/stack/301/CO_ODinterface.c ****             stream->attribute = odo->attribute0;
+ 688              	 .loc 1 235 0
+ 689 008a FB69     	 ldr r3,[r7,#28]
+ 690 008c 1A7A     	 ldrb r2,[r3,#8]
+ 691 008e 7B6A     	 ldr r3,[r7,#36]
+ 692 0090 1A74     	 strb r2,[r3,#16]
+ 236:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOrig = odo->dataOrig0;
+ 693              	 .loc 1 236 0
+ 694 0092 FB69     	 ldr r3,[r7,#28]
+ 695 0094 1A68     	 ldr r2,[r3]
+ 696 0096 7B6A     	 ldr r3,[r7,#36]
+ 697 0098 1A60     	 str r2,[r3]
+ 237:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataLength = 1;
+ 698              	 .loc 1 237 0
+ 699 009a 7B6A     	 ldr r3,[r7,#36]
+ 700 009c 0122     	 movs r2,#1
+ 701 009e 9A60     	 str r2,[r3,#8]
+ 238:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 239:../CANopen/stack/301/CO_ODinterface.c ****         else {
+ 240:../CANopen/stack/301/CO_ODinterface.c ****             stream->attribute = odo->attribute;
+ 241:../CANopen/stack/301/CO_ODinterface.c ****             uint8_t *ptr = odo->dataOrig;
+ 242:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOrig = ptr == NULL ? ptr
+ 243:../CANopen/stack/301/CO_ODinterface.c ****                              : ptr + odo->dataElementSizeof * (subIndex - 1);
+ 244:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataLength = odo->dataElementLength;
+ 245:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 246:../CANopen/stack/301/CO_ODinterface.c ****         break;
+ 702              	 .loc 1 246 0
+ 703 00a0 5AE0     	 b .L45
+ 704              	.L47:
+ 705              	.LBB6:
+ 240:../CANopen/stack/301/CO_ODinterface.c ****             uint8_t *ptr = odo->dataOrig;
+ 706              	 .loc 1 240 0
+ 707 00a2 FB69     	 ldr r3,[r7,#28]
+ 708 00a4 5A7A     	 ldrb r2,[r3,#9]
+ 709 00a6 7B6A     	 ldr r3,[r7,#36]
+ 710 00a8 1A74     	 strb r2,[r3,#16]
+ 241:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataOrig = ptr == NULL ? ptr
+ 711              	 .loc 1 241 0
+ 712 00aa FB69     	 ldr r3,[r7,#28]
+ 713 00ac 5B68     	 ldr r3,[r3,#4]
+ 714 00ae BB61     	 str r3,[r7,#24]
+ 243:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataLength = odo->dataElementLength;
+ 715              	 .loc 1 243 0
+ 716 00b0 BB69     	 ldr r3,[r7,#24]
+ 717 00b2 002B     	 cmp r3,#0
+ 718 00b4 08D0     	 beq .L49
+ 243:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataLength = odo->dataElementLength;
+ 719              	 .loc 1 243 0 is_stmt 0 discriminator 1
+ 720 00b6 FB69     	 ldr r3,[r7,#28]
+ 721 00b8 1B69     	 ldr r3,[r3,#16]
+ 722 00ba FA7A     	 ldrb r2,[r7,#11]
+ 723 00bc 013A     	 subs r2,r2,#1
+ 724 00be 02FB03F3 	 mul r3,r2,r3
+ 725 00c2 BA69     	 ldr r2,[r7,#24]
+ 726 00c4 1344     	 add r3,r3,r2
+ 727 00c6 00E0     	 b .L50
+ 728              	.L49:
+ 243:../CANopen/stack/301/CO_ODinterface.c ****             stream->dataLength = odo->dataElementLength;
+ 729              	 .loc 1 243 0 discriminator 2
+ 730 00c8 BB69     	 ldr r3,[r7,#24]
+ 731              	.L50:
+ 242:../CANopen/stack/301/CO_ODinterface.c ****                              : ptr + odo->dataElementSizeof * (subIndex - 1);
+ 732              	 .loc 1 242 0 is_stmt 1
+ 733 00ca 7A6A     	 ldr r2,[r7,#36]
+ 734 00cc 1360     	 str r3,[r2]
+ 244:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 735              	 .loc 1 244 0
+ 736 00ce FB69     	 ldr r3,[r7,#28]
+ 737 00d0 DA68     	 ldr r2,[r3,#12]
+ 738 00d2 7B6A     	 ldr r3,[r7,#36]
+ 739 00d4 9A60     	 str r2,[r3,#8]
+ 740              	.LBE6:
+ 741              	 .loc 1 246 0
+ 742 00d6 3FE0     	 b .L45
+ 743              	.L42:
+ 744              	.LBE5:
+ 745              	.LBB7:
+ 247:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 248:../CANopen/stack/301/CO_ODinterface.c ****     case ODT_REC: {
+ 249:../CANopen/stack/301/CO_ODinterface.c ****         CO_PROGMEM OD_obj_record_t *odoArr = entry->odObject;
+ 746              	 .loc 1 249 0
+ 747 00d8 FB68     	 ldr r3,[r7,#12]
+ 748 00da 5B68     	 ldr r3,[r3,#4]
+ 749 00dc 7B61     	 str r3,[r7,#20]
+ 250:../CANopen/stack/301/CO_ODinterface.c ****         CO_PROGMEM OD_obj_record_t *odo = NULL;
+ 750              	 .loc 1 250 0
+ 751 00de 0023     	 movs r3,#0
+ 752 00e0 FB62     	 str r3,[r7,#44]
+ 753              	.LBB8:
+ 251:../CANopen/stack/301/CO_ODinterface.c ****         for (uint8_t i = 0; i < entry->subEntriesCount; i++) {
+ 754              	 .loc 1 251 0
+ 755 00e2 0023     	 movs r3,#0
+ 756 00e4 87F82B30 	 strb r3,[r7,#43]
+ 757 00e8 1CE0     	 b .L51
+ 758              	.L54:
+ 252:../CANopen/stack/301/CO_ODinterface.c ****             if (odoArr[i].subIndex == subIndex) {
+ 759              	 .loc 1 252 0
+ 760 00ea 97F82B20 	 ldrb r2,[r7,#43]
+ 761 00ee 1346     	 mov r3,r2
+ 762 00f0 5B00     	 lsls r3,r3,#1
+ 763 00f2 1344     	 add r3,r3,r2
+ 764 00f4 9B00     	 lsls r3,r3,#2
+ 765 00f6 1A46     	 mov r2,r3
+ 766 00f8 7B69     	 ldr r3,[r7,#20]
+ 767 00fa 1344     	 add r3,r3,r2
+ 768 00fc 1B79     	 ldrb r3,[r3,#4]
+ 769 00fe FA7A     	 ldrb r2,[r7,#11]
+ 770 0100 9A42     	 cmp r2,r3
+ 771 0102 0AD1     	 bne .L52
+ 253:../CANopen/stack/301/CO_ODinterface.c ****                 odo = &odoArr[i];
+ 772              	 .loc 1 253 0
+ 773 0104 97F82B20 	 ldrb r2,[r7,#43]
+ 774 0108 1346     	 mov r3,r2
+ 775 010a 5B00     	 lsls r3,r3,#1
+ 776 010c 1344     	 add r3,r3,r2
+ 777 010e 9B00     	 lsls r3,r3,#2
+ 778 0110 1A46     	 mov r2,r3
+ 779 0112 7B69     	 ldr r3,[r7,#20]
+ 780 0114 1344     	 add r3,r3,r2
+ 781 0116 FB62     	 str r3,[r7,#44]
+ 254:../CANopen/stack/301/CO_ODinterface.c ****                 break;
+ 782              	 .loc 1 254 0
+ 783 0118 0AE0     	 b .L53
+ 784              	.L52:
+ 251:../CANopen/stack/301/CO_ODinterface.c ****             if (odoArr[i].subIndex == subIndex) {
+ 785              	 .loc 1 251 0 discriminator 2
+ 786 011a 97F82B30 	 ldrb r3,[r7,#43]
+ 787 011e 0133     	 adds r3,r3,#1
+ 788 0120 87F82B30 	 strb r3,[r7,#43]
+ 789              	.L51:
+ 251:../CANopen/stack/301/CO_ODinterface.c ****             if (odoArr[i].subIndex == subIndex) {
+ 790              	 .loc 1 251 0 is_stmt 0 discriminator 1
+ 791 0124 FB68     	 ldr r3,[r7,#12]
+ 792 0126 9B78     	 ldrb r3,[r3,#2]
+ 793 0128 97F82B20 	 ldrb r2,[r7,#43]
+ 794 012c 9A42     	 cmp r2,r3
+ 795 012e DCD3     	 bcc .L54
+ 796              	.L53:
+ 797              	.LBE8:
+ 255:../CANopen/stack/301/CO_ODinterface.c ****             }
+ 256:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 257:../CANopen/stack/301/CO_ODinterface.c ****         if (odo == NULL) return ODR_SUB_NOT_EXIST;
+ 798              	 .loc 1 257 0 is_stmt 1
+ 799 0130 FB6A     	 ldr r3,[r7,#44]
+ 800 0132 002B     	 cmp r3,#0
+ 801 0134 01D1     	 bne .L55
+ 802              	 .loc 1 257 0 is_stmt 0 discriminator 1
+ 803 0136 0E23     	 movs r3,#14
+ 804 0138 43E0     	 b .L38
+ 805              	.L55:
+ 258:../CANopen/stack/301/CO_ODinterface.c **** 
+ 259:../CANopen/stack/301/CO_ODinterface.c ****         stream->attribute = odo->attribute;
+ 806              	 .loc 1 259 0 is_stmt 1
+ 807 013a FB6A     	 ldr r3,[r7,#44]
+ 808 013c 5A79     	 ldrb r2,[r3,#5]
+ 809 013e 7B6A     	 ldr r3,[r7,#36]
+ 810 0140 1A74     	 strb r2,[r3,#16]
+ 260:../CANopen/stack/301/CO_ODinterface.c ****         stream->dataOrig = odo->dataOrig;
+ 811              	 .loc 1 260 0
+ 812 0142 FB6A     	 ldr r3,[r7,#44]
+ 813 0144 1A68     	 ldr r2,[r3]
+ 814 0146 7B6A     	 ldr r3,[r7,#36]
+ 815 0148 1A60     	 str r2,[r3]
+ 261:../CANopen/stack/301/CO_ODinterface.c ****         stream->dataLength = odo->dataLength;
+ 816              	 .loc 1 261 0
+ 817 014a FB6A     	 ldr r3,[r7,#44]
+ 818 014c 9A68     	 ldr r2,[r3,#8]
+ 819 014e 7B6A     	 ldr r3,[r7,#36]
+ 820 0150 9A60     	 str r2,[r3,#8]
+ 262:../CANopen/stack/301/CO_ODinterface.c ****         break;
+ 821              	 .loc 1 262 0
+ 822 0152 01E0     	 b .L45
+ 823              	.L63:
+ 824              	.LBE7:
+ 263:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 264:../CANopen/stack/301/CO_ODinterface.c ****     default: {
+ 265:../CANopen/stack/301/CO_ODinterface.c ****         return ODR_DEV_INCOMPAT;
+ 825              	 .loc 1 265 0
+ 826 0154 0923     	 movs r3,#9
+ 827 0156 34E0     	 b .L38
+ 828              	.L45:
+ 266:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 267:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 268:../CANopen/stack/301/CO_ODinterface.c **** 
+ 269:../CANopen/stack/301/CO_ODinterface.c ****     /* Access data from the original OD location */
+ 270:../CANopen/stack/301/CO_ODinterface.c ****     if (entry->extension == NULL || odOrig) {
+ 829              	 .loc 1 270 0
+ 830 0158 FB68     	 ldr r3,[r7,#12]
+ 831 015a 9B68     	 ldr r3,[r3,#8]
+ 832 015c 002B     	 cmp r3,#0
+ 833 015e 02D0     	 beq .L56
+ 834              	 .loc 1 270 0 is_stmt 0 discriminator 1
+ 835 0160 3B68     	 ldr r3,[r7]
+ 836 0162 002B     	 cmp r3,#0
+ 837 0164 09D0     	 beq .L57
+ 838              	.L56:
+ 271:../CANopen/stack/301/CO_ODinterface.c ****         io->read = OD_readOriginal;
+ 839              	 .loc 1 271 0 is_stmt 1
+ 840 0166 7B68     	 ldr r3,[r7,#4]
+ 841 0168 194A     	 ldr r2,.L64
+ 842 016a 5A61     	 str r2,[r3,#20]
+ 272:../CANopen/stack/301/CO_ODinterface.c ****         io->write = OD_writeOriginal;
+ 843              	 .loc 1 272 0
+ 844 016c 7B68     	 ldr r3,[r7,#4]
+ 845 016e 194A     	 ldr r2,.L64+4
+ 846 0170 9A61     	 str r2,[r3,#24]
+ 273:../CANopen/stack/301/CO_ODinterface.c ****         stream->object = NULL;
+ 847              	 .loc 1 273 0
+ 848 0172 7B6A     	 ldr r3,[r7,#36]
+ 849 0174 0022     	 movs r2,#0
+ 850 0176 5A60     	 str r2,[r3,#4]
+ 851 0178 1CE0     	 b .L58
+ 852              	.L57:
+ 274:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 275:../CANopen/stack/301/CO_ODinterface.c ****     /* Access data from extension specified by application */
+ 276:../CANopen/stack/301/CO_ODinterface.c ****     else {
+ 277:../CANopen/stack/301/CO_ODinterface.c ****         io->read = entry->extension->read != NULL ?
+ 853              	 .loc 1 277 0
+ 854 017a FB68     	 ldr r3,[r7,#12]
+ 855 017c 9B68     	 ldr r3,[r3,#8]
+ 856 017e 5B68     	 ldr r3,[r3,#4]
+ 278:../CANopen/stack/301/CO_ODinterface.c ****                    entry->extension->read : OD_readDisabled;
+ 857              	 .loc 1 278 0
+ 858 0180 002B     	 cmp r3,#0
+ 859 0182 03D0     	 beq .L59
+ 860              	 .loc 1 278 0 is_stmt 0 discriminator 1
+ 861 0184 FB68     	 ldr r3,[r7,#12]
+ 862 0186 9B68     	 ldr r3,[r3,#8]
+ 863 0188 5B68     	 ldr r3,[r3,#4]
+ 864 018a 00E0     	 b .L60
+ 865              	.L59:
+ 866              	 .loc 1 278 0 discriminator 2
+ 867 018c 124B     	 ldr r3,.L64+8
+ 868              	.L60:
+ 277:../CANopen/stack/301/CO_ODinterface.c ****                    entry->extension->read : OD_readDisabled;
+ 869              	 .loc 1 277 0 is_stmt 1
+ 870 018e 7A68     	 ldr r2,[r7,#4]
+ 871 0190 5361     	 str r3,[r2,#20]
+ 279:../CANopen/stack/301/CO_ODinterface.c ****         io->write = entry->extension->write != NULL ?
+ 872              	 .loc 1 279 0
+ 873 0192 FB68     	 ldr r3,[r7,#12]
+ 874 0194 9B68     	 ldr r3,[r3,#8]
+ 875 0196 9B68     	 ldr r3,[r3,#8]
+ 280:../CANopen/stack/301/CO_ODinterface.c ****                     entry->extension->write : OD_writeDisabled;
+ 876              	 .loc 1 280 0
+ 877 0198 002B     	 cmp r3,#0
+ 878 019a 03D0     	 beq .L61
+ 879              	 .loc 1 280 0 is_stmt 0 discriminator 1
+ 880 019c FB68     	 ldr r3,[r7,#12]
+ 881 019e 9B68     	 ldr r3,[r3,#8]
+ 882 01a0 9B68     	 ldr r3,[r3,#8]
+ 883 01a2 00E0     	 b .L62
+ 884              	.L61:
+ 885              	 .loc 1 280 0 discriminator 2
+ 886 01a4 0D4B     	 ldr r3,.L64+12
+ 887              	.L62:
+ 279:../CANopen/stack/301/CO_ODinterface.c ****         io->write = entry->extension->write != NULL ?
+ 888              	 .loc 1 279 0 is_stmt 1
+ 889 01a6 7A68     	 ldr r2,[r7,#4]
+ 890 01a8 9361     	 str r3,[r2,#24]
+ 281:../CANopen/stack/301/CO_ODinterface.c ****         stream->object = entry->extension->object;
+ 891              	 .loc 1 281 0
+ 892 01aa FB68     	 ldr r3,[r7,#12]
+ 893 01ac 9B68     	 ldr r3,[r3,#8]
+ 894 01ae 1A68     	 ldr r2,[r3]
+ 895 01b0 7B6A     	 ldr r3,[r7,#36]
+ 896 01b2 5A60     	 str r2,[r3,#4]
+ 897              	.L58:
+ 282:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 283:../CANopen/stack/301/CO_ODinterface.c **** 
+ 284:../CANopen/stack/301/CO_ODinterface.c ****     /* Reset stream data offset */
+ 285:../CANopen/stack/301/CO_ODinterface.c ****     stream->dataOffset = 0;
+ 898              	 .loc 1 285 0
+ 899 01b4 7B6A     	 ldr r3,[r7,#36]
+ 900 01b6 0022     	 movs r2,#0
+ 901 01b8 DA60     	 str r2,[r3,#12]
+ 286:../CANopen/stack/301/CO_ODinterface.c ****     stream->subIndex = subIndex;
+ 902              	 .loc 1 286 0
+ 903 01ba 7B6A     	 ldr r3,[r7,#36]
+ 904 01bc FA7A     	 ldrb r2,[r7,#11]
+ 905 01be 5A74     	 strb r2,[r3,#17]
+ 287:../CANopen/stack/301/CO_ODinterface.c **** 
+ 288:../CANopen/stack/301/CO_ODinterface.c ****     return ODR_OK;
+ 906              	 .loc 1 288 0
+ 907 01c0 0023     	 movs r3,#0
+ 908              	.L38:
+ 909 01c2 5BB2     	 sxtb r3,r3
+ 289:../CANopen/stack/301/CO_ODinterface.c **** }
+ 910              	 .loc 1 289 0
+ 911 01c4 1846     	 mov r0,r3
+ 912 01c6 3437     	 adds r7,r7,#52
+ 913              	.LCFI31:
+ 914              	 .cfi_def_cfa_offset 4
+ 915 01c8 BD46     	 mov sp,r7
+ 916              	.LCFI32:
+ 917              	 .cfi_def_cfa_register 13
+ 918              	 
+ 919 01ca 5DF8047B 	 ldr r7,[sp],#4
+ 920              	.LCFI33:
+ 921              	 .cfi_restore 7
+ 922              	 .cfi_def_cfa_offset 0
+ 923 01ce 7047     	 bx lr
+ 924              	.L65:
+ 925              	 .align 2
+ 926              	.L64:
+ 927 01d0 00000000 	 .word OD_readOriginal
+ 928 01d4 00000000 	 .word OD_writeOriginal
+ 929 01d8 00000000 	 .word OD_readDisabled
+ 930 01dc 00000000 	 .word OD_writeDisabled
+ 931              	 .cfi_endproc
+ 932              	.LFE38:
+ 934              	 .section .text.OD_getSDOabCode,"ax",%progbits
+ 935              	 .align 2
+ 936              	 .global OD_getSDOabCode
+ 937              	 .thumb
+ 938              	 .thumb_func
+ 940              	OD_getSDOabCode:
+ 941              	.LFB39:
+ 290:../CANopen/stack/301/CO_ODinterface.c **** 
+ 291:../CANopen/stack/301/CO_ODinterface.c **** /******************************************************************************/
+ 292:../CANopen/stack/301/CO_ODinterface.c **** uint32_t OD_getSDOabCode(ODR_t returnCode) {
+ 942              	 .loc 1 292 0
+ 943              	 .cfi_startproc
+ 944              	 
+ 945              	 
+ 946              	 
+ 947 0000 80B4     	 push {r7}
+ 948              	.LCFI34:
+ 949              	 .cfi_def_cfa_offset 4
+ 950              	 .cfi_offset 7,-4
+ 951 0002 83B0     	 sub sp,sp,#12
+ 952              	.LCFI35:
+ 953              	 .cfi_def_cfa_offset 16
+ 954 0004 00AF     	 add r7,sp,#0
+ 955              	.LCFI36:
+ 956              	 .cfi_def_cfa_register 7
+ 957 0006 0346     	 mov r3,r0
+ 958 0008 FB71     	 strb r3,[r7,#7]
+ 293:../CANopen/stack/301/CO_ODinterface.c ****     static const uint32_t abortCodes[ODR_COUNT] = {
+ 294:../CANopen/stack/301/CO_ODinterface.c ****         0x00000000UL, /* No abort */
+ 295:../CANopen/stack/301/CO_ODinterface.c ****         0x05040005UL, /* Out of memory */
+ 296:../CANopen/stack/301/CO_ODinterface.c ****         0x06010000UL, /* Unsupported access to an object */
+ 297:../CANopen/stack/301/CO_ODinterface.c ****         0x06010001UL, /* Attempt to read a write only object */
+ 298:../CANopen/stack/301/CO_ODinterface.c ****         0x06010002UL, /* Attempt to write a read only object */
+ 299:../CANopen/stack/301/CO_ODinterface.c ****         0x06020000UL, /* Object does not exist in the object dictionary */
+ 300:../CANopen/stack/301/CO_ODinterface.c ****         0x06040041UL, /* Object cannot be mapped to the PDO */
+ 301:../CANopen/stack/301/CO_ODinterface.c ****         0x06040042UL, /* Num and len of object to be mapped exceeds PDO len */
+ 302:../CANopen/stack/301/CO_ODinterface.c ****         0x06040043UL, /* General parameter incompatibility reasons */
+ 303:../CANopen/stack/301/CO_ODinterface.c ****         0x06040047UL, /* General internal incompatibility in device */
+ 304:../CANopen/stack/301/CO_ODinterface.c ****         0x06060000UL, /* Access failed due to hardware error */
+ 305:../CANopen/stack/301/CO_ODinterface.c ****         0x06070010UL, /* Data type does not match, length does not match */
+ 306:../CANopen/stack/301/CO_ODinterface.c ****         0x06070012UL, /* Data type does not match, length too high */
+ 307:../CANopen/stack/301/CO_ODinterface.c ****         0x06070013UL, /* Data type does not match, length too short */
+ 308:../CANopen/stack/301/CO_ODinterface.c ****         0x06090011UL, /* Sub index does not exist */
+ 309:../CANopen/stack/301/CO_ODinterface.c ****         0x06090030UL, /* Invalid value for parameter (download only). */
+ 310:../CANopen/stack/301/CO_ODinterface.c ****         0x06090031UL, /* Value range of parameter written too high */
+ 311:../CANopen/stack/301/CO_ODinterface.c ****         0x06090032UL, /* Value range of parameter written too low */
+ 312:../CANopen/stack/301/CO_ODinterface.c ****         0x06090036UL, /* Maximum value is less than minimum value. */
+ 313:../CANopen/stack/301/CO_ODinterface.c ****         0x060A0023UL, /* Resource not available: SDO connection */
+ 314:../CANopen/stack/301/CO_ODinterface.c ****         0x08000000UL, /* General error */
+ 315:../CANopen/stack/301/CO_ODinterface.c ****         0x08000020UL, /* Data cannot be transferred or stored to application */
+ 316:../CANopen/stack/301/CO_ODinterface.c ****         0x08000021UL, /* Data cannot be transferred because of local control */
+ 317:../CANopen/stack/301/CO_ODinterface.c ****         0x08000022UL, /* Data cannot be tran. because of present device state */
+ 318:../CANopen/stack/301/CO_ODinterface.c ****         0x08000023UL, /* Object dict. not present or dynamic generation fails */
+ 319:../CANopen/stack/301/CO_ODinterface.c ****         0x08000024UL  /* No data available */
+ 320:../CANopen/stack/301/CO_ODinterface.c ****     };
+ 321:../CANopen/stack/301/CO_ODinterface.c **** 
+ 322:../CANopen/stack/301/CO_ODinterface.c ****     return (returnCode < 0 || returnCode >= ODR_COUNT) ?
+ 323:../CANopen/stack/301/CO_ODinterface.c ****         abortCodes[ODR_DEV_INCOMPAT] : abortCodes[returnCode];
+ 959              	 .loc 1 323 0
+ 960 000a 97F90730 	 ldrsb r3,[r7,#7]
+ 961 000e 002B     	 cmp r3,#0
+ 962 0010 03DB     	 blt .L67
+ 322:../CANopen/stack/301/CO_ODinterface.c ****         abortCodes[ODR_DEV_INCOMPAT] : abortCodes[returnCode];
+ 963              	 .loc 1 322 0
+ 964 0012 97F90730 	 ldrsb r3,[r7,#7]
+ 965 0016 192B     	 cmp r3,#25
+ 966 0018 01DD     	 ble .L68
+ 967              	.L67:
+ 968              	 .loc 1 323 0 discriminator 1
+ 969 001a 064B     	 ldr r3,.L71
+ 970 001c 04E0     	 b .L69
+ 971              	.L68:
+ 972              	 .loc 1 323 0 is_stmt 0
+ 973 001e 97F90730 	 ldrsb r3,[r7,#7]
+ 974 0022 054A     	 ldr r2,.L71+4
+ 975 0024 52F82330 	 ldr r3,[r2,r3,lsl#2]
+ 976              	.L69:
+ 324:../CANopen/stack/301/CO_ODinterface.c **** }
+ 977              	 .loc 1 324 0 is_stmt 1
+ 978 0028 1846     	 mov r0,r3
+ 979 002a 0C37     	 adds r7,r7,#12
+ 980              	.LCFI37:
+ 981              	 .cfi_def_cfa_offset 4
+ 982 002c BD46     	 mov sp,r7
+ 983              	.LCFI38:
+ 984              	 .cfi_def_cfa_register 13
+ 985              	 
+ 986 002e 5DF8047B 	 ldr r7,[sp],#4
+ 987              	.LCFI39:
+ 988              	 .cfi_restore 7
+ 989              	 .cfi_def_cfa_offset 0
+ 990 0032 7047     	 bx lr
+ 991              	.L72:
+ 992              	 .align 2
+ 993              	.L71:
+ 994 0034 47000406 	 .word 100925511
+ 995 0038 00000000 	 .word abortCodes.5020
+ 996              	 .cfi_endproc
+ 997              	.LFE39:
+ 999              	 .section .text.OD_get_value,"ax",%progbits
+ 1000              	 .align 2
+ 1001              	 .global OD_get_value
+ 1002              	 .thumb
+ 1003              	 .thumb_func
+ 1005              	OD_get_value:
+ 1006              	.LFB40:
+ 325:../CANopen/stack/301/CO_ODinterface.c **** 
+ 326:../CANopen/stack/301/CO_ODinterface.c **** 
+ 327:../CANopen/stack/301/CO_ODinterface.c **** /******************************************************************************/
+ 328:../CANopen/stack/301/CO_ODinterface.c **** ODR_t OD_get_value(const OD_entry_t *entry, uint8_t subIndex,
+ 329:../CANopen/stack/301/CO_ODinterface.c ****                    void *val, OD_size_t len, bool_t odOrig)
+ 330:../CANopen/stack/301/CO_ODinterface.c **** {
+ 1007              	 .loc 1 330 0
+ 1008              	 .cfi_startproc
+ 1009              	 
+ 1010              	 
+ 1011 0000 90B5     	 push {r4,r7,lr}
+ 1012              	.LCFI40:
+ 1013              	 .cfi_def_cfa_offset 12
+ 1014              	 .cfi_offset 4,-12
+ 1015              	 .cfi_offset 7,-8
+ 1016              	 .cfi_offset 14,-4
+ 1017 0002 8FB0     	 sub sp,sp,#60
+ 1018              	.LCFI41:
+ 1019              	 .cfi_def_cfa_offset 72
+ 1020 0004 00AF     	 add r7,sp,#0
+ 1021              	.LCFI42:
+ 1022              	 .cfi_def_cfa_register 7
+ 1023 0006 F860     	 str r0,[r7,#12]
+ 1024 0008 7A60     	 str r2,[r7,#4]
+ 1025 000a 3B60     	 str r3,[r7]
+ 1026 000c 0B46     	 mov r3,r1
+ 1027 000e FB72     	 strb r3,[r7,#11]
+ 331:../CANopen/stack/301/CO_ODinterface.c ****     if (val == NULL) return ODR_DEV_INCOMPAT;
+ 1028              	 .loc 1 331 0
+ 1029 0010 7B68     	 ldr r3,[r7,#4]
+ 1030 0012 002B     	 cmp r3,#0
+ 1031 0014 01D1     	 bne .L74
+ 1032              	 .loc 1 331 0 is_stmt 0 discriminator 1
+ 1033 0016 0923     	 movs r3,#9
+ 1034 0018 26E0     	 b .L78
+ 1035              	.L74:
+ 332:../CANopen/stack/301/CO_ODinterface.c **** 
+ 333:../CANopen/stack/301/CO_ODinterface.c ****     OD_IO_t io;
+ 334:../CANopen/stack/301/CO_ODinterface.c ****     OD_stream_t *stream = (OD_stream_t *)&io;
+ 1036              	 .loc 1 334 0 is_stmt 1
+ 1037 001a 07F11403 	 add r3,r7,#20
+ 1038 001e 7B63     	 str r3,[r7,#52]
+ 335:../CANopen/stack/301/CO_ODinterface.c ****     OD_size_t countRd = 0;
+ 1039              	 .loc 1 335 0
+ 1040 0020 0023     	 movs r3,#0
+ 1041 0022 3B61     	 str r3,[r7,#16]
+ 336:../CANopen/stack/301/CO_ODinterface.c **** 
+ 337:../CANopen/stack/301/CO_ODinterface.c ****     ODR_t ret = OD_getSub(entry, subIndex, &io, odOrig);
+ 1042              	 .loc 1 337 0
+ 1043 0024 FA7A     	 ldrb r2,[r7,#11]
+ 1044 0026 07F11403 	 add r3,r7,#20
+ 1045 002a F868     	 ldr r0,[r7,#12]
+ 1046 002c 1146     	 mov r1,r2
+ 1047 002e 1A46     	 mov r2,r3
+ 1048 0030 BB6C     	 ldr r3,[r7,#72]
+ 1049 0032 FFF7FEFF 	 bl OD_getSub
+ 1050 0036 0346     	 mov r3,r0
+ 1051 0038 87F83330 	 strb r3,[r7,#51]
+ 338:../CANopen/stack/301/CO_ODinterface.c **** 
+ 339:../CANopen/stack/301/CO_ODinterface.c ****     if (ret != ODR_OK) return ret;
+ 1052              	 .loc 1 339 0
+ 1053 003c 97F93330 	 ldrsb r3,[r7,#51]
+ 1054 0040 002B     	 cmp r3,#0
+ 1055 0042 02D0     	 beq .L76
+ 1056              	 .loc 1 339 0 is_stmt 0 discriminator 1
+ 1057 0044 97F83330 	 ldrb r3,[r7,#51]
+ 1058 0048 0EE0     	 b .L78
+ 1059              	.L76:
+ 340:../CANopen/stack/301/CO_ODinterface.c ****     if (stream->dataLength != len) return ODR_TYPE_MISMATCH;
+ 1060              	 .loc 1 340 0 is_stmt 1
+ 1061 004a 7B6B     	 ldr r3,[r7,#52]
+ 1062 004c 9A68     	 ldr r2,[r3,#8]
+ 1063 004e 3B68     	 ldr r3,[r7]
+ 1064 0050 9A42     	 cmp r2,r3
+ 1065 0052 01D0     	 beq .L77
+ 1066              	 .loc 1 340 0 is_stmt 0 discriminator 1
+ 1067 0054 0B23     	 movs r3,#11
+ 1068 0056 07E0     	 b .L78
+ 1069              	.L77:
+ 341:../CANopen/stack/301/CO_ODinterface.c **** 
+ 342:../CANopen/stack/301/CO_ODinterface.c ****     return io.read(stream, val, len, &countRd);
+ 1070              	 .loc 1 342 0 is_stmt 1
+ 1071 0058 BC6A     	 ldr r4,[r7,#40]
+ 1072 005a 07F11003 	 add r3,r7,#16
+ 1073 005e 786B     	 ldr r0,[r7,#52]
+ 1074 0060 7968     	 ldr r1,[r7,#4]
+ 1075 0062 3A68     	 ldr r2,[r7]
+ 1076 0064 A047     	 blx r4
+ 1077 0066 0346     	 mov r3,r0
+ 1078              	.L78:
+ 1079 0068 5BB2     	 sxtb r3,r3
+ 343:../CANopen/stack/301/CO_ODinterface.c **** }
+ 1080              	 .loc 1 343 0 discriminator 1
+ 1081 006a 1846     	 mov r0,r3
+ 1082 006c 3C37     	 adds r7,r7,#60
+ 1083              	.LCFI43:
+ 1084              	 .cfi_def_cfa_offset 12
+ 1085 006e BD46     	 mov sp,r7
+ 1086              	.LCFI44:
+ 1087              	 .cfi_def_cfa_register 13
+ 1088              	 
+ 1089 0070 90BD     	 pop {r4,r7,pc}
+ 1090              	 .cfi_endproc
+ 1091              	.LFE40:
+ 1093 0072 00BF     	 .section .text.OD_set_value,"ax",%progbits
+ 1094              	 .align 2
+ 1095              	 .global OD_set_value
+ 1096              	 .thumb
+ 1097              	 .thumb_func
+ 1099              	OD_set_value:
+ 1100              	.LFB41:
+ 344:../CANopen/stack/301/CO_ODinterface.c **** 
+ 345:../CANopen/stack/301/CO_ODinterface.c **** ODR_t OD_set_value(const OD_entry_t *entry, uint8_t subIndex, void *val,
+ 346:../CANopen/stack/301/CO_ODinterface.c ****                    OD_size_t len, bool_t odOrig)
+ 347:../CANopen/stack/301/CO_ODinterface.c **** {
+ 1101              	 .loc 1 347 0
+ 1102              	 .cfi_startproc
+ 1103              	 
+ 1104              	 
+ 1105 0000 90B5     	 push {r4,r7,lr}
+ 1106              	.LCFI45:
+ 1107              	 .cfi_def_cfa_offset 12
+ 1108              	 .cfi_offset 4,-12
+ 1109              	 .cfi_offset 7,-8
+ 1110              	 .cfi_offset 14,-4
+ 1111 0002 8FB0     	 sub sp,sp,#60
+ 1112              	.LCFI46:
+ 1113              	 .cfi_def_cfa_offset 72
+ 1114 0004 00AF     	 add r7,sp,#0
+ 1115              	.LCFI47:
+ 1116              	 .cfi_def_cfa_register 7
+ 1117 0006 F860     	 str r0,[r7,#12]
+ 1118 0008 7A60     	 str r2,[r7,#4]
+ 1119 000a 3B60     	 str r3,[r7]
+ 1120 000c 0B46     	 mov r3,r1
+ 1121 000e FB72     	 strb r3,[r7,#11]
+ 348:../CANopen/stack/301/CO_ODinterface.c ****     OD_IO_t io;
+ 349:../CANopen/stack/301/CO_ODinterface.c ****     OD_stream_t *stream = &io.stream;
+ 1122              	 .loc 1 349 0
+ 1123 0010 07F11403 	 add r3,r7,#20
+ 1124 0014 7B63     	 str r3,[r7,#52]
+ 350:../CANopen/stack/301/CO_ODinterface.c ****     OD_size_t countWritten = 0;
+ 1125              	 .loc 1 350 0
+ 1126 0016 0023     	 movs r3,#0
+ 1127 0018 3B61     	 str r3,[r7,#16]
+ 351:../CANopen/stack/301/CO_ODinterface.c **** 
+ 352:../CANopen/stack/301/CO_ODinterface.c ****     ODR_t ret = OD_getSub(entry, subIndex, &io, odOrig);
+ 1128              	 .loc 1 352 0
+ 1129 001a FA7A     	 ldrb r2,[r7,#11]
+ 1130 001c 07F11403 	 add r3,r7,#20
+ 1131 0020 F868     	 ldr r0,[r7,#12]
+ 1132 0022 1146     	 mov r1,r2
+ 1133 0024 1A46     	 mov r2,r3
+ 1134 0026 BB6C     	 ldr r3,[r7,#72]
+ 1135 0028 FFF7FEFF 	 bl OD_getSub
+ 1136 002c 0346     	 mov r3,r0
+ 1137 002e 87F83330 	 strb r3,[r7,#51]
+ 353:../CANopen/stack/301/CO_ODinterface.c **** 
+ 354:../CANopen/stack/301/CO_ODinterface.c ****     if (ret != ODR_OK) return ret;
+ 1138              	 .loc 1 354 0
+ 1139 0032 97F93330 	 ldrsb r3,[r7,#51]
+ 1140 0036 002B     	 cmp r3,#0
+ 1141 0038 02D0     	 beq .L80
+ 1142              	 .loc 1 354 0 is_stmt 0 discriminator 1
+ 1143 003a 97F83330 	 ldrb r3,[r7,#51]
+ 1144 003e 0EE0     	 b .L83
+ 1145              	.L80:
+ 355:../CANopen/stack/301/CO_ODinterface.c ****     if (stream->dataLength != len) return ODR_TYPE_MISMATCH;
+ 1146              	 .loc 1 355 0 is_stmt 1
+ 1147 0040 7B6B     	 ldr r3,[r7,#52]
+ 1148 0042 9A68     	 ldr r2,[r3,#8]
+ 1149 0044 3B68     	 ldr r3,[r7]
+ 1150 0046 9A42     	 cmp r2,r3
+ 1151 0048 01D0     	 beq .L82
+ 1152              	 .loc 1 355 0 is_stmt 0 discriminator 1
+ 1153 004a 0B23     	 movs r3,#11
+ 1154 004c 07E0     	 b .L83
+ 1155              	.L82:
+ 356:../CANopen/stack/301/CO_ODinterface.c **** 
+ 357:../CANopen/stack/301/CO_ODinterface.c ****     return io.write(stream, val, len, &countWritten);
+ 1156              	 .loc 1 357 0 is_stmt 1
+ 1157 004e FC6A     	 ldr r4,[r7,#44]
+ 1158 0050 07F11003 	 add r3,r7,#16
+ 1159 0054 786B     	 ldr r0,[r7,#52]
+ 1160 0056 7968     	 ldr r1,[r7,#4]
+ 1161 0058 3A68     	 ldr r2,[r7]
+ 1162 005a A047     	 blx r4
+ 1163 005c 0346     	 mov r3,r0
+ 1164              	.L83:
+ 1165 005e 5BB2     	 sxtb r3,r3
+ 358:../CANopen/stack/301/CO_ODinterface.c **** }
+ 1166              	 .loc 1 358 0 discriminator 1
+ 1167 0060 1846     	 mov r0,r3
+ 1168 0062 3C37     	 adds r7,r7,#60
+ 1169              	.LCFI48:
+ 1170              	 .cfi_def_cfa_offset 12
+ 1171 0064 BD46     	 mov sp,r7
+ 1172              	.LCFI49:
+ 1173              	 .cfi_def_cfa_register 13
+ 1174              	 
+ 1175 0066 90BD     	 pop {r4,r7,pc}
+ 1176              	 .cfi_endproc
+ 1177              	.LFE41:
+ 1179              	 .section .text.OD_getPtr,"ax",%progbits
+ 1180              	 .align 2
+ 1181              	 .global OD_getPtr
+ 1182              	 .thumb
+ 1183              	 .thumb_func
+ 1185              	OD_getPtr:
+ 1186              	.LFB42:
+ 359:../CANopen/stack/301/CO_ODinterface.c **** 
+ 360:../CANopen/stack/301/CO_ODinterface.c **** void *OD_getPtr(const OD_entry_t *entry, uint8_t subIndex, OD_size_t len,
+ 361:../CANopen/stack/301/CO_ODinterface.c ****                 ODR_t *err)
+ 362:../CANopen/stack/301/CO_ODinterface.c **** {
+ 1187              	 .loc 1 362 0
+ 1188              	 .cfi_startproc
+ 1189              	 
+ 1190              	 
+ 1191 0000 80B5     	 push {r7,lr}
+ 1192              	.LCFI50:
+ 1193              	 .cfi_def_cfa_offset 8
+ 1194              	 .cfi_offset 7,-8
+ 1195              	 .cfi_offset 14,-4
+ 1196 0002 8EB0     	 sub sp,sp,#56
+ 1197              	.LCFI51:
+ 1198              	 .cfi_def_cfa_offset 64
+ 1199 0004 00AF     	 add r7,sp,#0
+ 1200              	.LCFI52:
+ 1201              	 .cfi_def_cfa_register 7
+ 1202 0006 F860     	 str r0,[r7,#12]
+ 1203 0008 7A60     	 str r2,[r7,#4]
+ 1204 000a 3B60     	 str r3,[r7]
+ 1205 000c 0B46     	 mov r3,r1
+ 1206 000e FB72     	 strb r3,[r7,#11]
+ 363:../CANopen/stack/301/CO_ODinterface.c ****     ODR_t errCopy;
+ 364:../CANopen/stack/301/CO_ODinterface.c ****     OD_IO_t io;
+ 365:../CANopen/stack/301/CO_ODinterface.c ****     OD_stream_t *stream = &io.stream;
+ 1207              	 .loc 1 365 0
+ 1208 0010 07F11403 	 add r3,r7,#20
+ 1209 0014 3B63     	 str r3,[r7,#48]
+ 366:../CANopen/stack/301/CO_ODinterface.c **** 
+ 367:../CANopen/stack/301/CO_ODinterface.c ****     errCopy = OD_getSub(entry, subIndex, &io, true);
+ 1210              	 .loc 1 367 0
+ 1211 0016 FA7A     	 ldrb r2,[r7,#11]
+ 1212 0018 07F11403 	 add r3,r7,#20
+ 1213 001c F868     	 ldr r0,[r7,#12]
+ 1214 001e 1146     	 mov r1,r2
+ 1215 0020 1A46     	 mov r2,r3
+ 1216 0022 0123     	 movs r3,#1
+ 1217 0024 FFF7FEFF 	 bl OD_getSub
+ 1218 0028 0346     	 mov r3,r0
+ 1219 002a 87F83730 	 strb r3,[r7,#55]
+ 368:../CANopen/stack/301/CO_ODinterface.c **** 
+ 369:../CANopen/stack/301/CO_ODinterface.c ****     if (errCopy == ODR_OK) {
+ 1220              	 .loc 1 369 0
+ 1221 002e 97F93730 	 ldrsb r3,[r7,#55]
+ 1222 0032 002B     	 cmp r3,#0
+ 1223 0034 16D1     	 bne .L85
+ 370:../CANopen/stack/301/CO_ODinterface.c ****         if (stream->dataOrig == NULL || stream->dataLength == 0) {
+ 1224              	 .loc 1 370 0
+ 1225 0036 3B6B     	 ldr r3,[r7,#48]
+ 1226 0038 1B68     	 ldr r3,[r3]
+ 1227 003a 002B     	 cmp r3,#0
+ 1228 003c 03D0     	 beq .L86
+ 1229              	 .loc 1 370 0 is_stmt 0 discriminator 1
+ 1230 003e 3B6B     	 ldr r3,[r7,#48]
+ 1231 0040 9B68     	 ldr r3,[r3,#8]
+ 1232 0042 002B     	 cmp r3,#0
+ 1233 0044 03D1     	 bne .L87
+ 1234              	.L86:
+ 371:../CANopen/stack/301/CO_ODinterface.c ****             errCopy = ODR_DEV_INCOMPAT;
+ 1235              	 .loc 1 371 0 is_stmt 1
+ 1236 0046 0923     	 movs r3,#9
+ 1237 0048 87F83730 	 strb r3,[r7,#55]
+ 1238 004c 0AE0     	 b .L85
+ 1239              	.L87:
+ 372:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 373:../CANopen/stack/301/CO_ODinterface.c ****         else if (len != 0 && len != stream->dataLength) {
+ 1240              	 .loc 1 373 0
+ 1241 004e 7B68     	 ldr r3,[r7,#4]
+ 1242 0050 002B     	 cmp r3,#0
+ 1243 0052 07D0     	 beq .L85
+ 1244              	 .loc 1 373 0 is_stmt 0 discriminator 1
+ 1245 0054 3B6B     	 ldr r3,[r7,#48]
+ 1246 0056 9A68     	 ldr r2,[r3,#8]
+ 1247 0058 7B68     	 ldr r3,[r7,#4]
+ 1248 005a 9A42     	 cmp r2,r3
+ 1249 005c 02D0     	 beq .L85
+ 374:../CANopen/stack/301/CO_ODinterface.c ****             errCopy = ODR_TYPE_MISMATCH;
+ 1250              	 .loc 1 374 0 is_stmt 1
+ 1251 005e 0B23     	 movs r3,#11
+ 1252 0060 87F83730 	 strb r3,[r7,#55]
+ 1253              	.L85:
+ 375:../CANopen/stack/301/CO_ODinterface.c ****         }
+ 376:../CANopen/stack/301/CO_ODinterface.c ****     }
+ 377:../CANopen/stack/301/CO_ODinterface.c **** 
+ 378:../CANopen/stack/301/CO_ODinterface.c ****     if (err != NULL) *err = errCopy;
+ 1254              	 .loc 1 378 0
+ 1255 0064 3B68     	 ldr r3,[r7]
+ 1256 0066 002B     	 cmp r3,#0
+ 1257 0068 03D0     	 beq .L88
+ 1258              	 .loc 1 378 0 is_stmt 0 discriminator 1
+ 1259 006a 3B68     	 ldr r3,[r7]
+ 1260 006c 97F83720 	 ldrb r2,[r7,#55]
+ 1261 0070 1A70     	 strb r2,[r3]
+ 1262              	.L88:
+ 379:../CANopen/stack/301/CO_ODinterface.c **** 
+ 380:../CANopen/stack/301/CO_ODinterface.c ****     return errCopy == ODR_OK ? stream->dataOrig : NULL;
+ 1263              	 .loc 1 380 0 is_stmt 1
+ 1264 0072 97F93730 	 ldrsb r3,[r7,#55]
+ 1265 0076 002B     	 cmp r3,#0
+ 1266 0078 02D1     	 bne .L89
+ 1267              	 .loc 1 380 0 is_stmt 0 discriminator 1
+ 1268 007a 3B6B     	 ldr r3,[r7,#48]
+ 1269 007c 1B68     	 ldr r3,[r3]
+ 1270 007e 00E0     	 b .L91
+ 1271              	.L89:
+ 1272              	 .loc 1 380 0 discriminator 2
+ 1273 0080 0023     	 movs r3,#0
+ 1274              	.L91:
+ 381:../CANopen/stack/301/CO_ODinterface.c **** }
+ 1275              	 .loc 1 381 0 is_stmt 1
+ 1276 0082 1846     	 mov r0,r3
+ 1277 0084 3837     	 adds r7,r7,#56
+ 1278              	.LCFI53:
+ 1279              	 .cfi_def_cfa_offset 8
+ 1280 0086 BD46     	 mov sp,r7
+ 1281              	.LCFI54:
+ 1282              	 .cfi_def_cfa_register 13
+ 1283              	 
+ 1284 0088 80BD     	 pop {r7,pc}
+ 1285              	 .cfi_endproc
+ 1286              	.LFE42:
+ 1288 008a 00BF     	 .section .rodata.abortCodes.5020,"a",%progbits
+ 1289              	 .align 2
+ 1292              	abortCodes.5020:
+ 1293 0000 00000000 	 .word 0
+ 1294 0004 05000405 	 .word 84148229
+ 1295 0008 00000106 	 .word 100728832
+ 1296 000c 01000106 	 .word 100728833
+ 1297 0010 02000106 	 .word 100728834
+ 1298 0014 00000206 	 .word 100794368
+ 1299 0018 41000406 	 .word 100925505
+ 1300 001c 42000406 	 .word 100925506
+ 1301 0020 43000406 	 .word 100925507
+ 1302 0024 47000406 	 .word 100925511
+ 1303 0028 00000606 	 .word 101056512
+ 1304 002c 10000706 	 .word 101122064
+ 1305 0030 12000706 	 .word 101122066
+ 1306 0034 13000706 	 .word 101122067
+ 1307 0038 11000906 	 .word 101253137
+ 1308 003c 30000906 	 .word 101253168
+ 1309 0040 31000906 	 .word 101253169
+ 1310 0044 32000906 	 .word 101253170
+ 1311 0048 36000906 	 .word 101253174
+ 1312 004c 23000A06 	 .word 101318691
+ 1313 0050 00000008 	 .word 134217728
+ 1314 0054 20000008 	 .word 134217760
+ 1315 0058 21000008 	 .word 134217761
+ 1316 005c 22000008 	 .word 134217762
+ 1317 0060 23000008 	 .word 134217763
+ 1318 0064 24000008 	 .word 134217764
+ 1319              	 .text
+ 1320              	.Letext0:
+ 1321              	 .file 2 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\machine\\_default_types.h"
+ 1322              	 .file 3 "d:\\programs\\infineon\\tools\\dave ide\\4.5.0.202105191637\\eclipse\\arm-gcc-49\\arm-none-eabi\\include\\stdint.h"
+ 1323              	 .file 4 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/driver/CO_driver_target.h"
+ 1324              	 .file 5 "D:/Workspace/Development/my/DAVE/Infineon_CANopen/CANopen/stack/301/CO_ODinterface.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 CO_ODinterface.c
+    {standard input}:20     .text.OD_readOriginal:00000000 $t
+    {standard input}:25     .text.OD_readOriginal:00000000 OD_readOriginal
+    {standard input}:168    .text.OD_writeOriginal:00000000 $t
+    {standard input}:173    .text.OD_writeOriginal:00000000 OD_writeOriginal
+    {standard input}:324    .text.OD_readDisabled:00000000 $t
+    {standard input}:328    .text.OD_readDisabled:00000000 OD_readDisabled
+    {standard input}:370    .text.OD_writeDisabled:00000000 $t
+    {standard input}:374    .text.OD_writeDisabled:00000000 OD_writeDisabled
+    {standard input}:416    .text.OD_find:00000000 $t
+    {standard input}:421    .text.OD_find:00000000 OD_find
+    {standard input}:575    .text.OD_getSub:00000000 $t
+    {standard input}:580    .text.OD_getSub:00000000 OD_getSub
+    {standard input}:927    .text.OD_getSub:000001d0 $d
+    {standard input}:935    .text.OD_getSDOabCode:00000000 $t
+    {standard input}:940    .text.OD_getSDOabCode:00000000 OD_getSDOabCode
+    {standard input}:994    .text.OD_getSDOabCode:00000034 $d
+    {standard input}:1292   .rodata.abortCodes.5020:00000000 abortCodes.5020
+    {standard input}:1000   .text.OD_get_value:00000000 $t
+    {standard input}:1005   .text.OD_get_value:00000000 OD_get_value
+    {standard input}:1094   .text.OD_set_value:00000000 $t
+    {standard input}:1099   .text.OD_set_value:00000000 OD_set_value
+    {standard input}:1180   .text.OD_getPtr:00000000 $t
+    {standard input}:1185   .text.OD_getPtr:00000000 OD_getPtr
+    {standard input}:1289   .rodata.abortCodes.5020:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+memcpy

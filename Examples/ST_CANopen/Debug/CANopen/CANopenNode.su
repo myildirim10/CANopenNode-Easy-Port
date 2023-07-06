@@ -1,0 +1,4 @@
+../CANopen/CANopenNode.c:62:28:xCANopenNodeInit	88	static
+../CANopen/CANopenNode.c:232:6:vCANopenNodeProcess	16	static
+../CANopen/CANopenNode.c:260:6:vCANopenNodeTimerInterrupt	16	static
+../CANopen/CANopenNode.c:289:6:vCANopenNodeReceiveInterrupt	8	static
