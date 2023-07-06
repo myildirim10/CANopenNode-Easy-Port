@@ -40,14 +40,14 @@ The CO_driver_target file is the one modified by me. Receive and Transmit functi
 #### Directories to add to the project:
 
      1. CANopen
-     2. CANopen->driver
-     3. CANopen->hardware
-     4. CANopen->stack
+     2. CANopen/driver
+     3. CANopen/hardware
+     4. CANopen/stack
      5. (EEPROM) - If EEPROM is to be used
 
 
 
-> Note: If you are going to use a TI C2000 series processor, you should change it to #define C2000_PORT (1) in the stack/301/CO_config.h file. In TMS320C28x series processors, such a change is needed because *bytes* and *word* are *16 bits* long in C2000. Note that the linker file has been changed in the sample project for C2000.
+> Note: If you are going to use a TI C2000 series MCU, you should change it to #define C2000_PORT (1) in the stack/301/CO_config.h file. In TMS320C28x series processors, such a change is needed because *bytes* and *word* are *16 bits* long in C2000. Note that the linker file has been changed in the sample project for C2000.
 
 
 
