@@ -43,7 +43,7 @@ The CO_driver_target file is the one modified by me. Receive and Transmit functi
      2. CANopen->driver
      3. CANopen->hardware
      4. CANopen->stack
-     5. (5th EEPROM) - If EEPROM is to be used
+     5. (EEPROM) - If EEPROM is to be used
 
 
 
