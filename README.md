@@ -4,7 +4,7 @@ This project was made to more easily "port" the CANopenNode open source library.
 
 The project also contains the library in the EEPROM XX25 Series (AT25256B, CAV25256...). In this way, the changes you make via CANopen can be kept in permanent memory.
 
-This library has been tested with MCU models STM32, ESP32, TI (TMS320F28335), Infineon (XMC4800). The sample projects are in the "Examples" folder.
+This library has been tested with MCU models STM32 (NUCLEO-F303RE), ESP32 (WROOM-32), TI (TMS320F28335), Infineon (XMC4800). The sample projects are in the "Examples" folder.
 
 
 
